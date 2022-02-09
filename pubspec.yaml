@@ -1,20 +1,19 @@
 name: sysmac_cmd
 description: A simple command-line application.
 version: 1.0.0
-# homepage: https://www.example.com
+homepage: https://github.com/nils-ten-hoeve/sysmac_cmd
+documentation: https://github.com/nils-ten-hoeve/sysmac_cmd/wiki
 
 environment:
   sdk: '>=2.14.4 <3.0.0'
 
-
-# dependencies:
-#   path: ^1.8.0
-
 dev_dependencies:
   lints: ^1.0.0
   test: ^1.19.2
+  build_runner: ^2.1.7
 dependencies:
-  archive: ^3.1.6
   collection: ^1.15.0
-  fluent_regex: ^1.0.1
+  archive: ^3.1.11
+  fluent_regex: ^1.0.3
   xml: ^5.3.1
+  documentation_builder: ^0.0.8
