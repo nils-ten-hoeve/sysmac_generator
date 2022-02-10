@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:sysmac_cmd/infrastructure/sysmac/base_type.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/data_type.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/sysmac.dart';
-import 'test_resource.dart';
+import 'package:sysmac_cmd/domain/base_type.dart';
+import 'package:sysmac_cmd/infrastructure/data_type.dart';
+import 'package:sysmac_cmd/infrastructure/sysmac_project.dart';
 import 'package:test/test.dart';
+
+import 'test_resource.dart';
 
 const String xml = """<?xml version="1.0" encoding="utf-8"?>
 <data>
@@ -90,8 +91,8 @@ main() {
   });
 
   File file = SysmacProjectTestResource().file;
-  var sysmacProjectFile = SysmacProjectFile(file.path);
-  var dataTypeTree = DataTypeTree(sysmacProjectFile);
+  var sysmacProject = SysmacProjectFactory().create(file.path);
+  var dataTypeTree = sysmacProject.dataTypeTree;
 
   group('class: DataTypeTree', () {
     group('constructor', () {

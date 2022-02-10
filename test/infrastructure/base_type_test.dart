@@ -1,4 +1,5 @@
-import 'package:sysmac_cmd/infrastructure/sysmac/base_type.dart';
+import 'package:sysmac_cmd/domain/base_type.dart';
+import 'package:sysmac_cmd/infrastructure/base_type.dart';
 import 'package:test/test.dart';
 
 main() {

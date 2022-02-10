@@ -1,8 +1,10 @@
 import 'package:archive/archive.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/data_type.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/sysmac.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/variable.dart';
+import 'package:sysmac_cmd/domain/data_type.dart';
 import 'package:xml/xml.dart';
+
+import 'data_type.dart';
+import 'sysmac_project.dart';
+import 'variable.dart';
 
 const String typeAttribute = 'type';
 const String subTypeAttribute = 'subtype';
@@ -23,10 +25,9 @@ const String variable = 'Variable';
 /// It can convert this [XmlDocument] to domain objects that represent
 /// more meaningful information (e.g. references to other xml files)
 class ProjectIndexXml extends ArchiveXml {
-  final SysmacProjectFile sysmacProjectFile;
+  final Archive archive;
 
-  ProjectIndexXml(this.sysmacProjectFile)
-      : super.fromArchiveFile(_findOemFile(sysmacProjectFile.archive));
+  ProjectIndexXml(this.archive) : super.fromArchiveFile(_findOemFile(archive));
 
   static ArchiveFile _findOemFile(Archive archive) =>
       archive.firstWhere((ArchiveFile archiveFile) =>
@@ -63,13 +64,6 @@ class ProjectIndexXml extends ArchiveXml {
     return dataTypeEntities;
   }
 
-  /// throws error when not found
-  ArchiveFile _findArchiveFile(String id) {
-    String xmlFileName = '$id.xml';
-    return sysmacProjectFile.archive.firstWhere(
-        (ArchiveFile archiveFile) => archiveFile.name.endsWith(xmlFileName));
-  }
-
   bool _isDataTypeEntity(XmlNode node) =>
       node is XmlElement &&
       node.name.local == entity &&
@@ -82,7 +76,8 @@ class ProjectIndexXml extends ArchiveXml {
       node.getAttribute(subTypeAttribute) == 'MemoryVariables' &&
       node.getAttribute(nameAttribute) == 'Global Variables';
 
-  List<GlobalVariableArchiveXmlFile> globalVariableArchiveXmlFiles() {
+  List<GlobalVariableArchiveXmlFile> globalVariableArchiveXmlFiles(
+      DataTypeTree dataTypeTree) {
     List<XmlNode> entities = _findGlobalMemoryVariableEntities();
 
     List<GlobalVariableArchiveXmlFile> variableArchiveXmlFiles = [];
@@ -94,7 +89,7 @@ class ProjectIndexXml extends ArchiveXml {
         var archiveFile = _findArchiveFile(id);
         var variableXmlArchiveFile =
             GlobalVariableArchiveXmlFile.fromArchiveFile(
-                sysmacProjectFile: sysmacProjectFile,
+                dataTypeTree: dataTypeTree,
                 nameSpacePath: nameSpacePath,
                 archiveFile: archiveFile);
         variableArchiveXmlFiles.add(variableXmlArchiveFile);
@@ -103,5 +98,12 @@ class ProjectIndexXml extends ArchiveXml {
       }
     }
     return variableArchiveXmlFiles;
+  }
+
+  /// throws error when not found
+  ArchiveFile _findArchiveFile(String id) {
+    String xmlFileName = '$id.xml';
+    return archive.firstWhere(
+        (ArchiveFile archiveFile) => archiveFile.name.endsWith(xmlFileName));
   }
 }

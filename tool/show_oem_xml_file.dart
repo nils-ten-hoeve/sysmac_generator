@@ -1,7 +1,8 @@
-import 'package:sysmac_cmd/infrastructure/sysmac/sysmac.dart';
+import 'package:sysmac_cmd/infrastructure/sysmac_project.dart';
 import '../test/infrastructure/test_resource.dart';
 
 main() {
-  var sysmacProjectFile=SysmacProjectFile(SysmacProjectTestResource().file.path);
-  print(sysmacProjectFile.projectIndexXml.xmlDocument);
+  var sysmacProjectArchive =
+      SysmacProjectArchive(SysmacProjectTestResource().file.path);
+  print(sysmacProjectArchive.projectIndexXml.xmlDocument);
 }

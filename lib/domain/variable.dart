@@ -1,11 +1,11 @@
 import 'base_type.dart';
 import 'namespace.dart';
 
-class DataType extends NameSpace {
+class Variable extends NameSpace {
   final String comment;
   BaseType baseType;
 
-  DataType({
+  Variable({
     required String name,
     required this.baseType,
     required this.comment,
@@ -23,7 +23,7 @@ class DataType extends NameSpace {
   @override
   String toString() {
     String string =
-        '$DataType{name: $name, comment: $comment, baseType: $baseType}';
+        '$Variable{name: $name, comment: $comment, dataType: $baseType}';
     for (var child in children) {
       var lines = child.toString().split('\n');
       for (var line in lines) {
@@ -32,8 +32,4 @@ class DataType extends NameSpace {
     }
     return string;
   }
-}
-
-class DataTypeTree extends NameSpace {
-  DataTypeTree() : super('$DataTypeTree');
 }

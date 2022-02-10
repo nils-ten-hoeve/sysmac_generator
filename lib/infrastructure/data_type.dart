@@ -1,9 +1,12 @@
 import 'package:archive/archive.dart';
-import 'package:sysmac_cmd/domain/data_type.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/sysmac.dart';
+import 'package:sysmac_cmd/infrastructure/project_index.dart';
 import 'package:xml/xml.dart';
 
+import '../domain/base_type.dart';
+import '../domain/data_type.dart';
+import '../domain/namespace.dart';
 import 'base_type.dart';
+import 'sysmac_project.dart';
 
 const String nameAttribute = 'Name';
 const String baseTypeAttribute = 'BaseType';
@@ -11,21 +14,23 @@ const String commentAttribute = 'Comment';
 
 const String nameSpacePathSeparator = '\\';
 
-class DataTypeTree extends NameSpace {
-  final SysmacProjectFile sysmacProjectFile;
-
-  DataTypeTree(this.sysmacProjectFile) : super('$DataTypeTree') {
-    _addAndCreateChildren();
-    DataTypeReferenceFactory().replaceWherePossible(this);
+class DataTypeTreeFactory {
+  DataTypeTree create(SysmacProjectArchive sysmacProjectArchive) {
+    DataTypeTree dataTypeTree = DataTypeTree();
+    _addAndCreateChildren(sysmacProjectArchive, dataTypeTree);
+    DataTypeReferenceFactory().replaceWherePossible(dataTypeTree);
+    return dataTypeTree;
   }
 
-  _addAndCreateChildren() {
-    var projectIndexXml = sysmacProjectFile.projectIndexXml;
-    var dataTypeArchiveXmlFiles = projectIndexXml.dataTypeArchiveXmlFiles();
+  _addAndCreateChildren(
+      SysmacProjectArchive sysmacProjectArchive, DataTypeTree dataTypeTree) {
+    var dataTypeArchiveXmlFiles =
+        sysmacProjectArchive.projectIndexXml.dataTypeArchiveXmlFiles();
 
     for (var dataTypeArchiveXmlFile in dataTypeArchiveXmlFiles) {
       String nameSpacePath = dataTypeArchiveXmlFile.nameSpacePath;
-      NameSpace nameSpace = _findOrCreateNameSpacePath(this, nameSpacePath);
+      NameSpace nameSpace =
+          _findOrCreateNameSpacePath(dataTypeTree, nameSpacePath);
 
       var dataTypes = dataTypeArchiveXmlFile.toDataTypes();
       nameSpace.children.addAll(dataTypes);
@@ -57,8 +62,6 @@ class DataTypeTree extends NameSpace {
     }
     return nameSpace;
   }
-
-
 }
 
 /// Represents an [ArchiveXml] with information of some [DataType]s within a given [nameSpacePath]

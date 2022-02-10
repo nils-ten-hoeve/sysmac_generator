@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:fluent_regex/fluent_regex.dart';
-import 'package:sysmac_cmd/domain/data_type.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac/data_type.dart';
+
+import '../domain/base_type.dart';
+import '../domain/data_type.dart';
+import '../domain/namespace.dart';
 
 class BaseTypeFactory {
   BaseTypeSubFactories baseTypeSubFactories = BaseTypeSubFactories();
@@ -10,21 +12,6 @@ class BaseTypeFactory {
     var factory = baseTypeSubFactories
         .firstWhere((factory) => factory.regex.hasMatch(expression));
     return factory.create(expression);
-  }
-}
-
-/// A [BaseType] is used in a [DataType] and refers to an internal type within
-/// (Sysmac)[https://industrial.omron.eu/en/products/sysmac-platform]
-abstract class BaseType {
-  final List<ArrayRange> arrayRanges = [];
-
-  @override
-  String toString() {
-    if (arrayRanges.isEmpty) {
-      return runtimeType.toString();
-    } else {
-      return arrayRanges.toString() + runtimeType.toString();
-    }
   }
 }
 
@@ -46,17 +33,6 @@ class BaseTypeSubFactories extends DelegatingList<BaseTypeSubFactory> {
         ]);
 }
 
-class UnknownBaseType extends BaseType {
-  final String expression;
-
-  UnknownBaseType(this.expression);
-
-  @override
-  String toString() {
-    return 'UnknownBaseType{expression: $expression}';
-  }
-}
-
 class UnknownBaseTypeFactory extends BaseTypeSubFactory {
   @override
   RegExp get regex => FluentRegex().anyCharacter(Quantity.oneOrMoreTimes());
@@ -64,8 +40,6 @@ class UnknownBaseTypeFactory extends BaseTypeSubFactory {
   @override
   BaseType create(String expression) => UnknownBaseType(expression);
 }
-
-class Struct extends BaseType {}
 
 class StructFactory extends BaseTypeSubFactory {
   final Struct _struct = Struct();
@@ -79,8 +53,6 @@ class StructFactory extends BaseTypeSubFactory {
   BaseType create(String expression) => _struct;
 }
 
-class Enum extends BaseType {}
-
 class EnumFactory extends BaseTypeSubFactory {
   final Enum _enum = Enum();
   final RegExp _regex =
@@ -91,59 +63,6 @@ class EnumFactory extends BaseTypeSubFactory {
 
   @override
   BaseType create(String expression) => _enum;
-}
-
-/// Nx PLC [BaseType] e.g.: a NJ PLC data type
-/// See [https://www.myomron.com/index.php?action=kb&article=1628]
-abstract class NxType extends BaseType {
-  String get name =>
-      runtimeType.toString().replaceFirst('Nx', '').toUpperCase();
-}
-
-class NxInt extends NxType {}
-
-class NxDInt extends NxType {}
-
-class NxLInt extends NxType {}
-
-class NxUInt extends NxType {}
-
-class NxWord extends NxType {}
-
-class NxUDInt extends NxType {}
-
-class NxDWord extends NxType {}
-
-class NxULInt extends NxType {}
-
-class NxLWord extends NxType {}
-
-class NxReal extends NxType {}
-
-class NxLReal extends NxType {}
-
-class NxBool extends NxType {}
-
-class NxString extends NxType {}
-
-class NxSInt extends NxType {}
-
-class NxUSInt extends NxType {}
-
-class NxByte extends NxType {}
-
-class NxTime extends NxType {}
-
-class NxDate extends NxType {}
-
-class NxDateAndType extends NxType {
-  @override
-  String get name => 'DATE_AND_TIME';
-}
-
-class NxTimeOfDay extends NxType {
-  @override
-  String get name => 'TIME_OF_DAY';
 }
 
 class NxTypeFactory extends BaseTypeSubFactory {
@@ -184,47 +103,6 @@ class NxTypeFactories extends DelegatingList<NxTypeFactory> {
           NxTypeFactory(NxDateAndType()),
           NxTypeFactory(NxTimeOfDay()),
         ]);
-}
-
-/// A Visual Basic [BaseType] e.g.:a HMI data type
-/// See [https://www.myomron.com/index.php?action=kb&article=1628]
-abstract class VbType extends BaseType {
-  String get name => runtimeType.toString().replaceFirst('Vb', '');
-}
-
-class VbShort extends VbType {}
-
-class VbInteger extends VbType {}
-
-class VbLong extends VbType {}
-
-class VbUShort extends VbType {}
-
-class VbUInteger extends VbType {}
-
-class VbULong extends VbType {}
-
-class VbSingle extends VbType {}
-
-class VbDouble extends VbType {}
-
-class VbDecimal extends VbType {}
-
-class VbBoolean extends VbType {}
-
-class VbString extends VbType {}
-
-class VbChar extends VbType {}
-
-class VbSByte extends VbType {}
-
-class VbByte extends VbType {}
-
-class VbDateTime extends VbType {}
-
-class VbTimeSpan extends VbType {
-  @override
-  String get name => 'System.TimeSpan';
 }
 
 class VbTypeFactory extends BaseTypeSubFactory {
@@ -305,49 +183,6 @@ class ArrayFactory extends BaseTypeSubFactory {
   RegExp get regex => _regex;
 }
 
-class ArrayRange {
-  static final minName = 'min';
-  static final maxName = 'max';
-  static final FluentRegex _numberRegex =
-      FluentRegex().digit(Quantity.oneOrMoreTimes());
-  static final FluentRegex regex = FluentRegex()
-      .group(_numberRegex, type: GroupType.captureNamed(minName))
-      .literal('..')
-      .group(_numberRegex, type: GroupType.captureNamed(maxName))
-      .literal(',', Quantity.zeroOrOneTime());
-
-  final int min;
-  final int max;
-
-  ArrayRange(String expression)
-      : min = _numberFromExpression(expression, minName),
-        max = _numberFromExpression(expression, maxName);
-
-  @override
-  String toString() {
-    return '$min..$max';
-  }
-
-  static _numberFromExpression(String expression, String groupName) {
-    var value = regex.firstMatch(expression)!.namedGroup(groupName)!;
-    return int.parse(value);
-  }
-}
-
-/// A [BaseType] that refers to an existing [DataType]:
-class DataTypeReference extends BaseType {
-  final DataType dataType;
-
-  DataTypeReference(this.dataType, List<ArrayRange> arrayRanges) {
-    this.arrayRanges.addAll(arrayRanges);
-  }
-
-  @override
-  String toString() {
-    return super.toString()+ '{$dataType}';
-  }
-}
-
 class DataTypeReferenceFactory {
   /// Replaces all the [UnknownBaseType]s with [DataTypeReference]s
   /// when the path can be found
@@ -356,16 +191,18 @@ class DataTypeReferenceFactory {
       if (child is DataType) {
         var baseType = child.baseType;
         if (baseType is UnknownBaseType) {
-          var dataTypeReference=createFromUnknownDataType(dataTypeTree, baseType);
-          if (dataTypeReference!=null) {
-            child.baseType=dataTypeReference;
+          var dataTypeReference =
+              createFromUnknownDataType(dataTypeTree, baseType);
+          if (dataTypeReference != null) {
+            child.baseType = dataTypeReference;
           }
         }
       }
     }
   }
 
-  DataTypeReference? createFromUnknownDataType(DataTypeTree dataTypeTree, UnknownBaseType baseType) {
+  DataTypeReference? createFromUnknownDataType(
+      DataTypeTree dataTypeTree, UnknownBaseType baseType) {
     String path = baseType.expression;
     var referencedDataType = dataTypeTree.findNamePathString(path);
     if (referencedDataType != null && referencedDataType is DataType) {

@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 
 class TestResource {
@@ -32,7 +30,7 @@ class TestResource {
 
   static bool _containsPubSpec(Directory directory) =>
       directory.listSync().any((FileSystemEntity entity) =>
-      entity is File && entity.path.endsWith('pubspec.yaml'));
+          entity is File && entity.path.endsWith('pubspec.yaml'));
 }
 
 class SysmacProjectTestResource extends TestResource {
