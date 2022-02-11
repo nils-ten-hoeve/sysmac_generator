@@ -1,3 +1,4 @@
+import 'package:recase/recase.dart';
 import 'package:sysmac_cmd/domain/base_type.dart';
 import 'package:sysmac_cmd/domain/data_type.dart';
 import 'package:sysmac_cmd/domain/event.dart';
@@ -65,8 +66,11 @@ class EventService {
 
   List<Event> _createEvents(EventGroup eventGroup, List<NameSpace> eventPath,
       EventCounter eventCounter) {
-    String groupName1 = eventGroup.name;
-    String groupName2 =  groupName1==eventPath[1].name?'':eventPath[1].name;
+    String groupName1 = ReCase(eventGroup.name).titleCase;
+    String groupName2 =  ReCase(eventPath[1].name).titleCase;
+    if (groupName1==groupName2) {
+      groupName2='';
+    }
     String id = eventCounter.next;
     String componentCode = ''; //TODO
     String expression =

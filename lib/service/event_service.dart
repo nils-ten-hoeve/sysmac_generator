@@ -13,7 +13,7 @@ class EventService {
   /// * All event texts are accurate and consistent
   /// * Creating or updating the events is less labor intensive and less error prone
   ///
-  /// ##How
+  /// ## How
   /// The event documents are generated from an exported [SysmacProjectFile] (*.scm).
   /// So first step in creating or updating UserAlarms is exporting the latest SysmacProject.
   /// Then start the sysmac_cmd application with the following parameters
@@ -28,7 +28,7 @@ class EventService {
   ///   a UserAlarmGroup. Note that memberNames that start the same
   ///   (e.g. Transport and TransportVfd) will be put in the same UserAlarmGroup.
   /// * a HMI variable name that ends with the \sEvent base type.
-  ///   This variablename combined with the DataTypes will be used to generate
+  ///   This variable name combined with the DataTypes will be used to generate
   ///   the UserAlarm expression.
   /// * existing UserAlarm texts. It will generate the English alarm texts using
   ///   the DataType's in the SysmacProject. We assume that an UserAlarm text of
