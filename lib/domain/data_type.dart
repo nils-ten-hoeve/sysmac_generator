@@ -4,6 +4,7 @@ import 'namespace.dart';
 class DataType extends NameSpace {
   final String comment;
   BaseType baseType;
+  DataType? parent;
 
   DataType({
     required String name,
@@ -14,7 +15,7 @@ class DataType extends NameSpace {
   @override
   List<NameSpace> get children {
     if (baseType is DataTypeReference) {
-      return [(baseType as DataTypeReference).dataType];
+      return (baseType as DataTypeReference).dataType.children;
     } else {
       return super.children;
     }

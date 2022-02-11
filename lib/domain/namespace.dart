@@ -17,7 +17,7 @@ class NameSpace {
 
   @override
   String toString() {
-    String string = 'NameSpace {name: $name}';
+    String string = '$runtimeType {name: $name}';
     for (var child in children) {
       var lines = child.toString().split('\n');
       for (var line in lines) {

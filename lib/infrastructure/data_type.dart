@@ -1,5 +1,4 @@
 import 'package:archive/archive.dart';
-import 'package:sysmac_cmd/infrastructure/project_index.dart';
 import 'package:xml/xml.dart';
 
 import '../domain/base_type.dart';

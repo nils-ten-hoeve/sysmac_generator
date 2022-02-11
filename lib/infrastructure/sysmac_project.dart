@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
-import 'package:sysmac_cmd/domain/sysmac_project.dart';
-import 'package:sysmac_cmd/infrastructure/data_type.dart';
 import 'package:xml/xml.dart';
 
+import '../domain/sysmac_project.dart';
+import 'data_type.dart';
+import 'event.dart';
 import 'project_index.dart';
 import 'variable.dart';
 
@@ -15,9 +16,13 @@ class SysmacProjectFactory {
     var dataTypeTree = DataTypeTreeFactory().create(sysmacProjectArchive);
     var globalVariableService =
         GlobalVariableService(sysmacProjectArchive, dataTypeTree);
+    var eventService = EventService(globalVariableService);
+
     return SysmacProject(
-        dataTypeTree: dataTypeTree,
-        globalVariableService: globalVariableService);
+      dataTypeTree: dataTypeTree,
+      globalVariableService: globalVariableService,
+      eventService: eventService,
+    );
   }
 }
 

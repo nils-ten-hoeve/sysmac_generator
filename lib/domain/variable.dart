@@ -14,7 +14,7 @@ class Variable extends NameSpace {
   @override
   List<NameSpace> get children {
     if (baseType is DataTypeReference) {
-      return [(baseType as DataTypeReference).dataType];
+      return (baseType as DataTypeReference).dataType.children;
     } else {
       return super.children;
     }
@@ -31,5 +31,25 @@ class Variable extends NameSpace {
       }
     }
     return string;
+  }
+
+  List<List<NameSpace>> findPaths(bool Function(NameSpace nameSpace) filter) {
+    List<NameSpace> nameSpacePath = [this];
+    return _findNameSpacePathsFor(nameSpacePath, filter);
+  }
+
+  List<List<NameSpace>> _findNameSpacePathsFor(List<NameSpace> nameSpacePath,
+      bool Function(NameSpace nameSpace) filter) {
+    NameSpace nameSpace = nameSpacePath.last;
+    List<List<NameSpace>> nameSpacePaths = [];
+    if (filter(nameSpace)) {
+      nameSpacePaths.add(nameSpacePath);
+    }
+    for (var child in nameSpace.children) {
+      //recursive call
+      nameSpacePaths
+          .addAll(_findNameSpacePathsFor([...nameSpacePath, child], filter));
+    }
+    return nameSpacePaths;
   }
 }

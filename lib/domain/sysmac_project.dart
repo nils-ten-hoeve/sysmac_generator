@@ -1,3 +1,5 @@
+import 'package:sysmac_cmd/infrastructure/event.dart';
+
 import '../infrastructure/variable.dart';
 import 'data_type.dart';
 
@@ -6,7 +8,10 @@ import 'data_type.dart';
 class SysmacProject {
   final DataTypeTree dataTypeTree;
   final GlobalVariableService globalVariableService;
+  final EventService eventService;
 
   SysmacProject(
-      {required this.dataTypeTree, required this.globalVariableService});
+      {required this.dataTypeTree,
+      required this.globalVariableService,
+      required this.eventService});
 }

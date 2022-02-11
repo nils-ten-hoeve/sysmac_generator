@@ -58,10 +58,8 @@ class EventService {
   /// {@insert UserAlarmGroupExampleTest}
   void generateForSysmacHmi(String sysmacProjectFilePath) {
     var sysmacProject = SysmacProjectFactory().create(sysmacProjectFilePath);
-    var eventGlobalVariables =
-        sysmacProject.globalVariableService.findVariablesWithEventGlobalName();
-
-    //sysmacProjectFile.dataTypes();
+    var eventGlobalVariables=sysmacProject.globalVariableService.findVariablesWithEventGlobalName();
+    sysmacProject.eventService.createFromVariable(eventGlobalVariables);
   }
 
   void generateForCynergy(String sysmacProjectFilePath) {
