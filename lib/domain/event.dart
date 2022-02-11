@@ -55,6 +55,11 @@ class EventPriority {
 
   String get omronPriority =>
       (level > 0 && level < 9) ? "UserFaultLevel$level" : "UserInformation";
+
+  @override
+  String toString() {
+    return 'EventPriority{name: $name, abbreviation: $abbreviation, level: $level, description: $description, example: $example}';
+  }
 }
 
 class EventPriorities extends DelegatingList<EventPriority> {
