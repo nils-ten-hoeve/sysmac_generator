@@ -52,3 +52,10 @@ class NameSpace {
   NameSpace? findNamePathString(String pathToFind) =>
       findNamePath(pathToFind.split('\\'));
 }
+
+class NameSpaceWithComment extends NameSpace {
+
+  final String comment;
+  NameSpaceWithComment(String name, this.comment) : super(name);
+
+}

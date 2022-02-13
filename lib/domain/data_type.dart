@@ -1,16 +1,15 @@
 import 'base_type.dart';
 import 'namespace.dart';
 
-class DataType extends NameSpace {
-  final String comment;
+class DataType extends NameSpaceWithComment {
   BaseType baseType;
   DataType? parent;
 
   DataType({
     required String name,
     required this.baseType,
-    required this.comment,
-  }) : super(name);
+    required String comment,
+  }) : super(name, comment);
 
   @override
   List<NameSpace> get children {

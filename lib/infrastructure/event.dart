@@ -1,7 +1,8 @@
 import 'package:recase/recase.dart';
 import 'package:sysmac_cmd/domain/base_type.dart';
 import 'package:sysmac_cmd/domain/data_type.dart';
-import 'package:sysmac_cmd/domain/event.dart';
+import 'package:sysmac_cmd/domain/event/event.dart';
+import 'package:sysmac_cmd/domain/event/parser/event.dart';
 import 'package:sysmac_cmd/domain/namespace.dart';
 import 'package:sysmac_cmd/domain/variable.dart';
 import 'package:sysmac_cmd/infrastructure/variable.dart';
@@ -27,7 +28,7 @@ class EventService {
     }
 
     for (var group in eventGroups) {
-      print(group);//TODO remove after test
+      print(group); //TODO remove after test
     }
 
     return eventGroups;
@@ -66,20 +67,20 @@ class EventService {
 
   List<Event> _createEvents(EventGroup eventGroup, List<NameSpace> eventPath,
       EventCounter eventCounter) {
-    String groupName1 = ReCase(eventGroup.name).titleCase;
-    String groupName2 =  ReCase(eventPath[1].name).titleCase;
-    if (groupName1==groupName2) {
-      groupName2='';
+    String groupName1 = eventGroup.name.titleCase;
+    String groupName2 = eventPath[1].name.titleCase;
+    if (groupName1 == groupName2) {
+      groupName2 = '';
     }
     String id = eventCounter.next;
     String componentCode = ''; //TODO
     String expression =
         eventPath.map((nameSpace) => nameSpace.name).join('.'); //TODO arrays;
     EventPriority priority = EventPriorities().first; //TODO
-    String message = eventPath
-        .map((nameSpace) => (nameSpace is DataType) ? nameSpace.comment : '')
-        .join(
-            ' '); //TODO message only (no meta), ensure correct use of letter case and remove double spaces and
+
+    var parsedComments = _parseComments(eventPath);
+    var metaData = _findMetaData(parsedComments);
+    String message = _findMessage(parsedComments);
     String explanation = ''; //TODO
     bool popup = false; //TODO
     bool acknowledge = false; //TODO
@@ -99,6 +100,23 @@ class EventService {
       event
     ]; //TODO return multiple events if eventPath contains DataTypes with baseType.array!=null
   }
+
+  List<EventMetaData> _findMetaData(List<dynamic> parsedComments) =>
+      parsedComments.whereType<EventMetaData>().toList();
+
+  //TODO Add to documentation: start with lowe case letters! First letter will be changed to upper case
+  String _joinComments(List<NameSpace> eventPath) => eventPath
+      .map((nameSpace) =>
+          (nameSpace is NameSpaceWithComment) ? nameSpace.comment : '')
+      .join(' ');
+
+  List _parseComments(List<NameSpace> eventPath) {
+    String joinedComments = _joinComments(eventPath);
+    return eventParser.parse(joinedComments).value;
+  }
+
+  String _findMessage(List parsedComments) =>
+      parsedComments.whereType<String>().join().trim().replaceAll('  ', ' ');
 }
 
 class EventCounter {

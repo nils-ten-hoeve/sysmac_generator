@@ -58,7 +58,7 @@ class EventPriority {
 
   @override
   String toString() {
-    return 'EventPriority{name: $name, abbreviation: $abbreviation, level: $level, description: $description, example: $example}';
+    return 'EventPriority{name: $name}';
   }
 }
 

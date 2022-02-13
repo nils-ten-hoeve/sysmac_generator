@@ -18,3 +18,4 @@ dependencies:
   xml: ^5.3.1
   documentation_builder: ^0.0.8
   recase: ^4.0.0
+  petitparser: ^4.4.0
