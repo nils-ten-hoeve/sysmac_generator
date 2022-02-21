@@ -5,15 +5,14 @@ import 'package:sysmac_cmd/domain/event/event.dart';
 import 'package:sysmac_cmd/domain/event/parser/event.dart';
 import 'package:sysmac_cmd/domain/namespace.dart';
 import 'package:sysmac_cmd/domain/variable.dart';
-import 'package:sysmac_cmd/infrastructure/variable.dart';
 
 class EventService {
-  final GlobalVariableService globalVariableService;
+  // final GlobalVariableService globalVariableService;
 
-  EventService(this.globalVariableService);
+  EventService();
 
   List<EventGroup> createFromVariable(List<Variable> variables) {
-    List<List<NameSpace>> eventPaths = _createEventPaths();
+    List<List<NameSpace>> eventPaths = _createEventPaths(variables);
 
     List<EventGroup> eventGroups = [];
     EventCounter eventCounter = EventCounter();
@@ -42,14 +41,11 @@ class EventService {
             .startsWith(eventGroups.last.name.toLowerCase());
   }
 
-  List<List<NameSpace>> _createEventPaths() {
+  List<List<NameSpace>> _createEventPaths(List<Variable> variables) {
     List<List<NameSpace>> eventPaths = [];
 
-    var eventGlobalVariables =
-        globalVariableService.findVariablesWithEventGlobalName();
-
-    for (var eventGlobalVariable in eventGlobalVariables) {
-      eventPaths.addAll(eventGlobalVariable.findPaths((nameSpace) =>
+    for (var variable in variables) {
+      eventPaths.addAll(variable.findPaths((nameSpace) =>
           nameSpace is DataType &&
           nameSpace.baseType is VbBoolean &&
           nameSpace.children.isEmpty));

@@ -23,10 +23,10 @@ final eventParser = (componentCodeParser | _remainingCharactersParser).star();
 /// * other [DataType] structures: to organize/group these events in a structure
 ///   comparable to how the system is structured (e.g. the ISA88 structure).
 ///
-/// This application used information of all the [DataType]s that are used in
+/// This application uses information of all the [DataType]s that are used in
 /// the EventGlobal variable.
 ///
-/// Each [Event] has an [Event.message]. This application used the comments
+/// Each [Event] has an [Event.message]. This application uses the comments
 /// of all the [DataType]s that are used inside the EventGlobal variable to
 /// generate the [Event.message]. Note that it uses all [DataType] comments of
 /// all [DataType] members, starting at the root (the [DataType] of

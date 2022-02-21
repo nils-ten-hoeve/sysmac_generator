@@ -1,7 +1,12 @@
 import 'package:documentation_builder/documentation_builder.dart';
-import 'package:sysmac_cmd/domain/event/event.dart';
+import '../test/domain/event/parser/example.dart';
+import '../test/domain/event/parser/component_code_test.dart';
+
 
 main() {
-  EventPriorities.writeMarkDownTemplateFile();
+  // EventExamples().writeMarkDownTemplateFile();
+  // for (var eventExample in EventExamples()) {
+  //   eventExample.writeMarkDownTemplateFile();
+  // }
   DocumentationBuilder().run();
 }

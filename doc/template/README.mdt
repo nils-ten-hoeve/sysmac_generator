@@ -1,8 +1,3 @@
-[!GitHubBadge]
-[!GithubWikiBadge]
-[!GitHubStarsBadge]
-[!CustomBadge tooltip='GitHub License' label='license' message='MIT' link='https://raw.githubusercontent.com/nils-ten-hoeve/sysmac_cmd/main/LICENSE']
-[!GitHubIssuesBadge]
-[!GitHubPullRequestsBadge]
+{ImportFile path='doc/template/Badges.mdt'}
 
 {ImportDartDoc path='lib/sysmac_cmd.dart|main' title='# sysmac_cmd'}

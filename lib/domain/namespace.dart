@@ -51,11 +51,42 @@ class NameSpace {
 
   NameSpace? findNamePathString(String pathToFind) =>
       findNamePath(pathToFind.split('\\'));
+
+  NameSpace? findFirst(bool Function(NameSpace nameSpace) predicate) {
+    if (predicate(this)) {
+      return this;
+    }
+    for (var child in children) {
+      //recursive call
+      var found = child.findFirst(predicate);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  List<NameSpace> findPath(
+    NameSpace nameSpaceToFind, [
+    List<NameSpace> currentPath = const [],
+  ]) {
+    currentPath = [...currentPath, this];
+    if (nameSpaceToFind.toString() == toString()) {
+      return currentPath;
+    }
+    for (var child in children) {
+      //recursive call
+      var result = child.findPath(nameSpaceToFind, currentPath);
+      if (result.isNotEmpty) {
+        return result;
+      }
+    }
+    return [];
+  }
 }
 
 class NameSpaceWithComment extends NameSpace {
-
   final String comment;
-  NameSpaceWithComment(String name, this.comment) : super(name);
 
+  NameSpaceWithComment(String name, this.comment) : super(name);
 }

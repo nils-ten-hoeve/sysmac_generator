@@ -15,6 +15,16 @@ abstract class BaseType {
       return arrayRanges.toString() + runtimeType.toString();
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BaseType &&
+          runtimeType == other.runtimeType &&
+          toString() == other.toString();
+
+  @override
+  int get hashCode => toString().hashCode;
 }
 
 class ArrayRange {

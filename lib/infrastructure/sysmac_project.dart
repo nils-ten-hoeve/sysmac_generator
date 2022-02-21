@@ -16,7 +16,7 @@ class SysmacProjectFactory {
     var dataTypeTree = DataTypeTreeFactory().create(sysmacProjectArchive);
     var globalVariableService =
         GlobalVariableService(sysmacProjectArchive, dataTypeTree);
-    var eventService = EventService(globalVariableService);
+    var eventService = EventService();
 
     return SysmacProject(
       dataTypeTree: dataTypeTree,
