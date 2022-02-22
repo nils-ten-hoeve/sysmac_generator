@@ -391,7 +391,7 @@ class EventTableColumns extends DelegatingList<EventTableColumn> {
       _add(EventTableColumn('Component Code', (event) => event.componentCode));
 
   EventTableColumns get withMessage =>
-      _add(EventTableColumn('Component Code', (event) => event.message));
+      _add(EventTableColumn('Message', (event) => event.message));
 
   _add(EventTableColumn newColumn) =>
       EventTableColumns.forColumns([...this, newColumn]);
