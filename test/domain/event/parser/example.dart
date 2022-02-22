@@ -71,7 +71,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
       );
 
   List<_HtmlRow> _createVariableHeaderRows() => [
-        _HtmlRow(values: ['Variable'], collSpans: [3]),
+        _HtmlRow(values: ['Variable'], colSpans: [3]),
         _HtmlRow(values: ['Name', 'Type', 'Comment']),
       ];
 
@@ -101,7 +101,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
       );
 
   List<_HtmlRow> _createDataTypeHeaderRows() => [
-        _HtmlRow(values: ['Data Types'], collSpans: [3]),
+        _HtmlRow(values: ['Data Types'], colSpans: [3]),
         _HtmlRow(values: ['Name', 'Type', 'Comment']),
       ];
 
@@ -134,7 +134,10 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
       );
 
   List<_HtmlRow> _createEventHeaderRows() => [
-        _HtmlRow(values: ['Generated Events'], collSpans: [3]),
+        _HtmlRow(
+          values: ['Generated Events'],
+          colSpans: [eventExample.eventTableColumns.length],
+        ),
         _HtmlRow(
             values: eventExample.eventTableColumns
                 .map((column) => column.name)
@@ -181,25 +184,25 @@ class _HtmlTable {
 }
 
 class _HtmlRow {
-  final List<int?> collSpans;
+  final List<int?> colSpans;
   final List<String> values;
 
-  _HtmlRow({this.collSpans=const [], required this.values});
+  _HtmlRow({this.colSpans = const [], required this.values});
 
   List<String> toHtmlLines({bool isHeader = false}) {
     List<String> htmlLines = [];
     htmlLines.add('<tr>\n');
     for (int i = 0; i < values.length; i++) {
-      var collSpan = i < collSpans.length ? collSpans[i] : null;
+      var collSpan = i < colSpans.length ? colSpans[i] : null;
       htmlLines.add(_createCellHtml(isHeader, values[i], collSpan));
     }
     htmlLines.add('</tr>\n');
     return htmlLines;
   }
 
-  String _createCellHtml(bool isHeader, String value, int? collSpan) {
+  String _createCellHtml(bool isHeader, String value, int? colSpan) {
     String cellHtml = '';
-    String collSpanAttribute = collSpan == null ? '' : " collspan='$collSpan'";
+    String collSpanAttribute = colSpan == null ? '' : ' colspan="$colSpan" ';
     cellHtml +=
         isHeader ? '  <th$collSpanAttribute>' : '  <td$collSpanAttribute>';
     cellHtml += value;
