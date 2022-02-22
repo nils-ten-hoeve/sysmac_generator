@@ -20,7 +20,6 @@ import 'structure_test.dart';
 /// * It generates a [MarkdownTemplateFile] to explain the event [Metadata]
 ///   syntax as parsed bij the [EventParser]
 abstract class EventExample with MarkDownTemplateWriter {
-
   Definition get definition;
 
   String get explanation;
@@ -35,29 +34,56 @@ abstract class EventExample with MarkDownTemplateWriter {
     return eventService.createFromVariable([definition.eventGlobalVariable]);
   }
 
+  @override
+  String get asMarkDown => EventExampleMarkDownWriter(this).asMarkDown;
+
   void test() {
-    var _definition=definition;
+    var _definition = definition;
     var eventGroups = createEventGroups(_definition);
     expect(eventGroups, equals(definition.eventGroups));
   }
+}
 
+class EventExampleMarkDownWriter with MarkDownTemplateWriter {
+  final EventExample eventExample;
 
+  EventExampleMarkDownWriter(this.eventExample);
 
   @override
   String get asMarkDown {
-    String markDown = '$explanation\n';
+    String markDown = '${eventExample.explanation}\n';
 
-    var _definition = definition;
-    var _variable = definition.eventGlobalVariable;
-    markDown +=
-        '\n${_variable.name} $Variable of $DataType: ${_createReferencePath(_definition, _variable)}. ${DataType}s:\n';
-    markDown += _createDataTypeTableMarkDown(_definition.dataTypeTree);
+    var definition = eventExample.definition;
+    var variable = definition.eventGlobalVariable;
 
-    markDown += '\nGenerated events:\n';
-    markDown += _createEventTableMarkDown(_definition.events);
-
+    markDown += _createVariableTable(definition, variable).toHtml();
+    markDown += '\n';
+    markDown += _createDataTypeTable(definition.dataTypeTree).toHtml();
+    markDown += '\n';
+    markDown += _createEventTable(definition.events).toHtml();
     return markDown;
   }
+
+  _HtmlTable _createVariableTable(Definition definition, Variable variable) =>
+      _HtmlTable(
+        headerRows: _createVariableHeaderRows(),
+        rows: _createVariableRows(definition, variable),
+      );
+
+  List<_HtmlRow> _createVariableHeaderRows() => [
+        _HtmlRow(values: ['Variable'], collSpan: 3),
+        _HtmlRow(values: ['Name', 'Type', 'Comment']),
+      ];
+
+  List<_HtmlRow> _createVariableRows(
+          Definition definition, Variable variable) =>
+      [
+        _HtmlRow(values: [
+          variable.name,
+          _createReferencePath(definition, variable),
+          variable.comment,
+        ]),
+      ];
 
   String _createReferencePath(Definition _definition, Variable variable) {
     var referencedDataType = (variable.baseType as DataTypeReference).dataType;
@@ -69,46 +95,113 @@ abstract class EventExample with MarkDownTemplateWriter {
     return referencePath.join('\\');
   }
 
-  String _createEventTableMarkDown(List<Event> events) {
-    String markDown = '';
-    var columns = eventTableColumns;
-    for (var column in columns) {
-      markDown += '| ${column.name} ';
-    }
-    markDown += '|\n';
+  _HtmlTable _createDataTypeTable(DataTypeTree dataTypeTree) => _HtmlTable(
+        headerRows: _createDataTypeHeaderRows(),
+        rows: _createDataTypeRowsForDataTypeTree(dataTypeTree),
+      );
 
-    for (var column in columns) {
-      markDown += '| --- ';
-    }
-    markDown += '|\n';
+  List<_HtmlRow> _createDataTypeHeaderRows() => [
+        _HtmlRow(values: ['Data Types'], collSpan: 3),
+        _HtmlRow(values: ['Name', 'Type', 'Comment']),
+      ];
 
-    for (var event in events) {
-      for (var column in columns) {
-        markDown += '| ${column.cellValue(event)} ';
-      }
-      markDown += '|\n';
-    }
-    return markDown;
-  }
-
-  String _createDataTypeTableMarkDown(DataTypeTree dataTypeTree) {
-    String markDown = '| Name | Type | Comment |\n';
-    markDown += '| --- | --- | --- |\n';
-    for (var child in dataTypeTree.children) {
-      markDown += _createDataTypeTableRowMarkDown(0, child);
-    }
-    return markDown;
-  }
-
-  String _createDataTypeTableRowMarkDown(int level, NameSpace nameSpace) {
-    String indent = level == 0 ? '' : ' ' * (level * 2) + '* ';
-    String markDown =
-        '| $indent${nameSpace.name} | ${nameSpace is DataType ? nameSpace.baseType : ''} | ${nameSpace is NameSpaceWithComment ? nameSpace.comment : ''} |\n';
+  List<_HtmlRow> _createDataTypeRows(int level, NameSpace nameSpace) {
+    List<_HtmlRow> rows = [];
+    String indent = level == 0 ? '' : '&nbsp;' * (level * 4);
+    String name = nameSpace.name;
+    String type = nameSpace is DataType ? nameSpace.baseType.toString() : '';
+    String comment = nameSpace is NameSpaceWithComment ? nameSpace.comment : '';
+    var row = _HtmlRow(values: [indent + name, type, comment]);
+    rows.add(row);
     for (var child in nameSpace.children) {
       //recursive call
-      markDown += _createDataTypeTableRowMarkDown(level + 1, child);
+      rows.addAll(_createDataTypeRows(level + 1, child));
     }
-    return markDown;
+    return rows;
+  }
+
+  List<_HtmlRow> _createDataTypeRowsForDataTypeTree(DataTypeTree dataTypeTree) {
+    List<_HtmlRow> rows = [];
+    for (var nameSpace in dataTypeTree.children) {
+      rows.addAll(_createDataTypeRows(0, nameSpace));
+    }
+    return rows;
+  }
+
+  _HtmlTable _createEventTable(List<Event> events) => _HtmlTable(
+        headerRows: _createEventHeaderRows(),
+        rows: _createEventRows(events),
+      );
+
+  List<_HtmlRow> _createEventHeaderRows() => [
+        _HtmlRow(values: ['Generated Events'], collSpan: 3),
+        _HtmlRow(
+            values: eventExample.eventTableColumns
+                .map((column) => column.name)
+                .toList()),
+      ];
+
+  List<_HtmlRow> _createEventRows(List<Event> events) {
+    List<_HtmlRow> rows = [];
+    for (var event in events) {
+      rows.add(_HtmlRow(
+          values: eventExample.eventTableColumns
+              .map((column) => column.cellValue(event))
+              .toList()));
+    }
+    return rows;
+  }
+}
+
+class _HtmlTable {
+  final List<_HtmlRow> headerRows;
+  final List<_HtmlRow> rows;
+
+  _HtmlTable({this.headerRows = const [], this.rows = const []});
+
+  String toHtml() {
+    String html = '<table>\n';
+    for (var headerRow in headerRows) {
+      for (var htmlLine in headerRow.toHtmlLines(isHeader: true)) {
+        html += '  $htmlLine';
+      }
+    }
+    for (var row in rows) {
+      for (var htmlLine in row.toHtmlLines()) {
+        html += '  $htmlLine';
+      }
+    }
+
+    html += '</table>\n';
+    return html;
+  }
+
+  @override
+  String toString() => toHtml();
+}
+
+class _HtmlRow {
+  final int? collSpan;
+  final List<String> values;
+
+  _HtmlRow({this.collSpan, required this.values});
+
+  List<String> toHtmlLines({bool isHeader = false}) {
+    List<String> htmlLines = [];
+    htmlLines.add('<tr${collSpan == null ? '' : " collspan='$collSpan'"}>\n');
+    for (var value in values) {
+      htmlLines.add(_createCellHtml(isHeader, value));
+    }
+    htmlLines.add('</tr>\n');
+    return htmlLines;
+  }
+
+  String _createCellHtml(bool isHeader, String value) {
+    String cellHtml = '';
+    cellHtml += isHeader ? '  <th>' : '  <td>';
+    cellHtml += value;
+    cellHtml += isHeader ? '</th>\n' : '</td>\n';
+    return cellHtml;
   }
 }
 
@@ -130,7 +223,6 @@ class Definition {
   ///Note that the [pointer] should never be a leaf in the tree
   ///, e.g.: never represent an [Event]!
   late NameSpace pointer = dataTypeTree;
-
 
   NameSpace addNameSpace(String name) {
     _verifyPointerToAddNameSpace();
@@ -249,19 +341,18 @@ class Definition {
   }
 
   List<EventGroup> get eventGroups {
-    String groupName='';
-    EventGroup eventGroup=EventGroup((groupName));
-    List<EventGroup> eventGroups=[];
+    String groupName = '';
+    EventGroup eventGroup = EventGroup((groupName));
+    List<EventGroup> eventGroups = [];
     for (var event in events) {
-      if (event.groupName1!=groupName) {
-        eventGroup=EventGroup(event.groupName1);
+      if (event.groupName1 != groupName) {
+        eventGroup = EventGroup(event.groupName1);
         eventGroups.add(eventGroup);
       }
       eventGroup.children.add(event);
     }
     return eventGroups;
   }
-
 }
 
 // See https://en.wikipedia.org/wiki/Fluent_interface
@@ -309,8 +400,7 @@ class EventExamples extends DelegatingList<EventExample>
         ]);
 
   @override
-  String get asMarkDown => this
-      .map((eventExample) =>
+  String get asMarkDown => map((eventExample) =>
           "{ImportFile path='${eventExample.fileName}' title='# ${eventExample.title}'}")
       .join('\n\n');
 }
