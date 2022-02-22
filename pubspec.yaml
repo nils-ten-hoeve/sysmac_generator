@@ -1,8 +1,8 @@
-name: sysmac_cmd
+name: sysmac_generator
 description: A simple command-line application.
 version: 1.0.0
-homepage: https://github.com/nils-ten-hoeve/sysmac_cmd
-documentation: https://github.com/nils-ten-hoeve/sysmac_cmd/wiki
+homepage: https://github.com/nils-ten-hoeve/sysmac_generator
+documentation: https://github.com/nils-ten-hoeve/sysmac_generator/wiki
 
 environment:
   sdk: '>=2.14.4 <3.0.0'

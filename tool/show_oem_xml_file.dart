@@ -1,4 +1,4 @@
-import 'package:sysmac_cmd/infrastructure/sysmac_project.dart';
+import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import '../test/infrastructure/test_resource.dart';
 
 main() {

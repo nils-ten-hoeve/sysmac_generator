@@ -1,10 +1,10 @@
 import 'package:recase/recase.dart';
-import 'package:sysmac_cmd/domain/base_type.dart';
-import 'package:sysmac_cmd/domain/data_type.dart';
-import 'package:sysmac_cmd/domain/event/event.dart';
-import 'package:sysmac_cmd/domain/event/parser/event.dart';
-import 'package:sysmac_cmd/domain/namespace.dart';
-import 'package:sysmac_cmd/domain/variable.dart';
+import 'package:sysmac_generator/domain/base_type.dart';
+import 'package:sysmac_generator/domain/data_type.dart';
+import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/event/parser/event.dart';
+import 'package:sysmac_generator/domain/namespace.dart';
+import 'package:sysmac_generator/domain/variable.dart';
 
 class EventService {
   // final GlobalVariableService globalVariableService;

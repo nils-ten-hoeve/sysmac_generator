@@ -1,8 +1,8 @@
 import 'package:petitparser/parser.dart';
-import 'package:sysmac_cmd/domain/data_type.dart';
-import 'package:sysmac_cmd/domain/event/event.dart';
-import 'package:sysmac_cmd/domain/event/parser/component_code.dart';
-import 'package:sysmac_cmd/domain/sysmac_project.dart';
+import 'package:sysmac_generator/domain/data_type.dart';
+import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/event/parser/component_code.dart';
+import 'package:sysmac_generator/domain/sysmac_project.dart';
 
 final _remainingCharactersParser = any();
 

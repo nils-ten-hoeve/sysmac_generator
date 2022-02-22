@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:sysmac_cmd/domain/data_type.dart';
-import 'package:sysmac_cmd/infrastructure/data_type.dart';
-import 'package:sysmac_cmd/infrastructure/project_index.dart';
-import 'package:sysmac_cmd/infrastructure/sysmac_project.dart';
+import 'package:sysmac_generator/domain/data_type.dart';
+import 'package:sysmac_generator/infrastructure/data_type.dart';
+import 'package:sysmac_generator/infrastructure/project_index.dart';
+import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 
 import 'test_resource.dart';
 import 'package:test/test.dart';

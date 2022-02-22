@@ -1,4 +1,4 @@
-import 'package:sysmac_cmd/infrastructure/event.dart';
+import 'package:sysmac_generator/infrastructure/event.dart';
 
 import '../infrastructure/variable.dart';
 import 'data_type.dart';

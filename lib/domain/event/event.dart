@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:sysmac_cmd/domain/namespace.dart';
+import 'package:sysmac_generator/domain/namespace.dart';
 
 class EventGroup extends NameSpace {
   EventGroup(String name) : super(name);

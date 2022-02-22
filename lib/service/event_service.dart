@@ -16,7 +16,7 @@ class EventService {
   /// ## How
   /// The event documents are generated from an exported [SysmacProjectFile] (*.scm).
   /// So first step in creating or updating UserAlarms is exporting the latest SysmacProject.
-  /// Then start the sysmac_cmd application with the following parameters
+  /// Then start the sysmac_generator application with the following parameters
   /// * TODO
   /// * [SysmacProjectFile] (*.scm).
   ///

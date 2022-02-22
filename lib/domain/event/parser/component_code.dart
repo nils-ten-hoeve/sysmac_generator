@@ -1,5 +1,5 @@
 import 'package:petitparser/petitparser.dart';
-import 'package:sysmac_cmd/domain/event/parser/event.dart';
+import 'package:sysmac_generator/domain/event/parser/event.dart';
 
 class ComponentCode implements EventMetaData {
   final int pageNumber;

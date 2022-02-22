@@ -1,5 +1,5 @@
 import 'package:archive/archive.dart';
-import 'package:sysmac_cmd/domain/data_type.dart';
+import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:xml/xml.dart';
 
 import 'data_type.dart';

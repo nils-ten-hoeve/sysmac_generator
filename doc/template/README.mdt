@@ -1,3 +1,3 @@
 {ImportFile path='doc/template/Badges.mdt'}
 
-{ImportDartDoc path='lib/sysmac_cmd.dart|main' title='# sysmac_cmd'}
+{ImportFile path='doc/template/01-Sysmac-Generator.mdt'}

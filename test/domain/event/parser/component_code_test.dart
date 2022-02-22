@@ -1,6 +1,6 @@
 import 'package:petitparser/src/matcher/matches_skipping.dart';
-import 'package:sysmac_cmd/domain/event/event.dart';
-import 'package:sysmac_cmd/domain/event/parser/component_code.dart';
+import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/event/parser/component_code.dart';
 import 'package:test/test.dart';
 
 import 'example.dart';
