@@ -9,22 +9,83 @@ import 'data_type.dart';
 import 'event.dart';
 import 'project_index.dart';
 import 'variable.dart';
+import 'package:petitparser/petitparser.dart';
 
 class SysmacProjectFactory {
   SysmacProject create(String sysmacProjectFilePath) {
     var sysmacProjectArchive = SysmacProjectArchive(sysmacProjectFilePath);
     var dataTypeTree = DataTypeTreeFactory().create(sysmacProjectArchive);
     var globalVariableService =
-        GlobalVariableService(sysmacProjectArchive, dataTypeTree);
-    var eventService = EventService();
+    GlobalVariableService(sysmacProjectArchive, dataTypeTree);
 
+    var parsedFileName = _parseFileName(sysmacProjectFilePath);
+    var site = _createSite(parsedFileName);
+    var electricPanel = _createElectricPanel(parsedFileName);
+    var sysmacProjectVersion = _createSysmacProjectVersion(
+        parsedFileName);
+    var eventService = EventService(
+      site: site,
+      electricPanel: electricPanel,
+    );
     return SysmacProject(
+      site: site,
+      electricPanel: electricPanel,
+      sysmacProjectVersion: sysmacProjectVersion,
       dataTypeTree: dataTypeTree,
       globalVariableService: globalVariableService,
       eventService: eventService,
     );
   }
+
+  _createSite(List<dynamic> parsedFileName) {
+    int siteNumber = parsedFileName[1] as int;
+    return Site(siteNumber);
+  }
+
+  _createElectricPanel(List<dynamic> parsedFileName) {
+    int number = parsedFileName[3] as int;
+    String name = parsedFileName[5] as String;
+    return ElectricPanel(number: number, name: name);
+  }
+
+  List<dynamic> _parseFileName(String sysmacProjectFilePath) {
+    var result = _fileNameParser.parse(sysmacProjectFilePath);
+    if (result.isFailure) {
+      try {
+        result.value;
+      } on Exception catch (e) {
+        throw Exception('Incorrect file name: "$sysmacProjectFilePath". $e');
+      }
+    }
+    return result.value;
+  }
+
+  SysmacProjectVersion _createSysmacProjectVersion(List parsedFileName) =>
+      SysmacProjectVersion(standardVersion: parsedFileName[7] as int,
+        customerVersion: parsedFileName[9] as int,
+        notInstalledComment: parsedFileName[10],);
+
 }
+
+var _pathSeparatorParser = char('\\') | char('/');
+
+var _pathParser = (any().starGreedy(
+    _pathSeparatorParser) & _pathSeparatorParser).flatten().optional();
+
+var _numberParser = digit().plus().flatten().trim().map(int.parse);
+
+var _deParser = stringIgnoreCase('de');
+
+var _dashParser = char('-');
+
+var _panelNameParser = any().plusLazy(_dashParser).flatten();
+
+var _versionSuffixParser = any().starLazy(_extensionParser).flatten();
+
+var _extensionParser = stringIgnoreCase('.smc2').end();
+
+var _fileNameParser = _pathParser & _numberParser & _deParser & _numberParser & _dashParser & _panelNameParser & _dashParser & _numberParser & _dashParser & _numberParser & _versionSuffixParser & _extensionParser;
+
 
 /// Represents a physical Sysmac project file,
 /// which is actually a zip [Archive] containing [ArchiveFile]s
@@ -57,7 +118,9 @@ class SysmacProjectArchive {
   }
 
   _validateNotEmpty(String sysmacProjectFilePath) {
-    if (sysmacProjectFilePath.trim().isEmpty) {
+    if (sysmacProjectFilePath
+        .trim()
+        .isEmpty) {
       throw ArgumentError('may not be empty', 'sysmacProjectFilePath');
     }
   }

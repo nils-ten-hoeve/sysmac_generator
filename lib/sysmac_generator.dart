@@ -11,7 +11,6 @@ main(List<String> arguments) {
 /// It generates files by reading [SysmacProjectFile]s and [TemplateFile]s.
 /// These files can than be used to import into Sysmac or other programs.
 class SysmacGenerator {
-
   void execute(List<String> arguments) {
     if (arguments.length == 1) {
       generateForSysmacHmi(arguments[1]);
@@ -30,15 +29,12 @@ class SysmacGenerator {
     }
   }
 
-
   void showInfo() {
     print(
-        "Usage: sysmac_generator <SysmacProjectFile.${SysmacProjectArchive.extension}>");// TODO
-    print("For more information see: https://https://github.com/nils-ten-hoeve/sysmac_generator/wiki");
+        "Usage: sysmac_generator <SysmacProjectFile.${SysmacProjectArchive.extension}>"); // TODO
+    print(
+        "For more information see: https://https://github.com/nils-ten-hoeve/sysmac_generator/wiki");
   }
-
-
-
 }
 
 /// A [SysmacProjectFile] is an exported
@@ -57,15 +53,22 @@ class SysmacProjectFile {}
 /// * [text files](https://en.wikipedia.org/wiki/Text_file)
 /// * etc...
 ///
-/// [TemplateFile] files can contain [Tags] and [Variable]s.
+/// [TemplateFile] files can contain [Tag]s.
 /// The [SysmacGenerator]:
 /// * reads these template file(s)
-/// * replaces the [Tag]s and [Variables]
+/// * does something with the [Tag]s
 /// * writes the resulting generated file(s) to disk
 class TemplateFile {}
 
-/// TODO
-class Tag{}
-
-/// Variable
-class Variable{}
+/// [TemplateFile]s can contain [Tag] texts.
+/// [Tag]s have a special meaning for the [SysmacGenerator].
+/// Most [Tag]s are replaced by the [SysmacGenerator] with generated text.
+///
+/// [Tag]s:
+/// * are surrounded by double square brackets: [[ ]]
+/// * contain some kind of information, e.g.:
+///   * often start with a name or name path:
+///     e.g. [[importFile]] or [[project.name]]
+///   * may have one or more attributes after the name:
+///     e.g. [[importFile path='otherFile.txt']]
+class Tag {}

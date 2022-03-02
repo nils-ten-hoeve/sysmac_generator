@@ -7,13 +7,14 @@ import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
+import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
 import 'package:sysmac_generator/infrastructure/event.dart';
 import 'package:sysmac_generator/infrastructure/variable.dart';
 import 'package:test/test.dart';
 
-import 'component_code_test.dart';
-import 'structure_test.dart';
+import 'basic_example_test.dart';
+import 'component_code_example_test.dart';
 
 /// This [EventExample] serves the following purposes
 /// * It test the event [Metadata] syntax as parsed bij the [EventParser]
@@ -26,21 +27,54 @@ abstract class EventExample with MarkDownTemplateWriter {
 
   EventTableColumns get eventTableColumns;
 
-  get title =>
-      runtimeType.toString().replaceFirst(RegExp('Example\$'), '').titleCase;
-
-  List<EventGroup> createEventGroups(Definition definition) {
-    EventService eventService = EventService();
-    return eventService.createFromVariable([definition.eventGlobalVariable]);
-  }
+  get title => runtimeType.toString().replaceAll('Event', '').titleCase;
 
   @override
   String get asMarkDown => EventExampleMarkDownWriter(this).asMarkDown;
 
-  void test() {
-    var _definition = definition;
-    var eventGroups = createEventGroups(_definition);
-    expect(eventGroups, equals(definition.eventGroups));
+   final Site site = Site(4321);
+   final ElectricPanel electricPanel = ElectricPanel(
+    number: 6,
+    name: 'EviscerationLine',
+  );
+
+
+
+  void executeTest() {
+    group('Class : $runtimeType', () {
+      test('Method: test', () {
+        List<EventGroup> generatedGroups = generatedEventGroups;
+        List<EventGroup> expectedGroups = expectedEventGroups;
+        expect(generatedGroups.length, expectedGroups.length);
+        for (int groupIndex = 0;
+            groupIndex < generatedGroups.length;
+            groupIndex++) {
+          var generatedGroup = generatedGroups[groupIndex];
+          var expectedGroup = expectedGroups[groupIndex];
+          expect(generatedGroup.name, expectedGroup.name);
+          expect(generatedGroup.children.length, expectedGroup.children.length);
+          for (int eventIndex = 0;
+              eventIndex < generatedGroup.children.length;
+              eventIndex++) {
+            var generatedEvent = generatedGroup.children[eventIndex];
+            var expectedEvent = expectedGroup.children[eventIndex];
+            expect(generatedEvent, expectedEvent);
+          }
+        }
+      });
+    });
+  }
+
+  List<EventGroup> get expectedEventGroups => definition.eventGroups;
+
+  List<EventGroup> get generatedEventGroups {
+    EventService eventService = EventService(
+      site: site,
+      electricPanel: electricPanel,
+    );
+    List<EventGroup> generatedGroups =
+        eventService.createFromVariable([definition.eventGlobalVariable]);
+    return generatedGroups;
   }
 }
 
@@ -390,6 +424,9 @@ class EventTableColumns extends DelegatingList<EventTableColumn> {
   EventTableColumns get withComponentCode =>
       _add(EventTableColumn('Component Code', (event) => event.componentCode));
 
+  EventTableColumns get withId =>
+      _add(EventTableColumn('Id', (event) => event.id));
+
   EventTableColumns get withMessage =>
       _add(EventTableColumn('Message', (event) => event.message));
 
@@ -401,8 +438,8 @@ class EventExamples extends DelegatingList<EventExample>
     with MarkDownTemplateWriter {
   EventExamples()
       : super([
-          EventStructureExample(),
-          EventComponentCodeExample(),
+          BasicEventExample(),
+          ComponentCodeEventExample(),
         ]);
 
   @override

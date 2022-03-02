@@ -13,12 +13,9 @@ main() {
 
   group('class: EventService', () {
     test('variables isNot Empty', () {
-      var result = sysmacProject.eventService
-                    .createFromVariable(eventGlobalVariables);
-      print(result);
-      expect( result.isEmpty
-              , true
-          );
+      var result =
+          sysmacProject.eventService.createFromVariable(eventGlobalVariables);
+      expect(result.isNotEmpty, true);
     });
   });
 }

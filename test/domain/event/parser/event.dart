@@ -11,7 +11,7 @@ main() {
         '1',
         '2',
         ' ',
-        ComponentCode(pageNumber: 30, letters: 'M', columnNumber: 2),
+        PartialComponentCode(pageNumber: 30, letters: 'M', columnNumber: 2),
         ' ',
         '3',
         '4'

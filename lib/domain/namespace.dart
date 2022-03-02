@@ -15,17 +15,6 @@ class NameSpace {
     return all;
   }
 
-  @override
-  String toString() {
-    String string = '$runtimeType {name: $name}';
-    for (var child in children) {
-      var lines = child.toString().split('\n');
-      for (var line in lines) {
-        string += "\n  $line";
-      }
-    }
-    return string;
-  }
 
   /// Tries to find a child using a list of [namesToFind]
   /// Returns this when [namesToFind] is empty.
@@ -82,6 +71,30 @@ class NameSpace {
       }
     }
     return [];
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NameSpace &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          children == other.children;
+
+  @override
+  int get hashCode => name.hashCode ^ children.hashCode;
+
+
+  @override
+  String toString() {
+    String string = '$runtimeType {name: $name}';
+    for (var child in children) {
+      var lines = child.toString().split('\n');
+      for (var line in lines) {
+        string += "\n  $line";
+      }
+    }
+    return string;
   }
 }
 

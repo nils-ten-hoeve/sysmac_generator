@@ -1,4 +1,4 @@
-[//]: # (This file was generated from: doc/template/README.mdt using the documentation_builder package on: 2022-02-22 12:08:41.332533.)
+[//]: # (This file was generated from: doc/template/README.mdt using the documentation_builder package on: 2022-02-27 14:11:42.478926.)
 <a id='doc-template-badges-mdt'></a>[![Code Repository](https://img.shields.io/badge/repository-git%20hub-informational)](https://github.com/nils-ten-hoeve/sysmac_generator)
 [![Github Wiki](https://img.shields.io/badge/documentation-wiki-informational)](https://github.com/nils-ten-hoeve/sysmac_generator/wiki)
 [![GitHub Stars](https://img.shields.io/github/stars/nils-ten-hoeve/sysmac_generator)](https://github.com/nils-ten-hoeve/sysmac_generator/stargazers)
@@ -35,21 +35,25 @@ before using it with [SysmacGenerator](https://github.com/nils-ten-hoeve/sysmac_
 * [text files](https://en.wikipedia.org/wiki/Text_file)
 * etc...
 
-[TemplateFile](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#template-file) files can contain [Tags] and [Variable](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#variable)s.
+[TemplateFile](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#template-file) files can contain [Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag)s.
 The [SysmacGenerator](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#sysmac-generator):
 * reads these template file(s)
-* replaces the [Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag)s and [Variables]
+* does something with the [Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag)s
 * writes the resulting generated file(s) to disk
 
 
 <a id='tag'></a>
 ## Tag
-TODO
+[TemplateFile](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#template-file)s can contain [Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag) texts.
+[Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag)s have a special meaning for the [SysmacGenerator](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#sysmac-generator).
+Most [Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag)s are replaced by the [SysmacGenerator](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#sysmac-generator) with generated text.
+
+[Tag](https://github.com/nils-ten-hoeve/sysmac_generator/wiki/01-Sysmac-Generator#tag)s:
+* are surrounded by double square brackets: [[ ]]
+* contain some kind of information, e.g.:
+  * often start with a name or name path:
+    e.g. [[importFile]] or [[project.name]]
+  * may have one or more attributes after the name:
+    e.g. [[importFile path='otherFile.txt']]
 
 //TODO Tag implementations to be generated from classes
-
-<a id='variable'></a>
-## Variable
-Variable
-
-//TODO Variable definition to be generated from classes

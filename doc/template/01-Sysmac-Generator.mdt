@@ -6,6 +6,3 @@
 
 {ImportDartDoc path='lib/sysmac_generator.dart|Tag' title='## Tag'}
 //TODO Tag implementations to be generated from classes
-
-{ImportDartDoc path='lib/sysmac_generator.dart|Variable' title='## Variable'}
-//TODO Variable definition to be generated from classes
