@@ -2,8 +2,10 @@ import 'package:recase/recase.dart';
 import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
-import 'package:sysmac_generator/domain/event/parser/component_code.dart';
-import 'package:sysmac_generator/domain/event/parser/event.dart';
+import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
@@ -14,6 +16,7 @@ class EventService {
   final Site site;
   final ElectricPanel electricPanel;
   static final _groupNameIndex = 1;
+  static final _eventTagsParser = EventTagsParser();
 
   EventService({required this.site, required this.electricPanel});
 
@@ -66,35 +69,27 @@ class EventService {
 
   List<Event> _createEvents(EventGroup eventGroup, List<NameSpace> eventPath,
       EventCounter eventCounter) {
-    String expression = _createExpression(eventPath);
     var parsedComments = _parseComments(eventPath);
-    var metaData = _findMetaData(parsedComments);
+    var eventTags = _findEventTags(parsedComments);
 
     String groupName1 = eventGroup.name;
     String groupName2 = eventPath[_groupNameIndex].name.titleCase;
     if (groupName1 == groupName2) {
       groupName2 = '';
     }
-    String id = eventCounter.next;
-    String componentCode = _findComponentCode(metaData);
-
-    String message = _findMessage(parsedComments);
-    String explanation = ''; //TODO
-    bool popup = false; //TODO
-    bool acknowledge = false; //TODO
-    EventPriority priority = EventPriorities.medium; //TODO
 
     Event event = Event(
       groupName1: groupName1,
       groupName2: groupName2,
-      id: id,
-      componentCode: componentCode,
-      expression: expression,
-      priority: priority,
-      message: message,
-      explanation: explanation,
-      popup: popup,
-      acknowledge: acknowledge,
+      id: eventCounter.next,
+      componentCode: _findComponentCode(eventTags),
+      expression: _createExpression(eventPath),
+      priority: EventPriorities.medium,
+      //TODO
+      message: _findMessage(parsedComments),
+      explanation: '',
+      //TODO
+      acknowledge: false, //TODO
     );
     return [
       event
@@ -108,9 +103,8 @@ class EventService {
     return filteredEventPath.map((nameSpace) => nameSpace.name).join('.');
   }
 
-  List<dynamic> _findMetaData(List<dynamic> parsedComments) => parsedComments
-      .where((parsedComment) => parsedComments is! String)
-      .toList();
+  List<EventTag> _findEventTags(List<dynamic> parsedComments) =>
+      parsedComments.whereType<EventTag>().toList();
 
   //TODO Add to documentation: start with lowe case letters! First letter will be changed to upper case
   String _joinComments(List<NameSpace> eventPath) => eventPath
@@ -120,9 +114,9 @@ class EventService {
 
   List<dynamic> _parseComments(List<NameSpace> eventPath) {
     String joinedComments = _joinComments(eventPath);
-    var result= eventParser.parse(joinedComments).value;
-    result.insert(0, electricPanel);
-    result.insert(0, site);
+    var result = _eventTagsParser.parse(joinedComments).value;
+    result.insert(0, PanelNumberTag(electricPanel.number));
+    result.insert(0, SiteNumberTag(site.number));
     return result;
   }
 
@@ -140,14 +134,16 @@ class EventService {
     }
   }
 
-  String _findComponentCode(List<dynamic> metaData) {
+  String _findComponentCode(List<EventTag> eventTags) {
     var partialComponentCodes =
-        metaData.whereType<PartialComponentCode>().toList();
+        eventTags.whereType<ComponentCodeTag>().toList();
     if (partialComponentCodes.isNotEmpty) {
       var partialComponentCode = partialComponentCodes.first;
       return ComponentCode(
-        site: _findSite(metaData),
-        electricPanel: _findElectricPanel(metaData),
+        site: Site(_findSiteNumberTag(eventTags).number),
+        electricPanel: ElectricPanel(
+            number: _findPanelNumberTag(eventTags).number,
+            name: electricPanel.name),
         pageNumber: partialComponentCode.pageNumber,
         letters: partialComponentCode.letters,
         columnNumber: partialComponentCode.columnNumber,
@@ -158,11 +154,11 @@ class EventService {
         : partialComponentCodes.first.toText();
   }
 
-  ElectricPanel _findElectricPanel(List<dynamic> metaData) =>
-      metaData.whereType<ElectricPanel>().last;
+  PanelNumberTag _findPanelNumberTag(List<EventTag> eventTags) =>
+      eventTags.whereType<PanelNumberTag>().last;
 
-  Site _findSite(List<dynamic> metaData) => metaData.whereType<Site>().last;
-
+  SiteNumberTag _findSiteNumberTag(List<EventTag> eventTags) =>
+      eventTags.whereType<SiteNumberTag>().last;
 }
 
 class EventCounter {

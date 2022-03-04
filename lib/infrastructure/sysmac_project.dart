@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
+import 'package:petitparser/petitparser.dart';
 import 'package:xml/xml.dart';
 
 import '../domain/sysmac_project.dart';
@@ -9,20 +10,37 @@ import 'data_type.dart';
 import 'event.dart';
 import 'project_index.dart';
 import 'variable.dart';
-import 'package:petitparser/petitparser.dart';
+
+/// A [SysmacProjectFile] is an exported
+/// [Omron Sysmac project](https://automation.omron.com/en/us/products/family/sysstdio).
+/// This is a file with the *.scm file extension.
+///
+/// Note that you need to export the
+/// [Omron Sysmac project](https://automation.omron.com/en/us/products/family/sysstdio)
+/// before using it with [SysmacGenerator].
+///
+/// A [SysmacProjectFile] name should have the following format:\
+/// &lt;site number&gt;DE&lt;panel number&gt;-&lt;panel name&gt;-&lt;standard version&gt;-&lt;customer version&gt;&lt;not installed reason&gt;.smc2\
+/// e.g.: 4321DE06-Evisceration-001-005-to_be_installed.smc2
+/// * &lt;site number&gt;= Meyn layout number
+/// * &lt;panel number&gt;= Unique number within site (see electrical schematic)
+/// * &lt;panel name&gt;= See official product name on web site (without line number!)
+/// * &lt;standard version&gt;= 0-...
+/// * &lt;customer version&gt;= 0-..., increases with 1 with every new version.
+/// * &lt;not installed reason&gt;= optional text explaining why this version is not the latest version at the customer.
+class SysmacProjectFile {}
 
 class SysmacProjectFactory {
   SysmacProject create(String sysmacProjectFilePath) {
     var sysmacProjectArchive = SysmacProjectArchive(sysmacProjectFilePath);
     var dataTypeTree = DataTypeTreeFactory().create(sysmacProjectArchive);
     var globalVariableService =
-    GlobalVariableService(sysmacProjectArchive, dataTypeTree);
+        GlobalVariableService(sysmacProjectArchive, dataTypeTree);
 
     var parsedFileName = _parseFileName(sysmacProjectFilePath);
     var site = _createSite(parsedFileName);
     var electricPanel = _createElectricPanel(parsedFileName);
-    var sysmacProjectVersion = _createSysmacProjectVersion(
-        parsedFileName);
+    var sysmacProjectVersion = _createSysmacProjectVersion(parsedFileName);
     var eventService = EventService(
       site: site,
       electricPanel: electricPanel,
@@ -61,16 +79,19 @@ class SysmacProjectFactory {
   }
 
   SysmacProjectVersion _createSysmacProjectVersion(List parsedFileName) =>
-      SysmacProjectVersion(standardVersion: parsedFileName[7] as int,
+      SysmacProjectVersion(
+        standardVersion: parsedFileName[7] as int,
         customerVersion: parsedFileName[9] as int,
-        notInstalledComment: parsedFileName[10],);
-
+        notInstalledComment: parsedFileName[10],
+      );
 }
 
 var _pathSeparatorParser = char('\\') | char('/');
 
-var _pathParser = (any().starGreedy(
-    _pathSeparatorParser) & _pathSeparatorParser).flatten().optional();
+var _pathParser =
+    (any().starGreedy(_pathSeparatorParser) & _pathSeparatorParser)
+        .flatten()
+        .optional();
 
 var _numberParser = digit().plus().flatten().trim().map(int.parse);
 
@@ -84,8 +105,18 @@ var _versionSuffixParser = any().starLazy(_extensionParser).flatten();
 
 var _extensionParser = stringIgnoreCase('.smc2').end();
 
-var _fileNameParser = _pathParser & _numberParser & _deParser & _numberParser & _dashParser & _panelNameParser & _dashParser & _numberParser & _dashParser & _numberParser & _versionSuffixParser & _extensionParser;
-
+var _fileNameParser = _pathParser &
+    _numberParser &
+    _deParser &
+    _numberParser &
+    _dashParser.optional() &
+    _panelNameParser &
+    _dashParser &
+    _numberParser &
+    _dashParser &
+    _numberParser &
+    _versionSuffixParser &
+    _extensionParser;
 
 /// Represents a physical Sysmac project file,
 /// which is actually a zip [Archive] containing [ArchiveFile]s
@@ -118,9 +149,7 @@ class SysmacProjectArchive {
   }
 
   _validateNotEmpty(String sysmacProjectFilePath) {
-    if (sysmacProjectFilePath
-        .trim()
-        .isEmpty) {
+    if (sysmacProjectFilePath.trim().isEmpty) {
       throw ArgumentError('may not be empty', 'sysmacProjectFilePath');
     }
   }

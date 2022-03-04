@@ -1,8 +1,8 @@
 {ImportDartDoc path='lib/sysmac_generator.dart|SysmacGenerator' title='# Sysmac Generator'}
 
-{ImportDartDoc path='lib/sysmac_generator.dart|SysmacProjectFile' title='# Sysmac Project File'}
+{ImportDartDoc path='lib/infrastructure/sysmac_project.dart|SysmacProjectFile' title='# Sysmac Project File'}
 
-{ImportDartDoc path='lib/sysmac_generator.dart|TemplateFile' title='# Template File'}
+{ImportDartDoc path='lib/sysmac_generator.dart|TemplateFile' title='# Template Files'}
 
-{ImportDartDoc path='lib/sysmac_generator.dart|Tag' title='## Tag'}
+{ImportDartDoc path='lib/sysmac_generator.dart|TemplateTag' title='## Template Tags'}
 //TODO Tag implementations to be generated from classes

@@ -10,11 +10,13 @@ import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
 import 'package:sysmac_generator/infrastructure/event.dart';
+import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'package:sysmac_generator/infrastructure/variable.dart';
 import 'package:test/test.dart';
 
-import 'basic_example_test.dart';
+import 'event_global_example_test.dart';
 import 'component_code_example_test.dart';
+import 'component_code_site_example_test.dart';
 
 /// This [EventExample] serves the following purposes
 /// * It test the event [Metadata] syntax as parsed bij the [EventParser]
@@ -27,18 +29,21 @@ abstract class EventExample with MarkDownTemplateWriter {
 
   EventTableColumns get eventTableColumns;
 
-  get title => runtimeType.toString().replaceAll('Event', '').titleCase;
+  /// override when [SysmacProjectFile] name table needs to be added to [asMarkDown]
+  bool get showSysmacFileNameTable => false;
+
+  get title => runtimeType.toString().replaceAll(RegExp('EventExample\$'), '').titleCase;
 
   @override
   String get asMarkDown => EventExampleMarkDownWriter(this).asMarkDown;
 
-   final Site site = Site(4321);
-   final ElectricPanel electricPanel = ElectricPanel(
+  final Site site = Site(4321);
+  final ElectricPanel electricPanel = ElectricPanel(
     number: 6,
     name: 'EviscerationLine',
   );
-
-
+  final SysmacProjectVersion sysmacProjectVersion =
+      SysmacProjectVersion(standardVersion: 12, customerVersion: 8);
 
   void executeTest() {
     group('Class : $runtimeType', () {
@@ -90,6 +95,10 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     var definition = eventExample.definition;
     var variable = definition.eventGlobalVariable;
 
+    if (eventExample.showSysmacFileNameTable) {
+      markDown += _createSysmacFileNameTable(eventExample).toHtml();
+      markDown += '\n';
+    }
     markDown += _createVariableTable(definition, variable).toHtml();
     markDown += '\n';
     markDown += _createDataTypeTable(definition.dataTypeTree).toHtml();
@@ -161,6 +170,28 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     }
     return rows;
   }
+
+  _createSysmacFileNameTable(EventExample eventExample) => _HtmlTable(
+        headerRows: _createSysmacFileNameHeaderRows(),
+        rows: _createSysmacFileNameRows(eventExample),
+      );
+
+  List<_HtmlRow> _createSysmacFileNameHeaderRows() => [
+        _HtmlRow(
+          values: ['Sysmac Project File Name'],
+        ),
+      ];
+
+  _createSysmacFileNameRows(EventExample eventExample) => [
+        _HtmlRow(
+          values: [
+            '${eventExample.site.code}${eventExample.electricPanel.code}-'
+                '${eventExample.electricPanel.name}-'
+                '${eventExample.sysmacProjectVersion.standardVersion}-'
+                '${eventExample.sysmacProjectVersion.customerVersion}.smc2'
+          ],
+        ),
+      ];
 
   _HtmlTable _createEventTable(List<Event> events) => _HtmlTable(
         headerRows: _createEventHeaderRows(),
@@ -438,14 +469,18 @@ class EventExamples extends DelegatingList<EventExample>
     with MarkDownTemplateWriter {
   EventExamples()
       : super([
-          BasicEventExample(),
+          EventGlobalEventExample(),
           ComponentCodeEventExample(),
+          ComponentCodeSiteEventExample(),
         ]);
 
   @override
   String get asMarkDown => map((eventExample) =>
           "{ImportFile path='${eventExample.fileName}' title='# ${eventExample.title}'}")
       .join('\n\n');
+
+  @override
+  String get markDownHeader => '';
 }
 
 mixin MarkDownTemplateWriter {

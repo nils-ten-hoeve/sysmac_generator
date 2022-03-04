@@ -37,14 +37,7 @@ class SysmacGenerator {
   }
 }
 
-/// A [SysmacProjectFile] is an exported
-/// [Omron Sysmac project](https://automation.omron.com/en/us/products/family/sysstdio).
-/// This is a file with the *.scm file extension.
-///
-/// Note that you need to export the
-/// [Omron Sysmac project](https://automation.omron.com/en/us/products/family/sysstdio)
-/// before using it with [SysmacGenerator].
-class SysmacProjectFile {}
+
 
 /// [TemplateFile] files are text files such as:
 /// * [csv files](https://en.wikipedia.org/wiki/Comma-separated_values)
@@ -53,22 +46,22 @@ class SysmacProjectFile {}
 /// * [text files](https://en.wikipedia.org/wiki/Text_file)
 /// * etc...
 ///
-/// [TemplateFile] files can contain [Tag]s.
+/// [TemplateFile] files can contain [TemplateTag]s.
 /// The [SysmacGenerator]:
 /// * reads these template file(s)
-/// * does something with the [Tag]s
+/// * does something with the [TemplateTag]s
 /// * writes the resulting generated file(s) to disk
 class TemplateFile {}
 
-/// [TemplateFile]s can contain [Tag] texts.
-/// [Tag]s have a special meaning for the [SysmacGenerator].
-/// Most [Tag]s are replaced by the [SysmacGenerator] with generated text.
+/// [TemplateFile]s can contain [TemplateTag] texts.
+/// [TemplateTag]s have a special meaning for the [SysmacGenerator].
+/// Most [TemplateTag]s are replaced by the [SysmacGenerator] with generated text.
 ///
-/// [Tag]s:
+/// [TemplateTag]s:
 /// * are surrounded by double square brackets: [[ ]]
 /// * contain some kind of information, e.g.:
 ///   * often start with a name or name path:
 ///     e.g. [[importFile]] or [[project.name]]
 ///   * may have one or more attributes after the name:
 ///     e.g. [[importFile path='otherFile.txt']]
-class Tag {}
+class TemplateTag {}

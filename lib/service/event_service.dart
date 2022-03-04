@@ -1,21 +1,26 @@
+import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/sysmac_generator.dart';
+
 import '../infrastructure/sysmac_project.dart';
 
 /// Generates event documents from a [SysmacProjectFile]
 class EventService {
-  /// ## Why
-  /// The goal is to always generate all the event texts, while not making any
-  /// manual changes afterwards so that:
+  /// # Why events must be generated
+  /// The goal is to always generate all the events from a [SysmacProjectFile],
+  /// while not making any manual changes afterwards so that:
   /// * The event texts accurately match the PLC program (data types)
   /// * All event texts are accurate and consistent
   /// * Creating or updating the events is less labor intensive and less error prone
   ///
-  /// ## How
-  /// The event documents are generated from an exported [SysmacProjectFile] (*.scm).
-  /// So first step in creating or updating UserAlarms is exporting the latest SysmacProject.
-  /// Then start the sysmac_generator application with the following parameters
-  /// * TODO
-  /// * [SysmacProjectFile] (*.scm).
+  /// # How events are generated
+  /// The [SysmacGenerator] will read a folder containing [SysmacProjectFile]s
+  /// (of just a single [SysmacProjectFile]) and parse the [Event]s.
   ///
+  /// It will then generate generate output files using [TemplateFile]s and [TemplateTag]s.
+  /// These generated files can than be used to be imported into
+  /// [SysmacProjectFile]s or other applications.
+  ///
+  /// TODO: reference to TemplateFileTag and the containing event variable structure (generated from [EventGroup])
 
 
   // TODO scan existing UserAlarm texts in the SysmacProject.

@@ -109,7 +109,7 @@ class SysmacProjectVersion extends NameSpace {
   SysmacProjectVersion({
     required this.standardVersion,
     required this.customerVersion,
-    required String? notInstalledComment,
+    String? notInstalledComment,
   })  : notInstalledComment =
             notInstalledComment == null ? '' : notInstalledComment.sentenceCase,
         super('$standardVersion-$customerVersion-$notInstalledComment');

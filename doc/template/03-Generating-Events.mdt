@@ -1,3 +1,8 @@
-{ImportDartDoc path='lib/service/event_service.dart|EventService.generateForSysmacHmi' }
+{ImportDartDoc path='lib/domain/event/event.dart|Event' title='# Events' }
+
+{ImportDartDoc path='lib/service/event_service.dart|EventService.generateForSysmacHmi'}
+
+{ImportDartDoc path='lib/domain/event/parser/event_parser.dart|EventTag' title='# Event Tags'}
+The following paragraphs explain how the events are generated, starting from simple to more advanced examples.
 
 {ImportFile path='doc/template/EventExamples.mdt'}

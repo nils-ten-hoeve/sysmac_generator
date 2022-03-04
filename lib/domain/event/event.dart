@@ -5,6 +5,9 @@ class EventGroup extends NameSpace {
   EventGroup(String name) : super(name);
 }
 
+/// [Event]s are system alarms, warnings or messages that are displayed to the
+/// operator.
+
 class Event extends NameSpace {
   final String groupName1;
   final String groupName2;
