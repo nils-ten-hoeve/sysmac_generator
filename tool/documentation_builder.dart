@@ -1,4 +1,5 @@
 import 'package:documentation_builder/documentation_builder.dart';
+
 import '../test/domain/event/parser/example.dart';
 
 main() {

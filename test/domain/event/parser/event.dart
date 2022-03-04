@@ -3,7 +3,7 @@ import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:test/test.dart';
 
 main() {
-  var eventTagsParser=EventTagsParser();
+  var eventTagsParser = EventTagsParser();
   group('$EventTagsParser', () {
     String text = '12 30M2 34';
     test("'$text' has correct result", () {

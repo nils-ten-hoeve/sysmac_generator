@@ -4,6 +4,7 @@ import 'package:petitparser/parser.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 
 /// In order to generate [Event]s we need more information.
@@ -15,7 +16,7 @@ import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 ///
 /// The format of an [EventTag] is normally some text between square brackets, e.g.: [30M2]
 ///
-/// [EventTag] are not be directly visible in the [Event] message!
+/// [EventTag] are not directly visible in the [Event] message!
 class EventTag {
 // all relevant tag information as final field values!
 
@@ -46,19 +47,17 @@ class EventTagParser extends Parser {
   }
 }
 
-
-
 /// The [EventTagsParser] combines all [EventTagParser]s.
 ///
 /// [EventTagsParser.parse] results in an array of [EventTag] objects or remaining characters.
 
 class EventTagsParser extends EventTagParser {
-
   static final _remainingCharactersParser = any().flatten();
 
   EventTagsParser()
       : super((ComponentCodeTagParser() |
                 SiteNumberTagParser() |
+                PanelNumberTagParser() |
                 _remainingCharactersParser)
             .star());
 }

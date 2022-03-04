@@ -60,16 +60,19 @@ class ArrayRange {
 class DataTypeReference extends BaseType {
   final DataType dataType;
 
-  DataTypeReference(this.dataType, List<ArrayRange> arrayRanges) {
+  DataTypeReference({
+    required this.dataType,
+    required List<ArrayRange> arrayRanges,
+  }) {
     this.arrayRanges.addAll(arrayRanges);
   }
 
   /// not showing data type in to String because the DataType is shown
   /// See: [DataType.children]
-  // @override
-  // String toString() {
-  //   return super.toString() + '{$dataType}';
-  // }
+// @override
+// String toString() {
+//   return super.toString() + '{$dataType}';
+// }
 }
 
 class UnknownBaseType extends BaseType {

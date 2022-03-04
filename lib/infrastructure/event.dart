@@ -147,7 +147,7 @@ class EventService {
         pageNumber: partialComponentCode.pageNumber,
         letters: partialComponentCode.letters,
         columnNumber: partialComponentCode.columnNumber,
-      ).toText();
+      ).toCode();
     }
     return partialComponentCodes.isEmpty
         ? ''

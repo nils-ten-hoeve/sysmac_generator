@@ -95,13 +95,18 @@ class ComponentCode {
     return 'ComponentCode{site: $site, electricalPanel: $electricPanel, pageNumber: $pageNumber, letters: $letters, columnNumber: $columnNumber}';
   }
 
-  String toText() {
+  String toCode() {
     return '${site.code}.${electricPanel.code}.$pageNumber$letters$columnNumber';
   }
 }
 
-/// Format: <pageNumber><letters><pageNumber>
-/// Example: 30M2
+/// Each [Event] should have a reference to a [ComponentCode] where possible.
+/// This is done by dding a [ComponentCodeTag] anywhere in a comment.
+/// The full [ComponentCode] will than become visible in the [ComponentCode] field in the [Event].
+///
+/// [ComponentCodeTag]:
+/// * Format: [&lt;pageNumber&gt;&lt;letters&gt;&lt;pageNumber&gt;]
+/// * Examples: [30M2] or [ 110S8 ] but not [ 110S9 ]
 class ComponentCodeTag extends EventTag {
   final int pageNumber;
   final String letters;
@@ -148,9 +153,15 @@ class ComponentCodeTagParser extends EventTagParser {
       pattern('1-8').times(1).flatten().map(int.parse);
 
   ComponentCodeTagParser()
-      : super((_pageNumberParser & _letterParser & _columnNumberParser).map(
-            (values) => ComponentCodeTag(
-                pageNumber: values[0],
-                letters: values[1],
-                columnNumber: values[2])));
+      : super((char('[') &
+                whiteSpaceParser.optional() &
+                _pageNumberParser &
+                _letterParser &
+                _columnNumberParser &
+                whiteSpaceParser.optional() &
+                char(']'))
+            .map((values) => ComponentCodeTag(
+                pageNumber: values[2],
+                letters: values[3],
+                columnNumber: values[4])));
 }

@@ -9,21 +9,23 @@ import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
+import 'package:sysmac_generator/infrastructure/base_type.dart';
 import 'package:sysmac_generator/infrastructure/event.dart';
 import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'package:sysmac_generator/infrastructure/variable.dart';
 import 'package:test/test.dart';
 
-import 'event_global_example_test.dart';
 import 'component_code_example_test.dart';
+import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
+import 'event_global_example_test.dart';
 
 /// This [EventExample] serves the following purposes
 /// * It test the event [Metadata] syntax as parsed bij the [EventParser]
 /// * It generates a [MarkdownTemplateFile] to explain the event [Metadata]
 ///   syntax as parsed bij the [EventParser]
 abstract class EventExample with MarkDownTemplateWriter {
-  Definition get definition;
+  Definition createDefinition();
 
   String get explanation;
 
@@ -32,7 +34,8 @@ abstract class EventExample with MarkDownTemplateWriter {
   /// override when [SysmacProjectFile] name table needs to be added to [asMarkDown]
   bool get showSysmacFileNameTable => false;
 
-  get title => runtimeType.toString().replaceAll(RegExp('EventExample\$'), '').titleCase;
+  get title =>
+      runtimeType.toString().replaceAll(RegExp('EventExample\$'), '').titleCase;
 
   @override
   String get asMarkDown => EventExampleMarkDownWriter(this).asMarkDown;
@@ -46,10 +49,12 @@ abstract class EventExample with MarkDownTemplateWriter {
       SysmacProjectVersion(standardVersion: 12, customerVersion: 8);
 
   void executeTest() {
+    Definition definition = createDefinition();
+    DataTypeReferenceFactory().replaceWherePossible(definition.dataTypeTree);
     group('Class : $runtimeType', () {
       test('Method: test', () {
-        List<EventGroup> generatedGroups = generatedEventGroups;
-        List<EventGroup> expectedGroups = expectedEventGroups;
+        List<EventGroup> generatedGroups = generatedEventGroups(definition);
+        List<EventGroup> expectedGroups = expectedEventGroups(definition);
         expect(generatedGroups.length, expectedGroups.length);
         for (int groupIndex = 0;
             groupIndex < generatedGroups.length;
@@ -70,15 +75,16 @@ abstract class EventExample with MarkDownTemplateWriter {
     });
   }
 
-  List<EventGroup> get expectedEventGroups => definition.eventGroups;
+  List<EventGroup> expectedEventGroups(Definition definition) =>
+      definition.eventGroups;
 
-  List<EventGroup> get generatedEventGroups {
+  List<EventGroup> generatedEventGroups(Definition definition) {
     EventService eventService = EventService(
       site: site,
       electricPanel: electricPanel,
     );
     List<EventGroup> generatedGroups =
-        eventService.createFromVariable([definition.eventGlobalVariable]);
+    eventService.createFromVariable([definition.eventGlobalVariable]);
     return generatedGroups;
   }
 }
@@ -92,7 +98,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
   String get asMarkDown {
     String markDown = '${eventExample.explanation}\n';
 
-    var definition = eventExample.definition;
+    Definition definition = eventExample.createDefinition();
     var variable = definition.eventGlobalVariable;
 
     if (eventExample.showSysmacFileNameTable) {
@@ -152,15 +158,28 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     List<_HtmlRow> rows = [];
     String indent = level == 0 ? '' : '&nbsp;' * (level * 4);
     String name = nameSpace.name;
-    String type = nameSpace is DataType ? nameSpace.baseType.toString() : '';
+    String baseType = _createDataTypeBaseTypeSting(nameSpace);
     String comment = nameSpace is NameSpaceWithComment ? nameSpace.comment : '';
-    var row = _HtmlRow(values: [indent + name, type, comment]);
+    var row = _HtmlRow(values: [indent + name, baseType, comment]);
     rows.add(row);
     for (var child in nameSpace.children) {
       //recursive call
       rows.addAll(_createDataTypeRows(level + 1, child));
     }
     return rows;
+  }
+
+  String _createDataTypeBaseTypeSting(NameSpace nameSpace) {
+    if (nameSpace is! DataType) {
+      return '';
+    } else {
+      var baseType = nameSpace.baseType;
+      if (baseType is UnknownBaseType) {
+        return baseType.expression;
+      } else {
+        return baseType.toString();
+      }
+    }
   }
 
   List<_HtmlRow> _createDataTypeRowsForDataTypeTree(DataTypeTree dataTypeTree) {
@@ -332,7 +351,6 @@ class Definition {
     /// * ARRAY[1..2,3..4] OF Equipment\Pump\sEvent
     required String dataTypeExpression,
   }) {
-    //TODO
     DataType dataType = DataType(
       name: dataTypeName,
       comment: dataTypeComment,
@@ -341,7 +359,6 @@ class Definition {
       ,
     );
     pointer.children.add(dataType);
-    pointer = dataType;
     return this;
   }
 
@@ -352,6 +369,7 @@ class Definition {
       String groupName2 = '',
       String componentCode = '',
       EventPriority priority = EventPriorities.medium,
+      required String expression,
       required String message,
       String explanation = '',
       bool acknowledge = false}) {
@@ -367,7 +385,7 @@ class Definition {
         groupName2: groupName2,
         id: '${events.length + 1}',
         componentCode: componentCode,
-        expression: _createExpression(dataType),
+        expression: expression,
         priority: priority,
         message: message,
         explanation: explanation,
@@ -377,16 +395,6 @@ class Definition {
     return this;
 
     /// [FluentInterface]
-  }
-
-  String _createExpression(DataType dataType) {
-    var path = dataTypeTree.findPath(dataType).toList();
-    path.removeAt(0);
-    path.removeWhere(
-        (nameSpace) => nameSpace is DataType && nameSpace.baseType == Struct());
-    return GlobalVariableService.eventGlobalVariableName +
-        '.' +
-        path.map((nameSpace) => nameSpace.name).join('.');
   }
 
   /// Sets the [pointer] to the [dataTypeTree] and returns the tree so that other [DataType]s can be added to it using a [FluentInterface]
@@ -408,7 +416,8 @@ class Definition {
     return Variable(
         name: GlobalVariableService.eventGlobalVariableName,
         comment: variableComment,
-        baseType: DataTypeReference(struct as DataType, []));
+        baseType:
+            DataTypeReference(dataType: struct as DataType, arrayRanges: []));
   }
 
   List<EventGroup> get eventGroups {
@@ -423,6 +432,19 @@ class Definition {
       eventGroup.children.add(event);
     }
     return eventGroups;
+  }
+
+  void goToPath(List<String> pathToFind) {
+    var found = dataTypeTree.findNamePath(pathToFind);
+    if (found == null) {
+      throw Exception('Could not find path: ${pathToFind.join(".")}');
+    } else {
+      pointer = found;
+    }
+  }
+
+  void goToRoot() {
+    pointer = dataTypeTree;
   }
 }
 
@@ -472,6 +494,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventGlobalEventExample(),
           ComponentCodeEventExample(),
           ComponentCodeSiteEventExample(),
+          ComponentCodePanelEventExample(),
         ]);
 
   @override

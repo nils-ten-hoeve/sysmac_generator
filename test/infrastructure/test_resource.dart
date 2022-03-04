@@ -34,5 +34,6 @@ class TestResource {
 }
 
 class SysmacProjectTestResource extends TestResource {
-  SysmacProjectTestResource() : super('4321DE06-Evisceration-001-005_not_installed.smc2');
+  SysmacProjectTestResource()
+      : super('4321DE06-Evisceration-001-005_not_installed.smc2');
 }

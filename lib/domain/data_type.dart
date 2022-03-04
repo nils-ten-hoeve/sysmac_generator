@@ -36,7 +36,4 @@ class DataType extends NameSpaceWithComment {
 
 class DataTypeTree extends NameSpace {
   DataTypeTree() : super('$DataTypeTree');
-
-
-
 }

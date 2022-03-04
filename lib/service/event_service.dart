@@ -22,7 +22,6 @@ class EventService {
   ///
   /// TODO: reference to TemplateFileTag and the containing event variable structure (generated from [EventGroup])
 
-
   // TODO scan existing UserAlarm texts in the SysmacProject.
   // It will generate the English alarm texts using
   //   the DataType's in the SysmacProject. We assume that an UserAlarm text of
@@ -48,7 +47,8 @@ class EventService {
   // can be inserted by importing the M$ Excel file.
   void generateForSysmacHmi(String sysmacProjectFilePath) {
     var sysmacProject = SysmacProjectFactory().create(sysmacProjectFilePath);
-    var eventGlobalVariables=sysmacProject.globalVariableService.findVariablesWithEventGlobalName();
+    var eventGlobalVariables =
+        sysmacProject.globalVariableService.findVariablesWithEventGlobalName();
     sysmacProject.eventService.createFromVariable(eventGlobalVariables);
   }
 

@@ -3,3 +3,5 @@
 {ImportFile path='doc/template/ComponentCodeEventExample.mdt' title='# Component Code'}
 
 {ImportFile path='doc/template/ComponentCodeSiteEventExample.mdt' title='# Component Code Site'}
+
+{ImportFile path='doc/template/ComponentCodePanelEventExample.mdt' title='# Component Code Panel'}

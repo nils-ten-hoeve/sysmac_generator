@@ -15,7 +15,6 @@ class NameSpace {
     return all;
   }
 
-
   /// Tries to find a child using a list of [namesToFind]
   /// Returns this when [namesToFind] is empty.
   /// Returns null when a name can't be found.
@@ -83,7 +82,6 @@ class NameSpace {
 
   @override
   int get hashCode => name.hashCode ^ children.hashCode;
-
 
   @override
   String toString() {

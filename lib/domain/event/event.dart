@@ -20,16 +20,17 @@ class Event extends NameSpace {
   final bool popup;
   final bool acknowledge;
 
-  Event({required this.groupName1,
-    this.groupName2 = '',
-    required this.id,
-    this.componentCode='',
-    required this.expression,
-    this.priority = EventPriorities.medium,
-    required this.message,
-    this.explanation='',
-    this.popup = false,
-    this.acknowledge = false})
+  Event(
+      {required this.groupName1,
+      this.groupName2 = '',
+      required this.id,
+      this.componentCode = '',
+      required this.expression,
+      this.priority = EventPriorities.medium,
+      required this.message,
+      this.explanation = '',
+      this.popup = false,
+      this.acknowledge = false})
       : super(expression);
 
   @override
@@ -111,9 +112,9 @@ class EventPriorities extends DelegatingList<EventPriority> {
     abbreviation: 'F',
     level: 1,
     description:
-    'A fatal problem that prevents the system from working (fatal for system).',
+        'A fatal problem that prevents the system from working (fatal for system).',
     example:
-    'An EtherCAT error, an important fuse of the control system, missing IO cards, critical IO card errors, etc.',
+        'An EtherCAT error, an important fuse of the control system, missing IO cards, critical IO card errors, etc.',
   );
 
   static const critical = EventPriority(
@@ -122,17 +123,15 @@ class EventPriorities extends DelegatingList<EventPriority> {
     level: 2,
     description: 'A critical problem that stops the system.',
     example:
-    'An emergency stop, a critical motor tripped, low hydraulic level, etc.',
+        'An emergency stop, a critical motor tripped, low hydraulic level, etc.',
   );
 
   static const high = EventPriority(
     name: 'High',
     abbreviation: 'H',
     level: 3,
-    description:
-    'A problem with major consequences, but system keeps running.',
-    example:
-    'Direct action is needed, e.g.: an important motor tripped, etc.',
+    description: 'A problem with major consequences, but system keeps running.',
+    example: 'Direct action is needed, e.g.: an important motor tripped, etc.',
   );
 
   static const mediumHigh = EventPriority(
@@ -149,7 +148,7 @@ class EventPriorities extends DelegatingList<EventPriority> {
     level: 5,
     description: 'A problem with some consequences.',
     example:
-    'Action within 5 minutes is required, e.g. when a low temperature is detected.',
+        'Action within 5 minutes is required, e.g. when a low temperature is detected.',
   );
 
   static const mediumLow = EventPriority(
@@ -164,8 +163,7 @@ class EventPriorities extends DelegatingList<EventPriority> {
     abbreviation: 'L',
     level: 7,
     description: 'A problem with almost no consequences.',
-    example:
-    'Eventually action is required, e.g. a tripped plucker motor.',
+    example: 'Eventually action is required, e.g. a tripped plucker motor.',
   );
 
   static const info = EventPriority(
@@ -173,20 +171,12 @@ class EventPriorities extends DelegatingList<EventPriority> {
       abbreviation: 'I',
       level: 9,
       description:
-      'All events that are not an error, such as information for the operator',
-      example:
-      'When a stop button is pressed, or external stop is activated.');
+          'All events that are not an error, such as information for the operator',
+      example: 'When a stop button is pressed, or external stop is activated.');
 
   EventPriorities._internal()
-      : super([
-    fatal,
-    critical,
-    high,
-    mediumHigh,
-    medium,
-    mediumLow,
-    low,
-    info]);
+      : super(
+            [fatal, critical, high, mediumHigh, medium, mediumLow, low, info]);
 
   String get asMarkDown {
     String markdown =
@@ -194,8 +184,7 @@ class EventPriorities extends DelegatingList<EventPriority> {
     markdown += '| --- | --- | --- | --- | --- |\n';
     for (var priority in EventPriorities()) {
       markdown +=
-      '| ${priority.name} | ${priority.abbreviation} | ${priority
-          .omronPriority} | ${priority.description} | ${priority.example} |\n';
+          '| ${priority.name} | ${priority.abbreviation} | ${priority.omronPriority} | ${priority.description} | ${priority.example} |\n';
     }
     return markdown;
   }

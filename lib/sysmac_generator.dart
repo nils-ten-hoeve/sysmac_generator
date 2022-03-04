@@ -37,8 +37,6 @@ class SysmacGenerator {
   }
 }
 
-
-
 /// [TemplateFile] files are text files such as:
 /// * [csv files](https://en.wikipedia.org/wiki/Comma-separated_values)
 /// * [json files](https://en.wikipedia.org/wiki/JSON)

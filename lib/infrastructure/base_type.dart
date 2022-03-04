@@ -207,7 +207,10 @@ class DataTypeReferenceFactory {
     var referencedDataType = dataTypeTree.findNamePathString(path);
     if (referencedDataType != null && referencedDataType is DataType) {
       var arrayRanges = baseType.arrayRanges;
-      return DataTypeReference(referencedDataType, arrayRanges);
+      return DataTypeReference(
+        dataType: referencedDataType,
+        arrayRanges: arrayRanges,
+      );
     } else {
       return null;
     }
