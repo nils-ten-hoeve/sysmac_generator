@@ -69,7 +69,6 @@ class ElectricPanel extends NameSpace {
   /// e.g. DE06 = Evisceration line (at site 4321 = Maple Leaf - London - Canada)
   final String code;
 
-
   ElectricPanel({
     required this.number,
     required String name,

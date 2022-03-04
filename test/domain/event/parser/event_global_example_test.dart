@@ -1,4 +1,3 @@
-
 import 'example.dart';
 
 class EventGlobalEventExample extends EventExample {

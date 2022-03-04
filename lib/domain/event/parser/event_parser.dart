@@ -46,14 +46,11 @@ class EventTagParser extends Parser {
   }
 }
 
-
-
 /// The [EventTagsParser] combines all [EventTagParser]s.
 ///
 /// [EventTagsParser.parse] results in an array of [EventTag] objects or remaining characters.
 
 class EventTagsParser extends EventTagParser {
-
   static final _remainingCharactersParser = any().flatten();
 
   EventTagsParser()

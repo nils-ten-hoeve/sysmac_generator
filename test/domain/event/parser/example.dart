@@ -14,9 +14,9 @@ import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'package:sysmac_generator/infrastructure/variable.dart';
 import 'package:test/test.dart';
 
-import 'event_global_example_test.dart';
 import 'component_code_example_test.dart';
 import 'component_code_site_example_test.dart';
+import 'event_global_example_test.dart';
 
 /// This [EventExample] serves the following purposes
 /// * It test the event [Metadata] syntax as parsed bij the [EventParser]
@@ -32,7 +32,8 @@ abstract class EventExample with MarkDownTemplateWriter {
   /// override when [SysmacProjectFile] name table needs to be added to [asMarkDown]
   bool get showSysmacFileNameTable => false;
 
-  get title => runtimeType.toString().replaceAll(RegExp('EventExample\$'), '').titleCase;
+  get title =>
+      runtimeType.toString().replaceAll(RegExp('EventExample\$'), '').titleCase;
 
   @override
   String get asMarkDown => EventExampleMarkDownWriter(this).asMarkDown;

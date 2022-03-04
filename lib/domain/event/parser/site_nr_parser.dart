@@ -3,8 +3,16 @@ import 'package:petitparser/parser.dart';
 import 'event_parser.dart';
 import 'generic_parsers.dart';
 
-/// Format: [SiteNr=#]
-/// Example: [SiteNr=123] or [sitenr=123] or [ siteNr = 123 ]
+/// The [ComponentCode] in an [Event] begins with a site number.
+/// Each known processing plant has a unique number, also called a Meyn layout number.
+///
+/// e.g. 4321 = Maple Leaf - London - Canada
+///
+/// The default site number  comes from the the [SysmacProjectFile] name.
+///
+/// You can override the site number by using a [SiteNumberTag] in one of the comments:
+/// * Format: [SiteNr=&lt;number&gt;]
+/// * Examples: [SiteNr=123] or [sitenr=123] or [ siteNr = 123 ]
 class SiteNumberTag extends EventTag {
   final int number;
 
