@@ -84,7 +84,7 @@ abstract class EventExample with MarkDownTemplateWriter {
       electricPanel: electricPanel,
     );
     List<EventGroup> generatedGroups =
-    eventService.createFromVariable([definition.eventGlobalVariable]);
+        eventService.createFromVariable([definition.eventGlobalVariable]);
     return generatedGroups;
   }
 }
