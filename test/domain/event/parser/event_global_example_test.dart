@@ -32,11 +32,5 @@ class EventGlobalExample extends EventExample {
 }
 
 main() {
-  // var example = BasicEventExample();
-  // group('class: $BasicEventExample', () {
-  //   test('Correctly generated ${EventGroup}s', () {
-  //     expect(example.generatedEventGroups, example.expectedEventGroups);
-  //   });
-  // });
   EventGlobalExample().executeTest();
 }
