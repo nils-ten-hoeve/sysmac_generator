@@ -1,4 +1,4 @@
-[//]: # (This file was generated from: doc/template/README.mdt using the documentation_builder package on: 2022-03-06 20:18:31.648406.)
+[//]: # (This file was generated from: doc/template/README.mdt using the documentation_builder package on: 2022-03-19 17:38:22.743908.)
 <a id='doc-template-badges-mdt'></a>[![Code Repository](https://img.shields.io/badge/repository-git%20hub-informational)](https://github.com/nils-ten-hoeve/sysmac_generator)
 [![Github Wiki](https://img.shields.io/badge/documentation-wiki-informational)](https://github.com/nils-ten-hoeve/sysmac_generator/wiki)
 [![GitHub Stars](https://img.shields.io/github/stars/nils-ten-hoeve/sysmac_generator)](https://github.com/nils-ten-hoeve/sysmac_generator/stargazers)

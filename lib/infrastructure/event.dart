@@ -5,6 +5,7 @@ import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
@@ -84,7 +85,7 @@ class EventService {
       id: eventCounter.next,
       componentCode: _findComponentCode(eventTags),
       expression: _createExpression(eventPath),
-      priority: EventPriorities.medium,
+      priority: _findPriority(parsedComments),
       //TODO
       message: _findMessage(parsedComments),
       explanation: '',
@@ -159,6 +160,15 @@ class EventService {
 
   SiteNumberTag _findSiteNumberTag(List<EventTag> eventTags) =>
       eventTags.whereType<SiteNumberTag>().last;
+
+  EventPriority _findPriority(List parsedComments) {
+    var priorityTags = parsedComments.whereType<PriorityTag>();
+    if (priorityTags.isEmpty) {
+      return EventPriorities.medium;
+    } else {
+      return priorityTags.last.priority;
+    }
+  }
 }
 
 class EventCounter {

@@ -6,6 +6,7 @@ import 'package:recase/recase.dart';
 import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/html/html_table.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
@@ -19,6 +20,7 @@ import 'component_code_example_test.dart';
 import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
 import 'event_global_example_test.dart';
+import 'priority_example_test.dart';
 
 /// This [EventExample] serves the following purposes
 /// * It test the event [Metadata] syntax as parsed bij the [EventParser]
@@ -34,8 +36,11 @@ abstract class EventExample with MarkDownTemplateWriter {
   /// override when [SysmacProjectFile] name table needs to be added to [asMarkDown]
   bool get showSysmacFileNameTable => false;
 
-  get title =>
-      runtimeType.toString().replaceAll(RegExp('EventExample\$'), '').titleCase;
+  get title => runtimeType
+      .toString()
+      .replaceAll(RegExp('^Event'), '')
+      .replaceAll(RegExp('Example\$'), '')
+      .titleCase;
 
   @override
   String get asMarkDown => EventExampleMarkDownWriter(this).asMarkDown;
@@ -96,7 +101,8 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
 
   @override
   String get asMarkDown {
-    String markDown = '${eventExample.explanation}\n';
+    String markDown = '${eventExample.explanation}\n\n';
+    markDown += '$SysmacProjectFile example:\n';
 
     Definition definition = eventExample.createDefinition();
     var variable = definition.eventGlobalVariable;
@@ -113,21 +119,20 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     return markDown;
   }
 
-  _HtmlTable _createVariableTable(Definition definition, Variable variable) =>
-      _HtmlTable(
+  HtmlTable _createVariableTable(Definition definition, Variable variable) =>
+      HtmlTable(
         headerRows: _createVariableHeaderRows(),
         rows: _createVariableRows(definition, variable),
       );
 
-  List<_HtmlRow> _createVariableHeaderRows() => [
-        _HtmlRow(values: ['Variable'], colSpans: [3]),
-        _HtmlRow(values: ['Name', 'Type', 'Comment']),
+  List<HtmlRow> _createVariableHeaderRows() => [
+        HtmlRow(values: ['Variable'], colSpans: [3]),
+        HtmlRow(values: ['Name', 'Type', 'Comment']),
       ];
 
-  List<_HtmlRow> _createVariableRows(
-          Definition definition, Variable variable) =>
+  List<HtmlRow> _createVariableRows(Definition definition, Variable variable) =>
       [
-        _HtmlRow(values: [
+        HtmlRow(values: [
           variable.name,
           _createReferencePath(definition, variable),
           variable.comment,
@@ -144,23 +149,23 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     return referencePath.join('\\');
   }
 
-  _HtmlTable _createDataTypeTable(DataTypeTree dataTypeTree) => _HtmlTable(
+  HtmlTable _createDataTypeTable(DataTypeTree dataTypeTree) => HtmlTable(
         headerRows: _createDataTypeHeaderRows(),
         rows: _createDataTypeRowsForDataTypeTree(dataTypeTree),
       );
 
-  List<_HtmlRow> _createDataTypeHeaderRows() => [
-        _HtmlRow(values: ['Data Types'], colSpans: [3]),
-        _HtmlRow(values: ['Name', 'Type', 'Comment']),
+  List<HtmlRow> _createDataTypeHeaderRows() => [
+        HtmlRow(values: ['Data Types'], colSpans: [3]),
+        HtmlRow(values: ['Name', 'Type', 'Comment']),
       ];
 
-  List<_HtmlRow> _createDataTypeRows(int level, NameSpace nameSpace) {
-    List<_HtmlRow> rows = [];
+  List<HtmlRow> _createDataTypeRows(int level, NameSpace nameSpace) {
+    List<HtmlRow> rows = [];
     String indent = level == 0 ? '' : '&nbsp;' * (level * 4);
     String name = nameSpace.name;
     String baseType = _createDataTypeBaseTypeSting(nameSpace);
     String comment = nameSpace is NameSpaceWithComment ? nameSpace.comment : '';
-    var row = _HtmlRow(values: [indent + name, baseType, comment]);
+    var row = HtmlRow(values: [indent + name, baseType, comment]);
     rows.add(row);
     for (var child in nameSpace.children) {
       //recursive call
@@ -182,27 +187,27 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     }
   }
 
-  List<_HtmlRow> _createDataTypeRowsForDataTypeTree(DataTypeTree dataTypeTree) {
-    List<_HtmlRow> rows = [];
+  List<HtmlRow> _createDataTypeRowsForDataTypeTree(DataTypeTree dataTypeTree) {
+    List<HtmlRow> rows = [];
     for (var nameSpace in dataTypeTree.children) {
       rows.addAll(_createDataTypeRows(0, nameSpace));
     }
     return rows;
   }
 
-  _createSysmacFileNameTable(EventExample eventExample) => _HtmlTable(
+  _createSysmacFileNameTable(EventExample eventExample) => HtmlTable(
         headerRows: _createSysmacFileNameHeaderRows(),
         rows: _createSysmacFileNameRows(eventExample),
       );
 
-  List<_HtmlRow> _createSysmacFileNameHeaderRows() => [
-        _HtmlRow(
+  List<HtmlRow> _createSysmacFileNameHeaderRows() => [
+        HtmlRow(
           values: ['Sysmac Project File Name'],
         ),
       ];
 
   _createSysmacFileNameRows(EventExample eventExample) => [
-        _HtmlRow(
+        HtmlRow(
           values: [
             '${eventExample.site.code}${eventExample.electricPanel.code}-'
                 '${eventExample.electricPanel.name}-'
@@ -212,86 +217,31 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         ),
       ];
 
-  _HtmlTable _createEventTable(List<Event> events) => _HtmlTable(
+  HtmlTable _createEventTable(List<Event> events) => HtmlTable(
         headerRows: _createEventHeaderRows(),
         rows: _createEventRows(events),
       );
 
-  List<_HtmlRow> _createEventHeaderRows() => [
-        _HtmlRow(
+  List<HtmlRow> _createEventHeaderRows() => [
+        HtmlRow(
           values: ['Generated Events'],
           colSpans: [eventExample.eventTableColumns.length],
         ),
-        _HtmlRow(
+        HtmlRow(
             values: eventExample.eventTableColumns
                 .map((column) => column.name)
                 .toList()),
       ];
 
-  List<_HtmlRow> _createEventRows(List<Event> events) {
-    List<_HtmlRow> rows = [];
+  List<HtmlRow> _createEventRows(List<Event> events) {
+    List<HtmlRow> rows = [];
     for (var event in events) {
-      rows.add(_HtmlRow(
+      rows.add(HtmlRow(
           values: eventExample.eventTableColumns
               .map((column) => column.cellValue(event))
               .toList()));
     }
     return rows;
-  }
-}
-
-class _HtmlTable {
-  final List<_HtmlRow> headerRows;
-  final List<_HtmlRow> rows;
-
-  _HtmlTable({this.headerRows = const [], this.rows = const []});
-
-  String toHtml() {
-    String html = '<table>\n';
-    for (var headerRow in headerRows) {
-      for (var htmlLine in headerRow.toHtmlLines(isHeader: true)) {
-        html += '  $htmlLine';
-      }
-    }
-    for (var row in rows) {
-      for (var htmlLine in row.toHtmlLines()) {
-        html += '  $htmlLine';
-      }
-    }
-
-    html += '</table>\n';
-    return html;
-  }
-
-  @override
-  String toString() => toHtml();
-}
-
-class _HtmlRow {
-  final List<int?> colSpans;
-  final List<String> values;
-
-  _HtmlRow({this.colSpans = const [], required this.values});
-
-  List<String> toHtmlLines({bool isHeader = false}) {
-    List<String> htmlLines = [];
-    htmlLines.add('<tr>\n');
-    for (int i = 0; i < values.length; i++) {
-      var collSpan = i < colSpans.length ? colSpans[i] : null;
-      htmlLines.add(_createCellHtml(isHeader, values[i], collSpan));
-    }
-    htmlLines.add('</tr>\n');
-    return htmlLines;
-  }
-
-  String _createCellHtml(bool isHeader, String value, int? colSpan) {
-    String cellHtml = '';
-    String collSpanAttribute = colSpan == null ? '' : ' colspan="$colSpan" ';
-    cellHtml +=
-        isHeader ? '  <th$collSpanAttribute>' : '  <td$collSpanAttribute>';
-    cellHtml += value;
-    cellHtml += isHeader ? '</th>\n' : '</td>\n';
-    return cellHtml;
   }
 }
 
@@ -421,11 +371,10 @@ class Definition {
   }
 
   List<EventGroup> get eventGroups {
-    String groupName = '';
-    EventGroup eventGroup = EventGroup((groupName));
+    EventGroup eventGroup = EventGroup('');
     List<EventGroup> eventGroups = [];
     for (var event in events) {
-      if (event.groupName1 != groupName) {
+      if (event.groupName1 != eventGroup.name) {
         eventGroup = EventGroup(event.groupName1);
         eventGroups.add(eventGroup);
       }
@@ -483,6 +432,9 @@ class EventTableColumns extends DelegatingList<EventTableColumn> {
   EventTableColumns get withMessage =>
       _add(EventTableColumn('Message', (event) => event.message));
 
+  EventTableColumns get withPriority => _add(EventTableColumn('Priority',
+      (event) => '${event.priority.name} (= ${event.priority.omronPriority})'));
+
   _add(EventTableColumn newColumn) =>
       EventTableColumns.forColumns([...this, newColumn]);
 }
@@ -492,6 +444,7 @@ class EventExamples extends DelegatingList<EventExample>
   EventExamples()
       : super([
           EventGlobalEventExample(),
+          EventPriorityExample(),
           ComponentCodeEventExample(),
           ComponentCodeSiteEventExample(),
           ComponentCodePanelEventExample(),

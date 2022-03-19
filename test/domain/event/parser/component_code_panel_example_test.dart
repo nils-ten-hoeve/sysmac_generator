@@ -20,7 +20,6 @@ class ComponentCodePanelEventExample extends EventExample {
 
   @override
   Definition createDefinition() => Definition()
-    ..variableComment = '[PanelNr=0]'
     ..addStruct('sEvent')
     ..addStructReference(
       dataTypeName: 'MainPanel',

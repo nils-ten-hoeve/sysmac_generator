@@ -5,6 +5,7 @@ import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 
 /// In order to generate [Event]s we need more information.
@@ -55,7 +56,8 @@ class EventTagsParser extends EventTagParser {
   static final _remainingCharactersParser = any().flatten();
 
   EventTagsParser()
-      : super((ComponentCodeTagParser() |
+      : super((PriorityTagParser() |
+                ComponentCodeTagParser() |
                 SiteNumberTagParser() |
                 PanelNumberTagParser() |
                 _remainingCharactersParser)

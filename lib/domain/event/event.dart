@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:sysmac_generator/domain/html/html_table.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 
 class EventGroup extends NameSpace {
@@ -178,14 +179,24 @@ class EventPriorities extends DelegatingList<EventPriority> {
       : super(
             [fatal, critical, high, mediumHigh, medium, mediumLow, low, info]);
 
-  String get asMarkDown {
-    String markdown =
-        '| Priority | Abbreviation | Omron Priority | Description | Example |\n';
-    markdown += '| --- | --- | --- | --- | --- |\n';
-    for (var priority in EventPriorities()) {
-      markdown +=
-          '| ${priority.name} | ${priority.abbreviation} | ${priority.omronPriority} | ${priority.description} | ${priority.example} |\n';
-    }
-    return markdown;
-  }
+  String get asMarkDown => HtmlTable(
+              headerRows: [
+            HtmlRow(values: [
+              'Priority Name',
+              'Abbreviation',
+              'Omron Priority',
+              'Description',
+              'Example'
+            ])
+          ],
+              rows: EventPriorities()
+                  .map((priority) => HtmlRow(values: [
+                        priority.name,
+                        priority.abbreviation,
+                        priority.omronPriority,
+                        priority.description,
+                        priority.example,
+                      ]))
+                  .toList())
+          .toHtml();
 }
