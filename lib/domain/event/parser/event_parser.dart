@@ -17,7 +17,7 @@ import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 ///
 /// The format of an [EventTag] is normally some text between square brackets, e.g.: [30M2]
 ///
-/// [EventTag] are not directly visible in the [Event] message!
+/// [EventTag]s are not directly visible in the [Event] message!
 class EventTag {
 // all relevant tag information as final field values!
 

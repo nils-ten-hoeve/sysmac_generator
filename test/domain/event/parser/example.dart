@@ -443,11 +443,11 @@ class EventExamples extends DelegatingList<EventExample>
     with MarkDownTemplateWriter {
   EventExamples()
       : super([
-          EventGlobalEventExample(),
+          EventGlobalExample(),
           EventPriorityExample(),
-          ComponentCodeEventExample(),
-          ComponentCodeSiteEventExample(),
-          ComponentCodePanelEventExample(),
+          EventComponentCodeExample(),
+          EventComponentCodeSiteExample(),
+          EventComponentCodePanelExample(),
         ]);
 
   @override

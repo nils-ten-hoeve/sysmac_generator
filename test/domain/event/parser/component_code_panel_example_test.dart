@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 import 'example.dart';
 
-class ComponentCodePanelEventExample extends EventExample {
+class EventComponentCodePanelExample extends EventExample {
   @override
   bool get showSysmacFileNameTable => true;
 
@@ -64,7 +64,7 @@ class ComponentCodePanelEventExample extends EventExample {
 }
 
 main() {
-  ComponentCodePanelEventExample().executeTest();
+  EventComponentCodePanelExample().executeTest();
 
   var parser = PanelNumberTagParser();
   group('$PanelNumberTagParser', () {

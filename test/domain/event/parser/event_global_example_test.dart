@@ -1,6 +1,9 @@
 import 'example.dart';
 
-class EventGlobalEventExample extends EventExample {
+class EventGlobalExample extends EventExample {
+  @override
+  get title => 'EventGlobal';
+
   @override
   String get explanation => 'Events are defined in the EventGlobal variable. '
       'Each boolean in the EventGlobal variable structure is an event:';
@@ -35,5 +38,5 @@ main() {
   //     expect(example.generatedEventGroups, example.expectedEventGroups);
   //   });
   // });
-  EventGlobalEventExample().executeTest();
+  EventGlobalExample().executeTest();
 }

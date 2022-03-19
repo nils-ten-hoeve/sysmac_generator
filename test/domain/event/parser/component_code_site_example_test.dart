@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 import 'example.dart';
 
-class ComponentCodeSiteEventExample extends EventExample {
+class EventComponentCodeSiteExample extends EventExample {
   @override
   bool get showSysmacFileNameTable => true;
 
@@ -38,7 +38,7 @@ class ComponentCodeSiteEventExample extends EventExample {
 }
 
 main() {
-  ComponentCodeSiteEventExample().executeTest();
+  EventComponentCodeSiteExample().executeTest();
 
   var parser = SiteNumberTagParser();
   group('$SiteNumberTagParser', () {

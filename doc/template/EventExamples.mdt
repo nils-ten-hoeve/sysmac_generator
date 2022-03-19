@@ -1,9 +1,9 @@
-{ImportFile path='doc/template/EventGlobalEventExample.mdt' title='# Global Event'}
+{ImportFile path='doc/template/EventGlobalExample.mdt' title='# EventGlobal'}
 
 {ImportFile path='doc/template/EventPriorityExample.mdt' title='# Priority'}
 
-{ImportFile path='doc/template/ComponentCodeEventExample.mdt' title='# Component Code Event'}
+{ImportFile path='doc/template/EventComponentCodeExample.mdt' title='# Component Code'}
 
-{ImportFile path='doc/template/ComponentCodeSiteEventExample.mdt' title='# Component Code Site Event'}
+{ImportFile path='doc/template/EventComponentCodeSiteExample.mdt' title='# Component Code Site'}
 
-{ImportFile path='doc/template/ComponentCodePanelEventExample.mdt' title='# Component Code Panel Event'}
+{ImportFile path='doc/template/EventComponentCodePanelExample.mdt' title='# Component Code Panel'}
