@@ -2,6 +2,7 @@ import 'package:recase/recase.dart';
 import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/event/parser/acknowledge_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
@@ -85,12 +86,11 @@ class EventService {
       id: eventCounter.next,
       componentCode: _findComponentCode(eventTags),
       expression: _createExpression(eventPath),
-      priority: _findPriority(parsedComments),
-      //TODO
+      priority: _findPriority(eventTags),
       message: _findMessage(parsedComments),
       explanation: '',
       //TODO
-      acknowledge: false, //TODO
+      acknowledge: _findAcknowledge(eventTags),
     );
     return [
       event
@@ -161,12 +161,21 @@ class EventService {
   SiteNumberTag _findSiteNumberTag(List<EventTag> eventTags) =>
       eventTags.whereType<SiteNumberTag>().last;
 
-  EventPriority _findPriority(List parsedComments) {
-    var priorityTags = parsedComments.whereType<PriorityTag>();
+  EventPriority _findPriority(List<EventTag> eventTags) {
+    var priorityTags = eventTags.whereType<PriorityTag>();
     if (priorityTags.isEmpty) {
       return EventPriorities.medium;
     } else {
       return priorityTags.last.priority;
+    }
+  }
+
+  bool _findAcknowledge(List<EventTag> eventTags) {
+    var acknowledgeTags = eventTags.whereType<AcknowledgeTag>();
+    if (acknowledgeTags.isEmpty) {
+      return _findPriority(eventTags) != EventPriorities.info;
+    } else {
+      return acknowledgeTags.last.acknowledge;
     }
   }
 }

@@ -16,6 +16,7 @@ import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'package:sysmac_generator/infrastructure/variable.dart';
 import 'package:test/test.dart';
 
+import 'acknowledge_example_test.dart';
 import 'component_code_example_test.dart';
 import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
@@ -435,6 +436,9 @@ class EventTableColumns extends DelegatingList<EventTableColumn> {
   EventTableColumns get withPriority => _add(EventTableColumn('Priority',
       (event) => '${event.priority.name} (= ${event.priority.omronPriority})'));
 
+  EventTableColumns get withAcknowledge => _add(
+      EventTableColumn('Acknowledge', (event) => event.acknowledge.toString()));
+
   _add(EventTableColumn newColumn) =>
       EventTableColumns.forColumns([...this, newColumn]);
 }
@@ -445,6 +449,7 @@ class EventExamples extends DelegatingList<EventExample>
       : super([
           EventGlobalExample(),
           EventPriorityExample(),
+          EventAcknowledgeExample(),
           EventComponentCodeExample(),
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),

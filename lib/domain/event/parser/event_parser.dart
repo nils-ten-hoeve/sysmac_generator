@@ -3,6 +3,7 @@ import 'package:petitparser/core.dart';
 import 'package:petitparser/parser.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/event/parser/acknowledge_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
@@ -57,6 +58,7 @@ class EventTagsParser extends EventTagParser {
 
   EventTagsParser()
       : super((PriorityTagParser() |
+                AcknowledgeTagParser() |
                 ComponentCodeTagParser() |
                 SiteNumberTagParser() |
                 PanelNumberTagParser() |
