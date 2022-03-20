@@ -323,7 +323,7 @@ class Definition {
       required String expression,
       required String message,
       String explanation = '',
-      bool acknowledge = false}) {
+      bool acknowledge = true}) {
     DataType dataType = DataType(
       name: dataTypeName,
       comment: dataTypeComment,

@@ -77,6 +77,7 @@ class EventPriorityExample extends EventExample {
         expression: 'EventGlobal.Examples.LineStopButton',
         priority: EventPriorities.info,
         message: 'Line stop button pressed',
+        acknowledge: false,
       );
   }
 }
