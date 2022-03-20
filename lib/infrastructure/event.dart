@@ -8,9 +8,11 @@ import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
+import 'package:sysmac_generator/util/sentence.dart';
 
 class EventService {
   // final GlobalVariableService globalVariableService;
@@ -73,24 +75,21 @@ class EventService {
       EventCounter eventCounter) {
     var parsedComments = _parseComments(eventPath);
     var eventTags = _findEventTags(parsedComments);
-
-    String groupName1 = eventGroup.name;
-    String groupName2 = eventPath[_groupNameIndex].name.titleCase;
-    if (groupName1 == groupName2) {
-      groupName2 = '';
-    }
-
+    var groupName1 = eventGroup.name;
+    var groupName2 = _findGroupName2(groupName1, eventPath);
+    var priority = _findPriority(eventTags);
+    var componentCode = _findComponentCode(eventTags);
+    var message = _findMessage(parsedComments);
     Event event = Event(
       groupName1: groupName1,
       groupName2: groupName2,
       id: eventCounter.next,
-      componentCode: _findComponentCode(eventTags),
+      componentCode: componentCode == null ? '' : componentCode.toCode(),
       expression: _createExpression(eventPath),
-      priority: _findPriority(eventTags),
-      message: _findMessage(parsedComments),
-      explanation: '',
-      //TODO
-      acknowledge: _findAcknowledge(eventTags),
+      priority: priority,
+      message: message,
+      solution: _findSolution(eventTags, componentCode),
+      acknowledge: _findAcknowledge(eventTags, priority),
     );
     return [
       event
@@ -121,21 +120,10 @@ class EventService {
     return result;
   }
 
-  String _findMessage(List parsedComments) => _upperCaseFirstLetter(
-      parsedComments.whereType<String>().join().trim().replaceAll('  ', ' '));
+  String _findMessage(List parsedComments) =>
+      Sentence.normalize(parsedComments.whereType<String>().join());
 
-  String _upperCaseFirstLetter(String trimmedSentence) {
-    if (trimmedSentence.isEmpty) {
-      return trimmedSentence;
-    } else if (trimmedSentence.length == 1) {
-      return trimmedSentence.substring(0, 1).toUpperCase();
-    } else {
-      return trimmedSentence.substring(0, 1).toUpperCase() +
-          trimmedSentence.substring(1);
-    }
-  }
-
-  String _findComponentCode(List<EventTag> eventTags) {
+  ComponentCode? _findComponentCode(List<EventTag> eventTags) {
     var partialComponentCodes =
         eventTags.whereType<ComponentCodeTag>().toList();
     if (partialComponentCodes.isNotEmpty) {
@@ -148,11 +136,10 @@ class EventService {
         pageNumber: partialComponentCode.pageNumber,
         letters: partialComponentCode.letters,
         columnNumber: partialComponentCode.columnNumber,
-      ).toCode();
+      );
+    } else {
+      return null;
     }
-    return partialComponentCodes.isEmpty
-        ? ''
-        : partialComponentCodes.first.toText();
   }
 
   PanelNumberTag _findPanelNumberTag(List<EventTag> eventTags) =>
@@ -170,13 +157,37 @@ class EventService {
     }
   }
 
-  bool _findAcknowledge(List<EventTag> eventTags) {
+  bool _findAcknowledge(List<EventTag> eventTags, EventPriority priority) {
     var acknowledgeTags = eventTags.whereType<AcknowledgeTag>();
     if (acknowledgeTags.isEmpty) {
-      return _findPriority(eventTags) != EventPriorities.info;
+      return priority != EventPriorities.info;
     } else {
       return acknowledgeTags.last.acknowledge;
     }
+  }
+
+  String _findGroupName2(
+    String groupName1,
+    List<NameSpace> eventPath,
+  ) {
+    var groupName2 = eventPath[_groupNameIndex].name.titleCase;
+    if (groupName1 == groupName2) {
+      return '';
+    } else {
+      return groupName2;
+    }
+  }
+
+  _findSolution(List<EventTag> eventTags, ComponentCode? componentCode) {
+    var solutionTexts = eventTags
+        .whereType<SolutionTag>()
+        .map((solutionTag) => solutionTag.solution)
+        .toList();
+    if (componentCode != null) {
+      solutionTexts.add(
+          'See component ${componentCode.toCode()} on electric diagram ${componentCode.site.code}.${componentCode.electricPanel.code} on page ${componentCode.pageNumber} at column ${componentCode.columnNumber}.');
+    }
+    return solutionTexts.join(' ');
   }
 }
 

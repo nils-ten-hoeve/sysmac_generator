@@ -34,33 +34,39 @@ class EventComponentCodePanelExample extends EventExample {
     ..goToRoot()
     ..addStruct('sMainPanel')
     ..addEvent(
-        dataTypeName: 'event1',
-        dataTypeComment: '[30Q1] plucker1 motor1 overloaded',
-        groupName1: 'Main Panel',
-        message: 'Plucker1 motor1 overloaded',
-        expression: 'EventGlobal.MainPanel.event1',
-        componentCode: ComponentCode(
-                site: Site(4321),
-                electricPanel: ElectricPanel(number: 1, name: ''),
-                pageNumber: 30,
-                letters: 'Q',
-                columnNumber: 1)
-            .toCode())
+      dataTypeName: 'event1',
+      dataTypeComment: '[30Q1] plucker1 motor1 overloaded',
+      groupName1: 'Main Panel',
+      message: 'Plucker1 motor1 overloaded.',
+      expression: 'EventGlobal.MainPanel.event1',
+      componentCode: ComponentCode(
+              site: Site(4321),
+              electricPanel: ElectricPanel(number: 1, name: ''),
+              pageNumber: 30,
+              letters: 'Q',
+              columnNumber: 1)
+          .toCode(),
+      solution:
+          'See component 4321.DE01.30Q1 on electric diagram 4321.DE01 on page 30 at column 1.',
+    )
     ..goToRoot()
     ..addStruct('sSecondPanel')
     ..addEvent(
-        dataTypeName: 'event2',
-        dataTypeComment: '[30Q1] plucker5 motor1 overloaded',
-        groupName1: 'Second Panel',
-        expression: 'EventGlobal.SecondPanel.event2',
-        message: 'Plucker5 motor1 overloaded',
-        componentCode: ComponentCode(
-                site: Site(4321),
-                electricPanel: ElectricPanel(number: 2, name: ''),
-                pageNumber: 30,
-                letters: 'Q',
-                columnNumber: 1)
-            .toCode());
+      dataTypeName: 'event2',
+      dataTypeComment: '[30Q1] plucker5 motor1 overloaded',
+      groupName1: 'Second Panel',
+      expression: 'EventGlobal.SecondPanel.event2',
+      message: 'Plucker5 motor1 overloaded.',
+      componentCode: ComponentCode(
+              site: Site(4321),
+              electricPanel: ElectricPanel(number: 2, name: ''),
+              pageNumber: 30,
+              letters: 'Q',
+              columnNumber: 1)
+          .toCode(),
+      solution:
+          'See component 4321.DE02.30Q1 on electric diagram 4321.DE02 on page 30 at column 1.',
+    );
 }
 
 main() {

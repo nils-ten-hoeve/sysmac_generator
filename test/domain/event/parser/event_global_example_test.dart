@@ -20,14 +20,14 @@ class EventGlobalExample extends EventExample {
       dataTypeComment: 'first event',
       groupName1: 'Event1',
       expression: 'EventGlobal.event1',
-      message: 'First event',
+      message: 'First event.',
     )
     ..addEvent(
       dataTypeName: 'event2',
       dataTypeComment: 'second event',
       groupName1: 'Event2',
       expression: 'EventGlobal.event2',
-      message: 'Second event',
+      message: 'Second event.',
     );
 }
 

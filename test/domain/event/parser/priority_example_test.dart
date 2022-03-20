@@ -36,7 +36,7 @@ class EventPriorityExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.EthercatError',
         priority: EventPriorities.fatal,
-        message: 'EtherCAT error',
+        message: 'EtherCAT error.',
       )
       ..addEvent(
         dataTypeName: 'EmergencyStopButton',
@@ -44,7 +44,7 @@ class EventPriorityExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.EmergencyStopButton',
         priority: EventPriorities.critical,
-        message: 'Emergency button pressed',
+        message: 'Emergency button pressed.',
       )
       ..addEvent(
         dataTypeName: 'PumpMotorTripped',
@@ -52,7 +52,7 @@ class EventPriorityExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.PumpMotorTripped',
         priority: EventPriorities.high,
-        message: 'Pump motor tripped',
+        message: 'Pump motor tripped.',
       )
       ..addEvent(
         dataTypeName: 'ScalderTemperatureTooHigh',
@@ -60,7 +60,7 @@ class EventPriorityExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.ScalderTemperatureTooHigh',
         priority: EventPriorities.medium,
-        message: 'Scalder temperature too high',
+        message: 'Scalder temperature too high.',
       )
       ..addEvent(
         dataTypeName: 'PluckerMotorTripped',
@@ -68,7 +68,7 @@ class EventPriorityExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.PluckerMotorTripped',
         priority: EventPriorities.low,
-        message: 'Plucker motor tripped',
+        message: 'Plucker motor tripped.',
       )
       ..addEvent(
         dataTypeName: 'LineStopButton',
@@ -76,7 +76,7 @@ class EventPriorityExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.LineStopButton',
         priority: EventPriorities.info,
-        message: 'Line stop button pressed',
+        message: 'Line stop button pressed.',
         acknowledge: false,
       );
   }

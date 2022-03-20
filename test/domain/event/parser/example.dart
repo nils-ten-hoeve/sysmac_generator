@@ -22,6 +22,7 @@ import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
 import 'event_global_example_test.dart';
 import 'priority_example_test.dart';
+import 'solution_example_test.dart';
 
 /// This [EventExample] serves the following purposes
 /// * It test the event [Metadata] syntax as parsed bij the [EventParser]
@@ -322,7 +323,7 @@ class Definition {
       EventPriority priority = EventPriorities.medium,
       required String expression,
       required String message,
-      String explanation = '',
+      String solution = '',
       bool acknowledge = true}) {
     DataType dataType = DataType(
       name: dataTypeName,
@@ -339,7 +340,7 @@ class Definition {
         expression: expression,
         priority: priority,
         message: message,
-        explanation: explanation,
+        solution: solution,
         acknowledge: acknowledge);
 
     events.add(event);
@@ -439,6 +440,9 @@ class EventTableColumns extends DelegatingList<EventTableColumn> {
   EventTableColumns get withAcknowledge => _add(
       EventTableColumn('Acknowledge', (event) => event.acknowledge.toString()));
 
+  EventTableColumns get withSolution =>
+      _add(EventTableColumn('Solution', (event) => event.solution));
+
   _add(EventTableColumn newColumn) =>
       EventTableColumns.forColumns([...this, newColumn]);
 }
@@ -450,6 +454,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventGlobalExample(),
           EventPriorityExample(),
           EventAcknowledgeExample(),
+          EventSolutionExample(),
           EventComponentCodeExample(),
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),

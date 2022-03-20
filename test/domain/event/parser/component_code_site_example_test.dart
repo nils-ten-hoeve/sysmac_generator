@@ -23,18 +23,21 @@ class EventComponentCodeSiteExample extends EventExample {
     ..variableComment = '[SiteNr=0]'
     ..addStruct('sEvent')
     ..addEvent(
-        dataTypeName: 'event1',
-        dataTypeComment: '[110s3] system air pressure too low',
-        groupName1: 'Event1',
-        expression: 'EventGlobal.event1',
-        message: 'System air pressure too low',
-        componentCode: ComponentCode(
-                site: Site(0),
-                electricPanel: electricPanel,
-                pageNumber: 110,
-                letters: 's',
-                columnNumber: 3)
-            .toCode());
+      dataTypeName: 'event1',
+      dataTypeComment: '[110s3] system air pressure too low',
+      groupName1: 'Event1',
+      expression: 'EventGlobal.event1',
+      message: 'System air pressure too low.',
+      componentCode: ComponentCode(
+              site: Site(0),
+              electricPanel: electricPanel,
+              pageNumber: 110,
+              letters: 's',
+              columnNumber: 3)
+          .toCode(),
+      solution:
+          'See component 0000.DE06.110S3 on electric diagram 0000.DE06 on page 110 at column 3.',
+    );
 }
 
 main() {

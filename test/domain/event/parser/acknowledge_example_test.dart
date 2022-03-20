@@ -31,7 +31,7 @@ class EventAcknowledgeExample extends EventExample {
         dataTypeComment: '[ack]needs to be acknowledged',
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event1',
-        message: 'Needs to be acknowledged',
+        message: 'Needs to be acknowledged.',
         acknowledge: true,
       )
       ..addEvent(
@@ -40,7 +40,7 @@ class EventAcknowledgeExample extends EventExample {
             '[ acknowledge = false]does not need to be acknowledged',
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event2',
-        message: 'Does not need to be acknowledged',
+        message: 'Does not need to be acknowledged.',
         acknowledge: false,
       )
       ..addEvent(
@@ -50,7 +50,7 @@ class EventAcknowledgeExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event3',
         priority: EventPriorities.info,
-        message: 'Info priority does not need to be acknowledged by default',
+        message: 'Info priority does not need to be acknowledged by default.',
         acknowledge: false,
       )
       ..addEvent(
@@ -60,7 +60,7 @@ class EventAcknowledgeExample extends EventExample {
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event4',
         priority: EventPriorities.high,
-        message: 'Other priorities need to be acknowledged by default',
+        message: 'Other priorities need to be acknowledged by default.',
         acknowledge: true,
       );
   }

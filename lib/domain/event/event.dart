@@ -17,7 +17,7 @@ class Event extends NameSpace {
   final String expression;
   final EventPriority priority;
   final String message;
-  final String explanation;
+  final String solution;
   final bool popup;
   final bool acknowledge;
 
@@ -29,20 +29,20 @@ class Event extends NameSpace {
       required this.expression,
       this.priority = EventPriorities.medium,
       required this.message,
-      this.explanation = '',
+      this.solution = '',
       this.popup = false,
       this.acknowledge = false})
       : super(expression);
 
   @override
   String toString() {
-    return 'Event{groupName1: $groupName1, groupName2: $groupName2, id: $id, componentCode: $componentCode, expression: $expression, priority: $priority, message: $message, explanation: $explanation, popup: $popup, acknowledge: $acknowledge}';
+    return 'Event{groupName1: $groupName1, groupName2: $groupName2, id: $id, componentCode: $componentCode, expression: $expression, priority: $priority, message: $message, solution: $solution, popup: $popup, acknowledge: $acknowledge}';
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Event &&
+          other is Event &&
           runtimeType == other.runtimeType &&
           groupName1 == other.groupName1 &&
           groupName2 == other.groupName2 &&
@@ -51,7 +51,7 @@ class Event extends NameSpace {
           expression == other.expression &&
           priority == other.priority &&
           message == other.message &&
-          explanation == other.explanation &&
+          solution == other.solution &&
           popup == other.popup &&
           acknowledge == other.acknowledge;
 
@@ -64,7 +64,7 @@ class Event extends NameSpace {
       expression.hashCode ^
       priority.hashCode ^
       message.hashCode ^
-      explanation.hashCode ^
+      solution.hashCode ^
       popup.hashCode ^
       acknowledge.hashCode;
 }

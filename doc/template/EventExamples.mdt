@@ -4,6 +4,8 @@
 
 {ImportFile path='doc/template/EventAcknowledgeExample.mdt' title='# Acknowledge'}
 
+{ImportFile path='doc/template/EventSolutionExample.mdt' title='# Solution'}
+
 {ImportFile path='doc/template/EventComponentCodeExample.mdt' title='# Component Code'}
 
 {ImportFile path='doc/template/EventComponentCodeSiteExample.mdt' title='# Component Code Site'}
