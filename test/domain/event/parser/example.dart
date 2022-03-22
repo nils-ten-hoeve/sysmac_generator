@@ -21,7 +21,8 @@ import 'component_code_example_test.dart';
 import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
 import 'event_global_example_test.dart';
-import 'event_mesage_example_test.dart';
+import 'event_tag_override_example_test.dart';
+import 'mesage_example_test.dart';
 import 'priority_example_test.dart';
 import 'solution_example_test.dart';
 
@@ -457,6 +458,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventPriorityExample(),
           EventAcknowledgeExample(),
           EventSolutionExample(),
+          EventTagOverrideExample(),
           EventComponentCodeExample(),
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),

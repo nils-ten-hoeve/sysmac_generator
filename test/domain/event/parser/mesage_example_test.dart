@@ -5,9 +5,10 @@ import 'example.dart';
 class EventMessageExample extends EventExample {
   @override
   String get explanation =>
-      'The [Event] message is the [EventGlobal] comments and its '
-      '[DataType] comments chained together, following the hierarchical '
-      'structure from [root to leaf](https://en.wikipedia.org/wiki/Tree_(data_structure))\n\n'
+      'The event message is the EventGlobal comments and its '
+      'DataType comments chained together, following the hierarchical '
+      'structure from [root to leaf]'
+      '(https://en.wikipedia.org/wiki/Tree_(data_structure))\n\n'
       'It is recommended to use lowercase letters in comments where possible '
       '(e.g. abbreviations like PLC in capital letters is ok). '
       '$SysmacGenerator will change the first letter of the message to a '
