@@ -298,9 +298,9 @@ class Definition {
     String dataTypeComment = '',
 
     /// [dataTypeExpression] format e.g. :
-    /// * Equipment\Pump\sEvent
-    /// * ARRAY[1..2] OF Equipment\Pump\sEvent
-    /// * ARRAY[1..2,3..4] OF Equipment\Pump\sEvent
+    /// * Equipment\Pump\Events
+    /// * ARRAY[1..2] OF Equipment\Pump\Events
+    /// * ARRAY[1..2,3..4] OF Equipment\Pump\Events
     required String dataTypeExpression,
   }) {
     DataType dataType = DataType(

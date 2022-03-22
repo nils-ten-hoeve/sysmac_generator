@@ -21,12 +21,12 @@ class EventComponentCodeSiteExample extends EventExample {
   @override
   Definition createDefinition() => Definition()
     ..variableComment = '[SiteNr=0]'
-    ..addStruct('sEvent')
+    ..addStruct('Events')
     ..addEvent(
-      dataTypeName: 'event1',
+      dataTypeName: 'Event1',
       dataTypeComment: '[110s3] system air pressure too low',
       groupName1: 'Event1',
-      expression: 'EventGlobal.event1',
+      expression: 'EventGlobal.Event1',
       message: 'System air pressure too low.',
       componentCode: ComponentCode(
               site: Site(0),

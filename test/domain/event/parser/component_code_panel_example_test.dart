@@ -20,7 +20,7 @@ class EventComponentCodePanelExample extends EventExample {
 
   @override
   Definition createDefinition() => Definition()
-    ..addStruct('sEvent')
+    ..addStruct('Events')
     ..addStructReference(
       dataTypeName: 'MainPanel',
       dataTypeExpression: 'sMainPanel',
