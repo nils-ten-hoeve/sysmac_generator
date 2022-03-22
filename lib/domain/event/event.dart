@@ -42,7 +42,7 @@ class Event extends NameSpace {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Event &&
+      other is Event &&
           runtimeType == other.runtimeType &&
           groupName1 == other.groupName1 &&
           groupName2 == other.groupName2 &&

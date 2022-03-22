@@ -1,5 +1,7 @@
 {ImportFile path='doc/template/EventGlobalExample.mdt' title='# EventGlobal'}
 
+{ImportFile path='doc/template/EventMessageExample.mdt' title='# Message'}
+
 {ImportFile path='doc/template/EventPriorityExample.mdt' title='# Priority'}
 
 {ImportFile path='doc/template/EventAcknowledgeExample.mdt' title='# Acknowledge'}

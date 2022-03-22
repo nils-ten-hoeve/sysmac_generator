@@ -31,8 +31,7 @@ class EventService {
     EventCounter eventCounter = EventCounter();
     for (var eventPath in eventPaths) {
       if (_newEventGroup(eventGroups, eventPath)) {
-        EventGroup eventGroup =
-            EventGroup(eventPath[_groupNameIndex].name.titleCase);
+        EventGroup eventGroup = EventGroup(_createEventGroupName(eventPath));
         eventGroups.add(eventGroup);
       }
       EventGroup eventGroup = eventGroups.last;
@@ -45,8 +44,7 @@ class EventService {
 
   bool _newEventGroup(List<EventGroup> eventGroups, List<NameSpace> eventPath) {
     return eventGroups.isEmpty ||
-        !eventPath[_groupNameIndex]
-            .name
+        !_createEventGroupName(eventPath)
             .toLowerCase()
             .startsWith(eventGroups.last.name.toLowerCase());
   }
@@ -97,7 +95,8 @@ class EventService {
   }
 
   String _createExpression(List<NameSpace> eventPath) {
-    List<NameSpace> filteredEventPath = eventPath
+    List<NameSpace> filteredEventPath = _createEventPathWithoutStructs(
+            eventPath)
         .where((nameSpace) => nameSpace is! Site && nameSpace is! ElectricPanel)
         .toList();
     return filteredEventPath.map((nameSpace) => nameSpace.name).join('.');
@@ -170,7 +169,7 @@ class EventService {
     String groupName1,
     List<NameSpace> eventPath,
   ) {
-    var groupName2 = eventPath[_groupNameIndex].name.titleCase;
+    var groupName2 = _createEventGroupName(eventPath);
     if (groupName1 == groupName2) {
       return '';
     } else {
@@ -189,6 +188,17 @@ class EventService {
     }
     return solutionTexts.join(' ');
   }
+
+  String _createEventGroupName(List<NameSpace> eventPath) {
+    var eventPathWithoutStructs = _createEventPathWithoutStructs(eventPath);
+    return eventPathWithoutStructs[_groupNameIndex].name.titleCase;
+  }
+
+  List<NameSpace> _createEventPathWithoutStructs(List<NameSpace> eventPath) =>
+      eventPath
+          .where((nameSpace) =>
+              !(nameSpace is DataType && nameSpace.baseType is Struct))
+          .toList();
 }
 
 class EventCounter {

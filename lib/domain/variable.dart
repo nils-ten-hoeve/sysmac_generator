@@ -13,7 +13,7 @@ class Variable extends NameSpaceWithComment {
   @override
   List<NameSpace> get children {
     if (baseType is DataTypeReference) {
-      return (baseType as DataTypeReference).dataType.children;
+      return [(baseType as DataTypeReference).dataType];
     } else {
       return super.children;
     }
