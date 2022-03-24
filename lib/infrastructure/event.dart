@@ -95,8 +95,7 @@ class EventService {
   }
 
   String _createExpression(List<NameSpace> eventPath) {
-    List<NameSpace> filteredEventPath = _createEventPathWithoutStructs(
-            eventPath)
+    List<NameSpace> filteredEventPath = eventPath
         .where((nameSpace) => nameSpace is! Site && nameSpace is! ElectricPanel)
         .toList();
     return filteredEventPath.map((nameSpace) => nameSpace.name).join('.');
@@ -105,11 +104,23 @@ class EventService {
   List<EventTag> _findEventTags(List<dynamic> parsedComments) =>
       parsedComments.whereType<EventTag>().toList();
 
-  //TODO Add to documentation: start with lowe case letters! First letter will be changed to upper case
-  String _joinComments(List<NameSpace> eventPath) => eventPath
-      .map((nameSpace) =>
-          (nameSpace is NameSpaceWithComment) ? nameSpace.comment : '')
-      .join(' ');
+  String _joinComments(List<NameSpace> eventPath) {
+    var joinedComments = '';
+    for (var nameSpace in eventPath) {
+      if (nameSpace is NameSpaceWithTypeAndComment) {
+        if (joinedComments.isNotEmpty) {
+          joinedComments += ' ';
+        }
+        joinedComments += nameSpace.comment;
+        if (nameSpace is NameSpaceWithTypeAndComment &&
+            nameSpace.baseType is DataTypeReference) {
+          var dataTypeReference = nameSpace.baseType as DataTypeReference;
+          joinedComments += ' ' + dataTypeReference.dataType.comment;
+        }
+      }
+    }
+    return joinedComments;
+  }
 
   List<dynamic> _parseComments(List<NameSpace> eventPath) {
     String joinedComments = _joinComments(eventPath);
@@ -173,7 +184,7 @@ class EventService {
     if (groupName1 == groupName2) {
       return '';
     } else {
-      return groupName2;
+      return groupName2.substring(groupName1.length).trim();
     }
   }
 
@@ -190,15 +201,8 @@ class EventService {
   }
 
   String _createEventGroupName(List<NameSpace> eventPath) {
-    var eventPathWithoutStructs = _createEventPathWithoutStructs(eventPath);
-    return eventPathWithoutStructs[_groupNameIndex].name.titleCase;
+    return eventPath[_groupNameIndex].name.titleCase;
   }
-
-  List<NameSpace> _createEventPathWithoutStructs(List<NameSpace> eventPath) =>
-      eventPath
-          .where((nameSpace) =>
-              !(nameSpace is DataType && nameSpace.baseType is Struct))
-          .toList();
 }
 
 class EventCounter {

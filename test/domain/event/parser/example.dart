@@ -22,6 +22,7 @@ import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
 import 'event_global_example_test.dart';
 import 'event_tag_override_example_test.dart';
+import 'group_example_test.dart';
 import 'mesage_example_test.dart';
 import 'priority_example_test.dart';
 import 'solution_example_test.dart';
@@ -168,7 +169,8 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     String indent = level == 0 ? '' : '&nbsp;' * (level * 4);
     String name = nameSpace.name;
     String baseType = _createDataTypeBaseTypeSting(nameSpace);
-    String comment = nameSpace is NameSpaceWithComment ? nameSpace.comment : '';
+    String comment =
+        nameSpace is NameSpaceWithTypeAndComment ? nameSpace.comment : '';
     var row = HtmlRow(values: [indent + name, baseType, comment]);
     rows.add(row);
     for (var child in nameSpace.children) {
@@ -319,6 +321,7 @@ class Definition {
   Definition addEvent(
       {required String dataTypeName,
       required String dataTypeComment,
+      String? id,
       required String groupName1,
       String groupName2 = '',
       String componentCode = '',
@@ -337,7 +340,7 @@ class Definition {
     Event event = Event(
         groupName1: groupName1,
         groupName2: groupName2,
-        id: '${events.length + 1}',
+        id: id ?? '${events.length + 1}',
         componentCode: componentCode,
         expression: expression,
         priority: priority,
@@ -377,7 +380,7 @@ class Definition {
   List<EventGroup> get eventGroups {
     EventGroup eventGroup = EventGroup('');
     List<EventGroup> eventGroups = [];
-    for (var event in events) {
+    for (var event in eventsSortedOnGroupName1) {
       if (event.groupName1 != eventGroup.name) {
         eventGroup = EventGroup(event.groupName1);
         eventGroups.add(eventGroup);
@@ -387,13 +390,20 @@ class Definition {
     return eventGroups;
   }
 
-  void goToPath(List<String> pathToFind) {
+  List<Event> get eventsSortedOnGroupName1 {
+    List<Event> sortedEvents = [...events];
+    sortedEvents.sort((a, b) => a.groupName1.compareTo(b.groupName1));
+    return sortedEvents;
+  }
+
+  Definition goToPath(List<String> pathToFind) {
     var found = dataTypeTree.findNamePath(pathToFind);
     if (found == null) {
       throw Exception('Could not find path: ${pathToFind.join(".")}');
     } else {
       pointer = found;
     }
+    return this;
   }
 
   void goToRoot() {
@@ -459,6 +469,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventAcknowledgeExample(),
           EventSolutionExample(),
           EventTagOverrideExample(),
+          EventGroupExample(),
           EventComponentCodeExample(),
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),

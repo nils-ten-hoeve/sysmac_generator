@@ -1,23 +1,16 @@
 import 'base_type.dart';
 import 'namespace.dart';
 
-class Variable extends NameSpaceWithComment {
-  BaseType baseType;
-
+class Variable extends NameSpaceWithTypeAndComment {
   Variable({
     required String name,
-    required this.baseType,
+    required BaseType baseType,
     required String comment,
-  }) : super(name, comment);
-
-  @override
-  List<NameSpace> get children {
-    if (baseType is DataTypeReference) {
-      return [(baseType as DataTypeReference).dataType];
-    } else {
-      return super.children;
-    }
-  }
+  }) : super(
+          name: name,
+          baseType: baseType,
+          comment: comment,
+        );
 
   @override
   String toString() {

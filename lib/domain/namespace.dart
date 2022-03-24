@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:sysmac_generator/domain/base_type.dart';
 
 class NameSpace {
   final String name;
@@ -96,8 +97,22 @@ class NameSpace {
   }
 }
 
-class NameSpaceWithComment extends NameSpace {
+class NameSpaceWithTypeAndComment extends NameSpace {
+  BaseType baseType;
   final String comment;
 
-  NameSpaceWithComment(String name, this.comment) : super(name);
+  NameSpaceWithTypeAndComment({
+    required String name,
+    required this.baseType,
+    required this.comment,
+  }) : super(name);
+
+  @override
+  List<NameSpace> get children {
+    if (baseType is DataTypeReference) {
+      return (baseType as DataTypeReference).dataType.children;
+    } else {
+      return super.children;
+    }
+  }
 }
