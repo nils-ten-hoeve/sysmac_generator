@@ -30,49 +30,61 @@ class EventPriorityExample extends EventExample {
       )
       ..goToRoot()
       ..addStruct(examples)
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'EthercatError',
         dataTypeComment: '[prio=f]etherCAT error',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.EthercatError',
         priority: EventPriorities.fatal,
         message: 'EtherCAT error.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'EmergencyStopButton',
         dataTypeComment: '[Priority=Critical]emergency button pressed',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.EmergencyStopButton',
         priority: EventPriorities.critical,
         message: 'Emergency button pressed.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'PumpMotorTripped',
         dataTypeComment: '[priority=h]pump motor tripped',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.PumpMotorTripped',
         priority: EventPriorities.high,
         message: 'Pump motor tripped.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'ScalderTemperatureTooHigh',
         dataTypeComment: 'scalder temperature too high',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.ScalderTemperatureTooHigh',
         priority: EventPriorities.medium,
         message: 'Scalder temperature too high.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'PluckerMotorTripped',
         dataTypeComment: '[prio=LOW]plucker motor tripped',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.PluckerMotorTripped',
         priority: EventPriorities.low,
         message: 'Plucker motor tripped.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'LineStopButton',
         dataTypeComment: '[PRIO = I]line stop button pressed',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.LineStopButton',
         priority: EventPriorities.info,

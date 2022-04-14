@@ -25,16 +25,20 @@ class EventSolutionExample extends EventExample {
       )
       ..goToRoot()
       ..addStruct(examples)
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event1',
         dataTypeComment: 'information',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event1',
         message: 'Information.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event2',
         dataTypeComment: '[20U1]motor over torque',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event2',
         message: 'Motor over torque.',
@@ -42,10 +46,12 @@ class EventSolutionExample extends EventExample {
         solution:
             'See component 4321.DE06.20U1 on electric diagram 4321.DE06 on page 20 at column 1.',
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event3',
         dataTypeComment:
             '[30S1]main panel emergency stop channel error [solution=Check the emergency stop button and wiring. Repair if needed. Then push and pull the emergency stop button and reset the safety system.]',
+      )
+      ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.Event3',
         message: 'Main panel emergency stop channel error.',

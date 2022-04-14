@@ -12,6 +12,8 @@
 
 {ImportFile path='doc/template/EventGroupExample.mdt' title='# Group'}
 
+{ImportFile path='doc/template/EventReuseExample.mdt' title='# Reuse'}
+
 {ImportFile path='doc/template/EventComponentCodeExample.mdt' title='# Component Code'}
 
 {ImportFile path='doc/template/EventComponentCodeSiteExample.mdt' title='# Component Code Site'}

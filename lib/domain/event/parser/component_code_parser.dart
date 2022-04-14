@@ -137,7 +137,7 @@ class ComponentCodeTag extends EventTag {
   }
 
   String toText() {
-    return '$pageNumber$letters$columnNumber';
+    return '[$pageNumber$letters$columnNumber]';
   }
 }
 

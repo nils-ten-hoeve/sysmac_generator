@@ -27,11 +27,14 @@ class EventService {
   List<EventGroup> createFromVariable(List<Variable> variables) {
     List<List<NameSpace>> eventPaths = _createEventPaths(variables);
 
+    var groupNames = _createGroupNames(eventPaths);
+
     List<EventGroup> eventGroups = [];
     EventCounter eventCounter = EventCounter();
     for (var eventPath in eventPaths) {
       if (_newEventGroup(eventGroups, eventPath)) {
-        EventGroup eventGroup = EventGroup(_createEventGroupName(eventPath));
+        var groupName = _findGroupName(eventPath, groupNames);
+        EventGroup eventGroup = EventGroup(groupName);
         eventGroups.add(eventGroup);
       }
       EventGroup eventGroup = eventGroups.last;
@@ -112,8 +115,7 @@ class EventService {
           joinedComments += ' ';
         }
         joinedComments += nameSpace.comment;
-        if (nameSpace is NameSpaceWithTypeAndComment &&
-            nameSpace.baseType is DataTypeReference) {
+        if (nameSpace.baseType is DataTypeReference) {
           var dataTypeReference = nameSpace.baseType as DataTypeReference;
           joinedComments += ' ' + dataTypeReference.dataType.comment;
         }
@@ -202,6 +204,42 @@ class EventService {
 
   String _createEventGroupName(List<NameSpace> eventPath) {
     return eventPath[_groupNameIndex].name.titleCase;
+  }
+
+  Set<String> _createGroupNames(List<List<NameSpace>> eventPaths) {
+    var originalNames = eventPaths
+        .map((eventPath) => _createEventGroupName(eventPath))
+        .toList();
+    return originalNames
+        .map((originalName) => _findUniqueName(originalName, originalNames))
+        .toSet();
+  }
+
+  String _findUniqueName(String originalName, List<String> originalNames) {
+    var words = originalName.titleCase.split(' ');
+    var uniqueName = originalName;
+    var matches = _startingWithTheSame(originalNames, originalName).length;
+    while (words.isNotEmpty) {
+      var nameCandidate = words.join(' ');
+      var foundMatches =
+          _startingWithTheSame(originalNames, nameCandidate).length;
+      if (foundMatches > matches) {
+        matches = foundMatches;
+        uniqueName = nameCandidate;
+      }
+      words.removeAt(words.length - 1);
+    }
+    return uniqueName;
+  }
+
+  Iterable<String> _startingWithTheSame(
+          List<String> strings, String stringToMatch) =>
+      strings.where((string) =>
+          string.toLowerCase().startsWith(stringToMatch.toLowerCase()));
+
+  String _findGroupName(List<NameSpace> eventPath, Set<String> groupNames) {
+    var fullName = _createEventGroupName(eventPath);
+    return groupNames.firstWhere((groupName) => fullName.startsWith(groupName));
   }
 }
 

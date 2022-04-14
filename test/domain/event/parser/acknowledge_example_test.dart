@@ -16,49 +16,50 @@ class EventAcknowledgeExample extends EventExample {
 
   @override
   Definition createDefinition() {
-    var examples = 'Examples';
 
     return Definition()
       ..addStruct('Events')
-      ..addStructReference(
-        dataTypeName: examples,
-        dataTypeExpression: examples,
-      )
-      ..goToRoot()
-      ..addStruct(examples)
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event1',
         dataTypeComment: '[ack]needs to be acknowledged',
-        groupName1: examples,
-        expression: 'EventGlobal.Examples.Event1',
-        message: 'Needs to be acknowledged.',
-        acknowledge: true,
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event2',
         dataTypeComment:
             '[ acknowledge = false]does not need to be acknowledged',
-        groupName1: examples,
-        expression: 'EventGlobal.Examples.Event2',
-        message: 'Does not need to be acknowledged.',
-        acknowledge: false,
       )
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event3',
         dataTypeComment:
             '[priority=info]info priority does not need to be acknowledged by default',
-        groupName1: examples,
-        expression: 'EventGlobal.Examples.Event3',
+      )
+      ..addStructBool(
+        dataTypeName: 'Event4',
+        dataTypeComment:
+            '[priority=h]other priorities need to be acknowledged by default',
+      )
+      ..addExpectedEvent(
+        groupName1: 'Event1',
+        expression: 'EventGlobal.Event1',
+        message: 'Needs to be acknowledged.',
+        acknowledge: true,
+      )
+      ..addExpectedEvent(
+        groupName1: 'Event2',
+        expression: 'EventGlobal.Event2',
+        message: 'Does not need to be acknowledged.',
+        acknowledge: false,
+      )
+      ..addExpectedEvent(
+        groupName1: 'Event3',
+        expression: 'EventGlobal.Event3',
         priority: EventPriorities.info,
         message: 'Info priority does not need to be acknowledged by default.',
         acknowledge: false,
       )
-      ..addEvent(
-        dataTypeName: 'Event4',
-        dataTypeComment:
-            '[priority=h]other priorities need to be acknowledged by default',
-        groupName1: examples,
-        expression: 'EventGlobal.Examples.Event4',
+      ..addExpectedEvent(
+        groupName1: 'Event4',
+        expression: 'EventGlobal.Event4',
         priority: EventPriorities.high,
         message: 'Other priorities need to be acknowledged by default.',
         acknowledge: true,

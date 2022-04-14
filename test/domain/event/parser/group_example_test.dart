@@ -34,36 +34,36 @@ class EventGroupExample extends EventExample {
   @override
   Definition createDefinition() {
     var definition = Definition()..addStruct(rapidEvents);
-
-    _add(definition, ['Transp'], 3);
-    _add(definition, ['Transp', 'Mtr'], 4);
-    _add(definition, ['WbCarStpr'], 5);
-    _add(definition, ['WbCarStpr', 'Cyl'], 6);
-    _add(definition, ['WbCutTopCm'], 10);
-    _add(definition, ['WbCutTopCm', 'Mtr'], 11);
-    _add(definition, ['WbCutTopCm', 'Pos', 'Act'], 12);
-    _add(definition, ['WbCutBotCm'], 7);
-    _add(definition, ['WbCutBotCm', 'Mtr'], 8);
-    _add(definition, ['WbCutBotCm', 'Pos', 'Act'], 9);
-    _add(definition, ['BckmtCarStpr'], 1);
-    _add(definition, ['BckmtCarStpr', 'Cyl'], 2);
+    _add(definition, ['BckmtCarStpr']);
+    _add(definition, ['BckmtCarStpr', 'Cyl']);
+    _add(definition, ['Transp']);
+    _add(definition, ['Transp', 'Mtr']);
+    _add(definition, ['WbCut', 'Bot', 'Cm']);
+    _add(definition, ['WbCut', 'Bot', 'Cm', 'Mtr']);
+    _add(definition, ['WbCut', 'Bot', 'Cm', 'Pos']);
+    _add(definition, ['WbCut', 'Stpr']);
+    _add(definition, ['WbCut', 'Stpr', 'Cyl']);
+    _add(definition, ['WbCut', 'Top', 'Cm']);
+    _add(definition, ['WbCut', 'Top', 'Cm', 'Mtr']);
+    _add(definition, ['WbCut', 'Top', 'Cm', 'Pos']);
     return definition;
   }
 
-  void _add(Definition definition, List<String> names, int id) {
+  void _add(Definition definition, List<String> names) {
     var someAlarmText = 'Some alarm.';
     definition
       ..goToPath([rapidEvents])
       ..addStruct(names.join())
-      ..addEvent(
+      ..addStructBool(
         dataTypeName: 'Event',
         dataTypeComment: someAlarmText,
+      )
+      ..addExpectedEvent(
         groupName1: names[0].titleCase,
         groupName2:
             names.where((name) => names.indexOf(name) != 0).toList().join(' '),
         expression: 'EventGlobal.${names.join()}.Event',
         message: someAlarmText,
-        id: id.toString(),
       );
   }
 }

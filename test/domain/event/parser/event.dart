@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 main() {
   var eventTagsParser = EventTagsParser();
   group('$EventTagsParser', () {
-    String text = '12 30M2 34';
+    String text = '12 [30M2] 34';
     test("'$text' has correct result", () {
       var result = eventTagsParser.parse(text);
       expect(result.value, [

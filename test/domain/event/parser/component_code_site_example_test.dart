@@ -22,9 +22,11 @@ class EventComponentCodeSiteExample extends EventExample {
   Definition createDefinition() => Definition()
     ..variableComment = '[SiteNr=0]'
     ..addStruct('Events')
-    ..addEvent(
+    ..addStructBool(
       dataTypeName: 'Event1',
       dataTypeComment: '[110s3] system air pressure too low',
+    )
+    ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',
       message: 'System air pressure too low.',

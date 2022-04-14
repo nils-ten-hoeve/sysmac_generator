@@ -25,6 +25,7 @@ import 'event_tag_override_example_test.dart';
 import 'group_example_test.dart';
 import 'mesage_example_test.dart';
 import 'priority_example_test.dart';
+import 'reuse_example_test.dart';
 import 'solution_example_test.dart';
 
 /// This [EventExample] serves the following purposes
@@ -182,7 +183,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
 
   String _createDataTypeBaseTypeSting(NameSpace nameSpace) {
     if (nameSpace is! DataType) {
-      return '';
+      return '$NameSpace';
     } else {
       var baseType = nameSpace.baseType;
       if (baseType is UnknownBaseType) {
@@ -318,11 +319,30 @@ class Definition {
     return this;
   }
 
-  Definition addEvent(
-      {required String dataTypeName,
-      required String dataTypeComment,
-      String? id,
-      required String groupName1,
+  Definition addStructBool({
+    //TODO rename to name
+    required String dataTypeName,
+    //TODO rename to comment
+    required String dataTypeComment,
+  }) {
+    DataType dataType = DataType(
+      name: dataTypeName,
+      comment: dataTypeComment,
+      baseType: VbBoolean(),
+    );
+    _verifyIfPointerIsStruct();
+    pointer.children.add(dataType);
+    return this;
+  }
+
+  void _verifyIfPointerIsStruct() {
+    if (pointer is! DataType || (pointer as DataType).baseType is! Struct) {
+      throw Exception('A boolean can only be added to a $Struct');
+    }
+  }
+
+  Definition addExpectedEvent(
+      {required String groupName1,
       String groupName2 = '',
       String componentCode = '',
       EventPriority priority = EventPriorities.medium,
@@ -330,17 +350,10 @@ class Definition {
       required String message,
       String solution = '',
       bool acknowledge = true}) {
-    DataType dataType = DataType(
-      name: dataTypeName,
-      comment: dataTypeComment,
-      baseType: VbBoolean(),
-    );
-    pointer.children.add(dataType);
-
     Event event = Event(
         groupName1: groupName1,
         groupName2: groupName2,
-        id: id ?? '${events.length + 1}',
+        id: '${events.length + 1}',
         componentCode: componentCode,
         expression: expression,
         priority: priority,
@@ -470,6 +483,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventSolutionExample(),
           EventTagOverrideExample(),
           EventGroupExample(),
+          EventReuseExample(),
           EventComponentCodeExample(),
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),

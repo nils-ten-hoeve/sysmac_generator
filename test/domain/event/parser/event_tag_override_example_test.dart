@@ -14,31 +14,36 @@ class EventTagOverrideExample extends EventExample {
       EventTableColumns().withId.withExpression.withPriority.withAcknowledge;
 
   @override
-  Definition createDefinition() =>
-      Definition()
+  Definition createDefinition() => Definition()
     ..variableComment = '[ack=false]'
     ..addStruct('Events', '[prio=info]')
-    ..addEvent(
+    ..addStructBool(
       dataTypeName: 'Event1',
       dataTypeComment: '',
+    )
+    ..addStructBool(
+      dataTypeName: 'Event2',
+      dataTypeComment: '[ack]',
+    )
+    ..addStructBool(
+      dataTypeName: 'Event3',
+      dataTypeComment: '[prio=critical]',
+    )
+    ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',
       message: '',
       priority: EventPriorities.info,
       acknowledge: false,
     )
-    ..addEvent(
-      dataTypeName: 'Event2',
-      dataTypeComment: '[ack]',
+    ..addExpectedEvent(
       groupName1: 'Event2',
       expression: 'EventGlobal.Event2',
       message: '',
       priority: EventPriorities.info,
       acknowledge: true,
     )
-    ..addEvent(
-      dataTypeName: 'Event3',
-      dataTypeComment: '[prio=critical]',
+    ..addExpectedEvent(
       groupName1: 'Event3',
       expression: 'EventGlobal.Event3',
       message: '',

@@ -33,9 +33,17 @@ class EventComponentCodePanelExample extends EventExample {
     )
     ..goToRoot()
     ..addStruct('sMainPanel')
-    ..addEvent(
+    ..addStructBool(
       dataTypeName: 'event1',
       dataTypeComment: '[30Q1] plucker1 motor1 overloaded',
+    )
+    ..goToRoot()
+    ..addStruct('sSecondPanel')
+    ..addStructBool(
+      dataTypeName: 'event2',
+      dataTypeComment: '[30Q1] plucker5 motor1 overloaded',
+    )
+    ..addExpectedEvent(
       groupName1: 'Main Panel',
       message: 'Plucker1 motor1 overloaded.',
       expression: 'EventGlobal.MainPanel.event1',
@@ -49,11 +57,7 @@ class EventComponentCodePanelExample extends EventExample {
       solution:
           'See component 4321.DE01.30Q1 on electric diagram 4321.DE01 on page 30 at column 1.',
     )
-    ..goToRoot()
-    ..addStruct('sSecondPanel')
-    ..addEvent(
-      dataTypeName: 'event2',
-      dataTypeComment: '[30Q1] plucker5 motor1 overloaded',
+    ..addExpectedEvent(
       groupName1: 'Second Panel',
       expression: 'EventGlobal.SecondPanel.event2',
       message: 'Plucker5 motor1 overloaded.',
