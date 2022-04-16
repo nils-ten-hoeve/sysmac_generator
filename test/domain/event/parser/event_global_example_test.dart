@@ -15,14 +15,8 @@ class EventGlobalExample extends EventExample {
   @override
   Definition createDefinition() => Definition()
     ..addStruct('Events')
-    ..addStructBool(
-      dataTypeName: 'Event1',
-      dataTypeComment: 'first event',
-    )
-    ..addStructBool(
-      dataTypeName: 'Event2',
-      dataTypeComment: 'second event',
-    )
+    ..addStructBool('Event1', 'first event')
+    ..addStructBool('Event2', 'second event')
     ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',

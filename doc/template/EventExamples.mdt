@@ -19,3 +19,5 @@
 {ImportFile path='doc/template/EventComponentCodeSiteExample.mdt' title='# Component Code Site'}
 
 {ImportFile path='doc/template/EventComponentCodePanelExample.mdt' title='# Component Code Panel'}
+
+{ImportFile path='doc/template/EventDerivedComponentCodeExample.mdt' title='# Derived Component Code'}

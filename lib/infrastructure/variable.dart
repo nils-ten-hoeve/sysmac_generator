@@ -11,11 +11,11 @@ const String nameSpacePathSeparator = '\\';
 const String nameAttribute = 'Name';
 const String dataTypeNameAttribute = 'DataTypeName';
 const String commentAttribute = 'Comment';
+const String eventGlobalVariableName = 'EventGlobal';
 
 class GlobalVariableService {
   final SysmacProjectArchive sysmacProjectArchive;
   final DataTypeTree dataTypeTree;
-  static final eventGlobalVariableName = 'EventGlobal';
 
   GlobalVariableService(this.sysmacProjectArchive, this.dataTypeTree);
 

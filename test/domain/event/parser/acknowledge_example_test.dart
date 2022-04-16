@@ -16,27 +16,16 @@ class EventAcknowledgeExample extends EventExample {
 
   @override
   Definition createDefinition() {
-
     return Definition()
       ..addStruct('Events')
+      ..addStructBool('Event1', '[ack]needs to be acknowledged')
       ..addStructBool(
-        dataTypeName: 'Event1',
-        dataTypeComment: '[ack]needs to be acknowledged',
-      )
+          'Event2', '[ acknowledge = false]does not need to be acknowledged')
+      ..addStructBool('Event3',
+          '[priority=info]info priority does not need to be acknowledged by default')
       ..addStructBool(
-        dataTypeName: 'Event2',
-        dataTypeComment:
-            '[ acknowledge = false]does not need to be acknowledged',
-      )
-      ..addStructBool(
-        dataTypeName: 'Event3',
-        dataTypeComment:
-            '[priority=info]info priority does not need to be acknowledged by default',
-      )
-      ..addStructBool(
-        dataTypeName: 'Event4',
-        dataTypeComment:
-            '[priority=h]other priorities need to be acknowledged by default',
+        'Event4',
+        '[priority=h]other priorities need to be acknowledged by default',
       )
       ..addExpectedEvent(
         groupName1: 'Event1',

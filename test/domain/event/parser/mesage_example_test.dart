@@ -23,13 +23,8 @@ class EventMessageExample extends EventExample {
     ..variableComment = 'the event message is'
     ..addStruct('Events', 'all comments chained together,')
     ..addStructBool(
-      dataTypeName: 'Event1',
-      dataTypeComment: 'following the hierarchical structure from root to leaf',
-    )
-    ..addStructBool(
-      dataTypeName: 'Event2',
-      dataTypeComment: 'making all messages unique',
-    )
+        'Event1', 'following the hierarchical structure from root to leaf')
+    ..addStructBool('Event2', 'making all messages unique')
     ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',

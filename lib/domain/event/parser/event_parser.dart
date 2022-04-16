@@ -5,6 +5,7 @@ import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/acknowledge_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/derived_component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
@@ -20,12 +21,8 @@ import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
 /// The format of an [EventTag] is normally some text between square brackets, e.g.: [30M2]
 ///
 /// [EventTag]s are not directly visible in the [Event] message!
-class EventTag {
+abstract class EventTag {
 // all relevant tag information as final field values!
-
-  /// The [EventTag] can be converted to a replacement text
-  /// using all [EventTag] objects of an [Event]
-//TODO String replacementText(List<EventMetaData> eventMetaData);
 }
 
 /// The [EventTagParser] converts the text representation of [EventTag]s
@@ -62,6 +59,7 @@ class EventTagsParser extends EventTagParser {
                 AcknowledgeTagParser() |
                 SolutionTagParser() |
                 ComponentCodeTagParser() |
+                DerivedComponentCodeTagParser() |
                 SiteNumberTagParser() |
                 PanelNumberTagParser() |
                 _remainingCharactersParser)

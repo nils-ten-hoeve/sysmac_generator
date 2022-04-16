@@ -20,6 +20,7 @@ import 'acknowledge_example_test.dart';
 import 'component_code_example_test.dart';
 import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
+import 'derived_component_code_example_test.dart';
 import 'event_global_example_test.dart';
 import 'event_tag_override_example_test.dart';
 import 'group_example_test.dart';
@@ -319,15 +320,13 @@ class Definition {
     return this;
   }
 
-  Definition addStructBool({
-    //TODO rename to name
-    required String dataTypeName,
-    //TODO rename to comment
-    required String dataTypeComment,
-  }) {
+  Definition addStructBool(
+    String name,
+    String comment,
+  ) {
     DataType dataType = DataType(
-      name: dataTypeName,
-      comment: dataTypeComment,
+      name: name,
+      comment: comment,
       baseType: VbBoolean(),
     );
     _verifyIfPointerIsStruct();
@@ -384,7 +383,7 @@ class Definition {
           'The  $DataTypeTree does not contain a $DataType with $BaseType == $Struct.');
     }
     return Variable(
-        name: GlobalVariableService.eventGlobalVariableName,
+        name: eventGlobalVariableName,
         comment: variableComment,
         baseType:
             DataTypeReference(dataType: struct as DataType, arrayRanges: []));
@@ -487,6 +486,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventComponentCodeExample(),
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),
+          EventDerivedComponentCodeExample(),
         ]);
 
   @override

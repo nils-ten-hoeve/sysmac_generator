@@ -54,10 +54,7 @@ class EventGroupExample extends EventExample {
     definition
       ..goToPath([rapidEvents])
       ..addStruct(names.join())
-      ..addStructBool(
-        dataTypeName: 'Event',
-        dataTypeComment: someAlarmText,
-      )
+      ..addStructBool('Event', someAlarmText)
       ..addExpectedEvent(
         groupName1: names[0].titleCase,
         groupName2:

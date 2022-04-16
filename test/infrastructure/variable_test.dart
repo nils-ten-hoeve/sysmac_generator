@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'package:sysmac_generator/infrastructure/variable.dart';
+import 'package:test/test.dart';
 
 import 'test_resource.dart';
-import 'package:test/test.dart';
 
 main() {
   File file = SysmacProjectTestResource().file;
@@ -29,10 +29,9 @@ main() {
     group('method: findVariablesWithEventsGlobalName', () {
       var results = variableService.findVariablesWithEventGlobalName();
       test(
-          'contains one variable with ${GlobalVariableService.eventGlobalVariableName}',
-          () {
+          'contains one variable with $eventGlobalVariableName', () {
         expect(results, hasLength(1));
-        expect(results[0].name, GlobalVariableService.eventGlobalVariableName);
+        expect(results[0].name, eventGlobalVariableName);
         expect(results[0].baseType, isA<DataTypeReference>());
         expect(results[0].children.isNotEmpty, true);
         expect((results[0].baseType as DataTypeReference).dataType.baseType,

@@ -1,3 +1,5 @@
+import 'package:fluent_regex/fluent_regex.dart';
+
 class Sentence {
   static String normalize(String input) {
     var trimmed = input.trim();
@@ -22,6 +24,6 @@ class Sentence {
       trimmedWithPeriod.substring(0, 1).toUpperCase() +
       trimmedWithPeriod.substring(1);
 
-  static String _replaceDoubleSpaces(String trimmed) =>
-      trimmed.replaceAll('  ', ' ');
+  static String _replaceDoubleSpaces(String string) => string.replaceAll(
+      FluentRegex().whiteSpace(Quantity.oneOrMoreTimes()), ' ');
 }

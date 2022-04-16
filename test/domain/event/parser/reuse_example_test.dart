@@ -196,46 +196,27 @@ class EventReuseExample extends EventExample {
       ..addNameSpace(equipmentModules)
       ..addNameSpace(transport)
       ..addStruct(events)
-      ..addStructBool(
-        dataTypeName: transportEvent,
-        dataTypeComment: _eventExample,
-      )
+      ..addStructBool(transportEvent, _eventExample)
       ..goToPath([equipmentModules])
       ..addNameSpace(camHeight)
       ..addStruct(events)
-      ..addStructBool(
-        dataTypeName: camHeightEvent,
-        dataTypeComment: _eventExample,
-      )
+      ..addStructBool(camHeightEvent, _eventExample)
       ..goToPath([equipmentModules])
       ..addNameSpace(carrierStopper)
       ..addStruct(events)
-      ..addStructBool(
-        dataTypeName: carrierStopperEvent,
-        dataTypeComment: _eventExample,
-      )
+      ..addStructBool(carrierStopperEvent, _eventExample)
       ..goToRoot()
-      ..addNameSpace(controlModules)
-      ..addNameSpace(mtrCtrl)
+      ..addNameSpace(controlModules)..addNameSpace(mtrCtrl)
       ..addStruct(eventsVfd)
-      ..addStructBool(
-        dataTypeName: vfdEvent,
-        dataTypeComment: _eventExample,
-      )
+      ..addStructBool(vfdEvent, _eventExample)
       ..goToPath([controlModules])
       ..addNameSpace(cylCtrl)
       ..addStruct(events)
-      ..addStructBool(
-        dataTypeName: cylinderEvent,
-        dataTypeComment: _eventExample,
-      )
+      ..addStructBool(cylinderEvent, _eventExample)
       ..goToPath([controlModules])
       ..addNameSpace(ai)
       ..addStruct(events)
-      ..addStructBool(
-        dataTypeName: analogInputEvent,
-        dataTypeComment: _eventExample,
-      );
+      ..addStructBool(analogInputEvent, _eventExample);
 
     return definition;
   }

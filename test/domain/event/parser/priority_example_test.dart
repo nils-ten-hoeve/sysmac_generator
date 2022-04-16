@@ -30,10 +30,7 @@ class EventPriorityExample extends EventExample {
       )
       ..goToRoot()
       ..addStruct(examples)
-      ..addStructBool(
-        dataTypeName: 'EthercatError',
-        dataTypeComment: '[prio=f]etherCAT error',
-      )
+      ..addStructBool('EthercatError', '[prio=f]etherCAT error')
       ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.EthercatError',
@@ -41,19 +38,14 @@ class EventPriorityExample extends EventExample {
         message: 'EtherCAT error.',
       )
       ..addStructBool(
-        dataTypeName: 'EmergencyStopButton',
-        dataTypeComment: '[Priority=Critical]emergency button pressed',
-      )
+          'EmergencyStopButton', '[Priority=Critical]emergency button pressed')
       ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.EmergencyStopButton',
         priority: EventPriorities.critical,
         message: 'Emergency button pressed.',
       )
-      ..addStructBool(
-        dataTypeName: 'PumpMotorTripped',
-        dataTypeComment: '[priority=h]pump motor tripped',
-      )
+      ..addStructBool('PumpMotorTripped', '[priority=h]pump motor tripped')
       ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.PumpMotorTripped',
@@ -61,29 +53,21 @@ class EventPriorityExample extends EventExample {
         message: 'Pump motor tripped.',
       )
       ..addStructBool(
-        dataTypeName: 'ScalderTemperatureTooHigh',
-        dataTypeComment: 'scalder temperature too high',
-      )
+          'ScalderTemperatureTooHigh', 'scalder temperature too high')
       ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.ScalderTemperatureTooHigh',
         priority: EventPriorities.medium,
         message: 'Scalder temperature too high.',
       )
-      ..addStructBool(
-        dataTypeName: 'PluckerMotorTripped',
-        dataTypeComment: '[prio=LOW]plucker motor tripped',
-      )
+      ..addStructBool('PluckerMotorTripped', '[prio=LOW]plucker motor tripped')
       ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.PluckerMotorTripped',
         priority: EventPriorities.low,
         message: 'Plucker motor tripped.',
       )
-      ..addStructBool(
-        dataTypeName: 'LineStopButton',
-        dataTypeComment: '[PRIO = I]line stop button pressed',
-      )
+      ..addStructBool('LineStopButton', '[PRIO = I]line stop button pressed')
       ..addExpectedEvent(
         groupName1: examples,
         expression: 'EventGlobal.Examples.LineStopButton',

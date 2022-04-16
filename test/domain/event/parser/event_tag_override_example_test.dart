@@ -17,18 +17,9 @@ class EventTagOverrideExample extends EventExample {
   Definition createDefinition() => Definition()
     ..variableComment = '[ack=false]'
     ..addStruct('Events', '[prio=info]')
-    ..addStructBool(
-      dataTypeName: 'Event1',
-      dataTypeComment: '',
-    )
-    ..addStructBool(
-      dataTypeName: 'Event2',
-      dataTypeComment: '[ack]',
-    )
-    ..addStructBool(
-      dataTypeName: 'Event3',
-      dataTypeComment: '[prio=critical]',
-    )
+    ..addStructBool('Event1', '')
+    ..addStructBool('Event2', '[ack]')
+    ..addStructBool('Event3', '[prio=critical]')
     ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',

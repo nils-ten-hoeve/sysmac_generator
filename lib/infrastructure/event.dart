@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:recase/recase.dart';
 import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/acknowledge_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/derived_component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
@@ -57,7 +60,7 @@ class EventService {
 
     for (var variable in variables) {
       eventPaths.addAll(variable.findPaths((nameSpace) =>
-          nameSpace is DataType &&
+      nameSpace is DataType &&
           nameSpace.baseType is VbBoolean &&
           nameSpace.children.isEmpty));
     }
@@ -79,8 +82,8 @@ class EventService {
     var groupName1 = eventGroup.name;
     var groupName2 = _findGroupName2(groupName1, eventPath);
     var priority = _findPriority(eventTags);
-    var componentCode = _findComponentCode(eventTags);
-    var message = _findMessage(parsedComments);
+    var componentCode = _createComponentCode(eventTags, eventPath);
+    var message = _createMessage(parsedComments);
     Event event = Event(
       groupName1: groupName1,
       groupName2: groupName2,
@@ -132,25 +135,25 @@ class EventService {
     return result;
   }
 
-  String _findMessage(List parsedComments) =>
+  String _createMessage(List parsedComments) =>
       Sentence.normalize(parsedComments.whereType<String>().join());
 
-  ComponentCode? _findComponentCode(List<EventTag> eventTags) {
-    var partialComponentCodes =
-        eventTags.whereType<ComponentCodeTag>().toList();
-    if (partialComponentCodes.isNotEmpty) {
-      var partialComponentCode = partialComponentCodes.first;
+  ComponentCode? _createComponentCode(
+      List<EventTag> eventTags, List<NameSpace> eventPath) {
+    var componentCodeTag = _findComponentCodeTag(eventTags, eventPath);
+
+    if (componentCodeTag == null) {
+      return null;
+    } else {
       return ComponentCode(
         site: Site(_findSiteNumberTag(eventTags).number),
         electricPanel: ElectricPanel(
             number: _findPanelNumberTag(eventTags).number,
             name: electricPanel.name),
-        pageNumber: partialComponentCode.pageNumber,
-        letters: partialComponentCode.letters,
-        columnNumber: partialComponentCode.columnNumber,
+        pageNumber: componentCodeTag.pageNumber,
+        letters: componentCodeTag.letters,
+        columnNumber: componentCodeTag.columnNumber,
       );
-    } else {
-      return null;
     }
   }
 
@@ -240,6 +243,89 @@ class EventService {
   String _findGroupName(List<NameSpace> eventPath, Set<String> groupNames) {
     var fullName = _createEventGroupName(eventPath);
     return groupNames.firstWhere((groupName) => fullName.startsWith(groupName));
+  }
+
+  _eventPathString(List<NameSpace> eventPath) =>
+      eventPath.map((nameSpace) => nameSpace.name).join('.');
+
+  ComponentCodeTag? _findComponentCodeTag(
+      List<EventTag> eventTags, List<NameSpace> eventPath) {
+    var componentCodeTags = eventTags.whereType<ComponentCodeTag>().toList();
+    var derivedComponentCodeTags =
+        eventTags.whereType<DerivedComponentCodeTag>().toList();
+
+    if (derivedComponentCodeTags.isEmpty) {
+      if (componentCodeTags.isEmpty) {
+        return null;
+      } else {
+        return componentCodeTags.first;
+      }
+    } else {
+      return _createDerivedComponentCodeTag(
+          derivedComponentCodeTags, eventPath, componentCodeTags);
+    }
+  }
+
+  ComponentCodeTag? _createDerivedComponentCodeTag(
+      List<DerivedComponentCodeTag> derivedComponentCodeTags,
+      List<NameSpace> eventPath,
+      List<ComponentCodeTag> componentCodeTags) {
+    var derivedComponentCodeTag =
+        _findDerivedComponentCode(derivedComponentCodeTags, eventPath);
+    var componentCodeTagWithSameLetter = _findComponentCodeTagWithSameLetter(
+        derivedComponentCodeTag, componentCodeTags, eventPath);
+    if (componentCodeTagWithSameLetter == null) {
+      return null;
+    } else {
+      return ComponentCodeTag(
+          pageNumber: componentCodeTagWithSameLetter.pageNumber,
+          letters: derivedComponentCodeTag.letters,
+          columnNumber: componentCodeTagWithSameLetter.columnNumber);
+    }
+  }
+
+  DerivedComponentCodeTag _findDerivedComponentCode(
+      List<DerivedComponentCodeTag> derivedComponentCodeTags,
+      List<NameSpace> eventPath) {
+    if (derivedComponentCodeTags.length > 1) {
+      log('The following event path contains more then 1 '
+          '${DerivedComponentCodeTag}s: ${_eventPathString(eventPath)}');
+    }
+    return derivedComponentCodeTags.first;
+  }
+
+  ComponentCodeTag? _findComponentCodeTagWithSameLetter(
+      DerivedComponentCodeTag derivedComponentCodeTag,
+      List<ComponentCodeTag> componentCodeTags,
+      List<NameSpace> eventPath) {
+    if (componentCodeTags.isEmpty) {
+      log('The following event path contains a $DerivedComponentCodeTag '
+          'but no ${ComponentCodeTag}s": '
+          '${_eventPathString(eventPath)}');
+      return null;
+    }
+
+    var componentCodeTagsWithSameLetter = componentCodeTags
+        .where((componentCodeTag) =>
+            componentCodeTag.letters == derivedComponentCodeTag.letters)
+        .toList();
+    if (componentCodeTagsWithSameLetter.isEmpty) {
+      return componentCodeTags.first;
+    }
+
+    var index = derivedComponentCodeTag.indexNumber;
+    if (index < 1) {
+      log('The following event path contains a $DerivedComponentCodeTag '
+          'with an indexNumber <1: ${_eventPathString(eventPath)}');
+      return componentCodeTagsWithSameLetter.first;
+    }
+    if (index > componentCodeTagsWithSameLetter.length) {
+      log('The following event path contains a $DerivedComponentCodeTag '
+          'with indexNumber > the number of ${ComponentCodeTag}s '
+          'with the same letter: ${_eventPathString(eventPath)}');
+      return componentCodeTags.first;
+    }
+    return componentCodeTagsWithSameLetter[index - 1];
   }
 }
 

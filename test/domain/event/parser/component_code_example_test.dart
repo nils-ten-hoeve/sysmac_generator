@@ -14,17 +14,14 @@ class EventComponentCodeExample extends EventExample {
 
   @override
   String get explanation =>
-      "{ImportDartDoc path='lib/domain/event/parser/component_code_parser.dart|ComponentCode' }"
+      "{ImportDartDoc path='lib/domain/event/parser/component_code_parser.dart|$ComponentCode' }"
       "\n\n"
-      "{ImportDartDoc path='lib/domain/event/parser/component_code_parser.dart|ComponentCodeTag' }";
+      "{ImportDartDoc path='lib/domain/event/parser/component_code_parser.dart|$ComponentCodeTag' }";
 
   @override
   Definition createDefinition() => Definition()
     ..addStruct('Events')
-    ..addStructBool(
-      dataTypeName: 'Event1',
-      dataTypeComment: '[110s3] system air pressure too low',
-    )
+    ..addStructBool('Event1', '[110s3] system air pressure too low')
     ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',

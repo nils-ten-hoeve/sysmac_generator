@@ -33,16 +33,10 @@ class EventComponentCodePanelExample extends EventExample {
     )
     ..goToRoot()
     ..addStruct('sMainPanel')
-    ..addStructBool(
-      dataTypeName: 'event1',
-      dataTypeComment: '[30Q1] plucker1 motor1 overloaded',
-    )
+    ..addStructBool('event1', '[30Q1] plucker1 motor1 overloaded')
     ..goToRoot()
     ..addStruct('sSecondPanel')
-    ..addStructBool(
-      dataTypeName: 'event2',
-      dataTypeComment: '[30Q1] plucker5 motor1 overloaded',
-    )
+    ..addStructBool('event2', '[30Q1] plucker5 motor1 overloaded')
     ..addExpectedEvent(
       groupName1: 'Main Panel',
       message: 'Plucker1 motor1 overloaded.',
