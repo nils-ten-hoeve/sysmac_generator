@@ -14,72 +14,138 @@ import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
 import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
-import 'package:sysmac_generator/domain/variable.dart';
 import 'package:sysmac_generator/util/sentence.dart';
 
 class EventService {
-  // final GlobalVariableService globalVariableService;
-
   final Site site;
   final ElectricPanel electricPanel;
-  static final _groupNameIndex = 1;
-  static final _eventTagsParser = EventTagsParser();
+  final List<NameSpace> eventGlobalVariables;
 
-  EventService({required this.site, required this.electricPanel});
+  EventService({
+    required this.site,
+    required this.electricPanel,
+    required this.eventGlobalVariables,
+  });
 
-  List<EventGroup> createFromVariable(List<Variable> variables) {
-    List<List<NameSpace>> eventPaths = _createEventPaths(variables);
+  List<EventGroup> get eventGroups => EventGroupFactory(this).create();
+}
 
-    var groupNames = _createGroupNames(eventPaths);
+class EventGroupFactory {
+  final EventService eventService;
+  final EventCounter eventCounter = EventCounter();
+  Set<String>? _cachedGroupNames;
 
-    List<EventGroup> eventGroups = [];
-    EventCounter eventCounter = EventCounter();
-    for (var eventPath in eventPaths) {
-      if (_newEventGroup(eventGroups, eventPath)) {
-        var groupName = _findGroupName(eventPath, groupNames);
-        EventGroup eventGroup = EventGroup(groupName);
-        eventGroups.add(eventGroup);
-      }
-      EventGroup eventGroup = eventGroups.last;
-      eventGroup.children
-          .addAll(_createEvents(eventGroup, eventPath, eventCounter));
+  EventGroupFactory(this.eventService);
+
+  List<EventGroup> create() {
+    List<Event> allEvents = [];
+    for (var eventGlobalVariable in eventService.eventGlobalVariables) {
+      allEvents.addAll(EventFactory(this, eventGlobalVariable).createAll());
     }
 
+    List<EventGroup> eventGroups = [];
+    for (var groupName in groupNames) {
+      var eventGroup = EventGroup(groupName);
+      eventGroup.children
+          .addAll(allEvents.where((event) => event.groupName1 == groupName));
+      eventGroups.add(eventGroup);
+    }
     return eventGroups;
   }
 
-  bool _newEventGroup(List<EventGroup> eventGroups, List<NameSpace> eventPath) {
-    return eventGroups.isEmpty ||
-        !_createEventGroupName(eventPath)
-            .toLowerCase()
-            .startsWith(eventGroups.last.name.toLowerCase());
+  Set<String> get groupNames {
+    if (_cachedGroupNames == null) {
+      List<String> allNames = [];
+      for (var eventGlobalVariable in eventService.eventGlobalVariables) {
+        allNames.addAll(eventGlobalVariable.children
+            .map((eventGlobalVariableChild) =>
+                eventGlobalVariableChild.name.titleCase)
+            .toList());
+      }
+
+      allNames.sort((a, b) => a.compareTo(b));
+      _cachedGroupNames =
+          allNames.map((name) => _findUniqueName(name, allNames)).toSet();
+    }
+    return _cachedGroupNames!;
   }
 
-  List<List<NameSpace>> _createEventPaths(List<Variable> variables) {
-    List<List<NameSpace>> eventPaths = [];
+  String _findUniqueName(String originalName, List<String> allNames) {
+    var words = originalName.titleCase.split(' ');
+    var uniqueName = originalName;
+    var matches = _startingWithTheSame(allNames, originalName).length;
+    while (words.isNotEmpty) {
+      var nameCandidate = words.join(' ');
+      var foundMatches = _startingWithTheSame(allNames, nameCandidate).length;
+      if (foundMatches > matches) {
+        matches = foundMatches;
+        uniqueName = nameCandidate;
+      }
+      words.removeAt(words.length - 1);
+    }
+    return uniqueName;
+  }
 
-    for (var variable in variables) {
-      eventPaths.addAll(variable.findPaths((nameSpace) =>
-      nameSpace is DataType &&
-          nameSpace.baseType is VbBoolean &&
-          nameSpace.children.isEmpty));
+  Iterable<String> _startingWithTheSame(
+          List<String> strings, String stringToMatch) =>
+      strings.where((string) =>
+          string.toLowerCase().startsWith(stringToMatch.toLowerCase()));
+}
+
+/// [EventFactory] wil recursively create all events of a EvenGlobalNode.
+/// It will contain all information necessary such as array counters
+class EventFactory {
+  static final _eventTagsParser = EventTagsParser();
+  final EventGroupFactory eventGroupFactory;
+  final EventFactory? parentFactory;
+  final NameSpace eventGlobalNode;
+
+  EventFactory(
+    this.eventGroupFactory,
+    this.eventGlobalNode, [
+    this.parentFactory,
+  ]);
+
+  List<NameSpace> get eventPath => parentFactory == null
+      ? [eventGlobalNode]
+      : [...parentFactory!.eventPath, eventGlobalNode];
+
+  EventCounter get eventCounter => eventGroupFactory.eventCounter;
+
+  /// Recursively creates all events of a eventGlobalNode.
+  List<Event> createAll() {
+    List<Event> events = [];
+    //TODO arrays
+    if (eventGlobalNode is DataType &&
+        (eventGlobalNode as DataType).baseType is VbBoolean) {
+      events.add(_createEvent());
     }
 
-    _sortOnFirstDataTypeNames(eventPaths);
-
-    return eventPaths;
+    for (var child in eventGlobalNode.children) {
+      events.addAll(EventFactory(eventGroupFactory, child, this).createAll());
+    }
+    return events;
   }
 
-  /// Sort on the name of the first [DataType] members of the EventGlobal variable
-  void _sortOnFirstDataTypeNames(List<List<NameSpace>> eventPaths) {
-    eventPaths.sort((a, b) => a[1].name.compareTo(b[1].name));
-  }
+  // List<List<NameSpace>> _createEventPaths(List<Variable> variables) {
+  //   List<List<NameSpace>> eventPaths = [];
+  //
+  //   for (var variable in variables) {
+  //     eventPaths.addAll(variable.findPaths((nameSpace) =>
+  //     nameSpace is DataType &&
+  //         nameSpace.baseType is VbBoolean &&
+  //         nameSpace.children.isEmpty));
+  //   }
+  //
+  //   _sortOnFirstDataTypeNames(eventPaths);
+  //
+  //   return eventPaths;
+  // }
 
-  List<Event> _createEvents(EventGroup eventGroup, List<NameSpace> eventPath,
-      EventCounter eventCounter) {
+  Event _createEvent() {
     var parsedComments = _parseComments(eventPath);
     var eventTags = _findEventTags(parsedComments);
-    var groupName1 = eventGroup.name;
+    var groupName1 = _findGroupName();
     var groupName2 = _findGroupName2(groupName1, eventPath);
     var priority = _findPriority(eventTags);
     var componentCode = _createComponentCode(eventTags, eventPath);
@@ -95,9 +161,7 @@ class EventService {
       solution: _findSolution(eventTags, componentCode),
       acknowledge: _findAcknowledge(eventTags, priority),
     );
-    return [
-      event
-    ]; //TODO return multiple events if eventPath contains DataTypes with baseType.array!=null
+    return event;
   }
 
   String _createExpression(List<NameSpace> eventPath) {
@@ -130,10 +194,16 @@ class EventService {
   List<dynamic> _parseComments(List<NameSpace> eventPath) {
     String joinedComments = _joinComments(eventPath);
     var result = _eventTagsParser.parse(joinedComments).value;
+
     result.insert(0, PanelNumberTag(electricPanel.number));
     result.insert(0, SiteNumberTag(site.number));
     return result;
   }
+
+  ElectricPanel get electricPanel =>
+      eventGroupFactory.eventService.electricPanel;
+
+  Site get site => eventGroupFactory.eventService.site;
 
   String _createMessage(List parsedComments) =>
       Sentence.normalize(parsedComments.whereType<String>().join());
@@ -185,7 +255,7 @@ class EventService {
     String groupName1,
     List<NameSpace> eventPath,
   ) {
-    var groupName2 = _createEventGroupName(eventPath);
+    var groupName2 = _createEventGroupName();
     if (groupName1 == groupName2) {
       return '';
     } else {
@@ -205,44 +275,11 @@ class EventService {
     return solutionTexts.join(' ');
   }
 
-  String _createEventGroupName(List<NameSpace> eventPath) {
-    return eventPath[_groupNameIndex].name.titleCase;
-  }
-
-  Set<String> _createGroupNames(List<List<NameSpace>> eventPaths) {
-    var originalNames = eventPaths
-        .map((eventPath) => _createEventGroupName(eventPath))
-        .toList();
-    return originalNames
-        .map((originalName) => _findUniqueName(originalName, originalNames))
-        .toSet();
-  }
-
-  String _findUniqueName(String originalName, List<String> originalNames) {
-    var words = originalName.titleCase.split(' ');
-    var uniqueName = originalName;
-    var matches = _startingWithTheSame(originalNames, originalName).length;
-    while (words.isNotEmpty) {
-      var nameCandidate = words.join(' ');
-      var foundMatches =
-          _startingWithTheSame(originalNames, nameCandidate).length;
-      if (foundMatches > matches) {
-        matches = foundMatches;
-        uniqueName = nameCandidate;
-      }
-      words.removeAt(words.length - 1);
-    }
-    return uniqueName;
-  }
-
-  Iterable<String> _startingWithTheSame(
-          List<String> strings, String stringToMatch) =>
-      strings.where((string) =>
-          string.toLowerCase().startsWith(stringToMatch.toLowerCase()));
-
-  String _findGroupName(List<NameSpace> eventPath, Set<String> groupNames) {
-    var fullName = _createEventGroupName(eventPath);
-    return groupNames.firstWhere((groupName) => fullName.startsWith(groupName));
+  String _findGroupName() {
+    var fullName = _createEventGroupName();
+    var groupNames = eventGroupFactory.groupNames;
+    return groupNames.firstWhere((groupName) => fullName.startsWith(groupName),
+        orElse: () => '');
   }
 
   _eventPathString(List<NameSpace> eventPath) =>
@@ -327,6 +364,10 @@ class EventService {
     }
     return componentCodeTagsWithSameLetter[index - 1];
   }
+
+  String _createEventGroupName() => eventPath.length == 1
+      ? eventPath[0].name.titleCase
+      : eventPath[1].name.titleCase;
 }
 
 class EventCounter {

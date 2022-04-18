@@ -47,9 +47,8 @@ class EventService {
   // can be inserted by importing the M$ Excel file.
   void generateForSysmacHmi(String sysmacProjectFilePath) {
     var sysmacProject = SysmacProjectFactory().create(sysmacProjectFilePath);
-    var eventGlobalVariables =
-        sysmacProject.globalVariableService.findVariablesWithEventGlobalName();
-    sysmacProject.eventService.createFromVariable(eventGlobalVariables);
+    //var eventGroups=
+    sysmacProject.eventService.eventGroups;
   }
 
   void generateForCynergy(String sysmacProjectFilePath) {

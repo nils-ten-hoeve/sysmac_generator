@@ -8,13 +8,10 @@ import 'test_resource.dart';
 main() {
   File file = SysmacProjectTestResource().file;
   var sysmacProject = SysmacProjectFactory().create(file.path);
-  var eventGlobalVariables =
-      sysmacProject.globalVariableService.findVariablesWithEventGlobalName();
 
   group('class: EventService', () {
     test('variables isNot Empty', () {
-      var result =
-          sysmacProject.eventService.createFromVariable(eventGlobalVariables);
+      var result = sysmacProject.eventService.eventGroups;
       expect(result.isNotEmpty, true);
     });
   });

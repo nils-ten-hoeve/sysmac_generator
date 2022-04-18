@@ -28,8 +28,7 @@ main() {
     });
     group('method: findVariablesWithEventsGlobalName', () {
       var results = variableService.findVariablesWithEventGlobalName();
-      test(
-          'contains one variable with $eventGlobalVariableName', () {
+      test('contains one variable with $eventGlobalVariableName', () {
         expect(results, hasLength(1));
         expect(results[0].name, eventGlobalVariableName);
         expect(results[0].baseType, isA<DataTypeReference>());

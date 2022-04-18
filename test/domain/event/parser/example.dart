@@ -64,7 +64,7 @@ abstract class EventExample with MarkDownTemplateWriter {
     Definition definition = createDefinition();
     DataTypeReferenceFactory().replaceWherePossible(definition.dataTypeTree);
     group('Class : $runtimeType', () {
-      test('Method: test', () {
+      test('Method: executeTest', () {
         List<EventGroup> generatedGroups = generatedEventGroups(definition);
         List<EventGroup> expectedGroups = expectedEventGroups(definition);
         expect(generatedGroups.length, expectedGroups.length);
@@ -94,9 +94,9 @@ abstract class EventExample with MarkDownTemplateWriter {
     EventService eventService = EventService(
       site: site,
       electricPanel: electricPanel,
+      eventGlobalVariables: [definition.eventGlobalVariable],
     );
-    List<EventGroup> generatedGroups =
-        eventService.createFromVariable([definition.eventGlobalVariable]);
+    List<EventGroup> generatedGroups = eventService.eventGroups;
     return generatedGroups;
   }
 }

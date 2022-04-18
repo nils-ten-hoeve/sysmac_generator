@@ -44,6 +44,8 @@ class SysmacProjectFactory {
     var eventService = EventService(
       site: site,
       electricPanel: electricPanel,
+      eventGlobalVariables:
+          globalVariableService.findVariablesWithEventGlobalName(),
     );
     return SysmacProject(
       site: site,
