@@ -17,6 +17,7 @@ import 'package:sysmac_generator/infrastructure/variable.dart';
 import 'package:test/test.dart';
 
 import 'acknowledge_example_test.dart';
+import 'array_example_test.dart';
 import 'component_code_example_test.dart';
 import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
@@ -186,12 +187,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     if (nameSpace is! DataType) {
       return '$NameSpace';
     } else {
-      var baseType = nameSpace.baseType;
-      if (baseType is UnknownBaseType) {
-        return baseType.expression;
-      } else {
-        return baseType.toString();
-      }
+      return nameSpace.baseType.toString();
     }
   }
 
@@ -308,26 +304,28 @@ class Definition {
     /// * ARRAY[1..2] OF Equipment\Pump\Events
     /// * ARRAY[1..2,3..4] OF Equipment\Pump\Events
     required String dataTypeExpression,
+    List<ArrayRange> dataTypeArrayRanges = const [],
   }) {
+    //[baseType] will be converted to a [DataTypeReference] later
+    var baseType = UnknownBaseType(dataTypeExpression);
+    baseType.arrayRanges.addAll(dataTypeArrayRanges);
     DataType dataType = DataType(
       name: dataTypeName,
       comment: dataTypeComment,
-      baseType: UnknownBaseType(dataTypeExpression)
-      //[baseType] will be converted to a [DataTypeReference] later
-      ,
+      baseType: baseType,
     );
     pointer.children.add(dataType);
     return this;
   }
 
-  Definition addStructBool(
-    String name,
-    String comment,
-  ) {
+  Definition addStructBool(String name, String comment,
+      [List<ArrayRange> arrayRanges = const []]) {
+    var vbBoolean = VbBoolean();
+    vbBoolean.arrayRanges.addAll(arrayRanges);
     DataType dataType = DataType(
       name: name,
       comment: comment,
-      baseType: VbBoolean(),
+      baseType: vbBoolean,
     );
     _verifyIfPointerIsStruct();
     pointer.children.add(dataType);
@@ -487,6 +485,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventComponentCodeSiteExample(),
           EventComponentCodePanelExample(),
           EventDerivedComponentCodeExample(),
+          EventArrayExample(),
         ]);
 
   @override

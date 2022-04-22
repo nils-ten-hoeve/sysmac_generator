@@ -12,7 +12,7 @@ abstract class BaseType {
     if (arrayRanges.isEmpty) {
       return runtimeType.toString();
     } else {
-      return arrayRanges.toString() + runtimeType.toString();
+      return 'ARRAY$arrayRanges OF $runtimeType';
     }
   }
 
@@ -45,10 +45,23 @@ class ArrayRange {
       : min = _numberFromExpression(expression, minName),
         max = _numberFromExpression(expression, maxName);
 
+  ArrayRange.minMax(this.min, this.max);
+
   @override
   String toString() {
     return '$min..$max';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ArrayRange &&
+          runtimeType == other.runtimeType &&
+          min == other.min &&
+          max == other.max;
+
+  @override
+  int get hashCode => min.hashCode ^ max.hashCode;
 
   static _numberFromExpression(String expression, String groupName) {
     var value = regex.firstMatch(expression)!.namedGroup(groupName)!;
@@ -82,7 +95,11 @@ class UnknownBaseType extends BaseType {
 
   @override
   String toString() {
-    return 'UnknownBaseType{expression: $expression}';
+    if (arrayRanges.isEmpty) {
+      return expression;
+    } else {
+      return 'ARRAY$arrayRanges OF $expression';
+    }
   }
 }
 

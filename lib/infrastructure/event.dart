@@ -99,12 +99,13 @@ class EventFactory {
   final EventGroupFactory eventGroupFactory;
   final EventFactory? parentFactory;
   final NameSpace eventGlobalNode;
+  final ArrayValues arrayValues;
 
   EventFactory(
     this.eventGroupFactory,
     this.eventGlobalNode, [
     this.parentFactory,
-  ]);
+  ]) : arrayValues = ArrayValues(eventGlobalNode);
 
   List<NameSpace> get eventPath => parentFactory == null
       ? [eventGlobalNode]
@@ -115,34 +116,22 @@ class EventFactory {
   /// Recursively creates all events of a eventGlobalNode.
   List<Event> createAll() {
     List<Event> events = [];
-    //TODO arrays
-    if (eventGlobalNode is DataType &&
-        (eventGlobalNode as DataType).baseType is VbBoolean) {
-      events.add(_createEvent());
-    }
 
-    for (var child in eventGlobalNode.children) {
-      events.addAll(EventFactory(eventGroupFactory, child, this).createAll());
+    for (var arrayValue in arrayValues) {
+      if (eventGlobalNode is DataType &&
+          (eventGlobalNode as DataType).baseType is VbBoolean) {
+        events.add(_createEvent(arrayValue));
+      } else {
+        for (var child in eventGlobalNode.children) {
+          events
+              .addAll(EventFactory(eventGroupFactory, child, this).createAll());
+        }
+      }
     }
     return events;
   }
 
-  // List<List<NameSpace>> _createEventPaths(List<Variable> variables) {
-  //   List<List<NameSpace>> eventPaths = [];
-  //
-  //   for (var variable in variables) {
-  //     eventPaths.addAll(variable.findPaths((nameSpace) =>
-  //     nameSpace is DataType &&
-  //         nameSpace.baseType is VbBoolean &&
-  //         nameSpace.children.isEmpty));
-  //   }
-  //
-  //   _sortOnFirstDataTypeNames(eventPaths);
-  //
-  //   return eventPaths;
-  // }
-
-  Event _createEvent() {
+  Event _createEvent(String arrayValue) {
     var parsedComments = _parseComments(eventPath);
     var eventTags = _findEventTags(parsedComments);
     var groupName1 = _findGroupName();
@@ -155,7 +144,7 @@ class EventFactory {
       groupName2: groupName2,
       id: eventCounter.next,
       componentCode: componentCode == null ? '' : componentCode.toCode(),
-      expression: _createExpression(eventPath),
+      expression: expression,
       priority: priority,
       message: message,
       solution: _findSolution(eventTags, componentCode),
@@ -164,11 +153,15 @@ class EventFactory {
     return event;
   }
 
-  String _createExpression(List<NameSpace> eventPath) {
-    List<NameSpace> filteredEventPath = eventPath
-        .where((nameSpace) => nameSpace is! Site && nameSpace is! ElectricPanel)
-        .toList();
-    return filteredEventPath.map((nameSpace) => nameSpace.name).join('.');
+  String get expression {
+    if (parentFactory == null) {
+      return eventGlobalNode.name;
+    } else {
+      return parentFactory!.expression +
+          '.' +
+          eventGlobalNode.name +
+          arrayValues.current;
+    }
   }
 
   List<EventTag> _findEventTags(List<dynamic> parsedComments) =>
@@ -368,6 +361,146 @@ class EventFactory {
   String _createEventGroupName() => eventPath.length == 1
       ? eventPath[0].name.titleCase
       : eventPath[1].name.titleCase;
+}
+
+abstract class ArrayValues extends Iterable with Iterator<String> {
+  final List<ArrayCounterListener> listeners = [];
+
+  ArrayValues._();
+
+  factory ArrayValues(NameSpace eventGlobalNode) {
+    if (eventGlobalNode is DataType) {
+      var arrayRangesReversed = eventGlobalNode.baseType.arrayRanges.reversed;
+      ArrayCounter? child;
+      ArrayCounter? arrayCounter;
+      for (var arrayRange in arrayRangesReversed) {
+        arrayCounter = ArrayCounter(arrayRange: arrayRange, child: child);
+        child = arrayCounter;
+      }
+      return arrayCounter ?? NoArrayValues();
+    } else {
+      return NoArrayValues();
+    }
+  }
+
+  void invokeListeners() {
+    for (var listener in listeners.whereType<ArrayCounterListener>()) {
+      listener.onNext();
+    }
+  }
+}
+
+class NoArrayValues extends ArrayValues {
+  bool firstTime = true;
+
+  NoArrayValues() : super._();
+
+  @override
+  String get current => '';
+
+  @override
+  Iterator get iterator => this;
+
+  @override
+  bool moveNext() {
+    invokeListeners();
+    if (firstTime) {
+      firstTime = false;
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+class ArrayCounter extends ArrayValues {
+  final ArrayRange arrayRange;
+  final ArrayCounter? child;
+  ArrayCounter? parent;
+  late int value;
+
+  ArrayCounter({
+    required this.arrayRange,
+    this.child,
+  }) : super._() {
+    if (child != null) {
+      child!.parent = this;
+    }
+    value = _startValue;
+  }
+
+  /// An [ArrayCounter] has at least one value.
+  /// Therefore the start value of the [leafArrayCounter] =arrayRange.min-1;
+  int get _startValue => child == null ? arrayRange.min - 1 : arrayRange.min;
+
+  /// Advances to the next element of this [ArrayCounter]
+  /// (comparable to an [Iterator]).
+  ///
+  /// Should be called before reading [value].
+  /// If the call to `moveNext` returns `true`,
+  /// then [value] will contain the next element of the iteration
+  /// until `moveNext` is called again.
+  /// If the call returns `false`, there are no further elements
+  /// and [value] should not be used any more.
+  ///
+  /// It is safe to call [goToNext] after it has already returned `false`,
+  /// but it must keep returning `false` and not have any other effect.
+  bool goToNext() {
+    value++;
+    invokeListeners();
+    if (value > arrayRange.max) {
+      value = arrayRange.min;
+      return parent == null ? false : parent!.goToNext();
+    } else {
+      return true;
+    }
+  }
+
+  ArrayCounter get rootArrayCounter {
+    if (parent == null) {
+      return this;
+    } else {
+      return parent!.rootArrayCounter;
+    }
+  }
+
+  ArrayCounter get leafArrayCounter {
+    if (child == null) {
+      return this;
+    } else {
+      return child!.leafArrayCounter;
+    }
+  }
+
+  /// needed to iterate trough all values of the [ArrayCounter] tree.
+  @override
+  String get current => toString();
+
+  /// needed to iterate trough all values of the [ArrayCounter] tree.
+  @override
+  bool moveNext() {
+    return leafArrayCounter.goToNext();
+  }
+
+  @override
+  String toString() => '(${_toStringValues.join(',')})';
+
+  List<int> get _toStringValues {
+    List<int> values = [];
+    ArrayCounter? node = rootArrayCounter;
+    while (node != null) {
+      values.add(node.value);
+      node = node.child;
+    }
+    return values;
+  }
+
+  @override
+  Iterator<String> get iterator => this;
+}
+
+abstract class ArrayCounterListener {
+  void onNext();
 }
 
 class EventCounter {

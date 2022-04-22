@@ -21,3 +21,5 @@
 {ImportFile path='doc/template/EventComponentCodePanelExample.mdt' title='# Component Code Panel'}
 
 {ImportFile path='doc/template/EventDerivedComponentCodeExample.mdt' title='# Derived Component Code'}
+
+{ImportFile path='doc/template/EventArrayExample.mdt' title='# Array'}
