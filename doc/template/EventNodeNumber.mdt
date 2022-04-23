@@ -1,0 +1,2 @@
+Do not use node numbers or other addresses such IO addresses or IP addresses in [Event] messages.
+For consistency use [ComponentCode]'s instead.
