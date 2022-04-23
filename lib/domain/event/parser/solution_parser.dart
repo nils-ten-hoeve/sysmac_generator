@@ -17,7 +17,7 @@ import 'generic_parsers.dart';
 ///   * upper or lower case (lower case is recommended for consistency)
 ///   * spaces (spaces are not recommended: keep [EventTag]s short)
 /// * Examples:
-///   * [solution=solution to solve the problem]   (=true)
+///   * [solution=reset the emergency button and press the safety reset button.]
 class SolutionTag extends EventTag {
   final String solution;
 
