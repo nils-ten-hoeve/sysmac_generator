@@ -1,15 +1,15 @@
 import 'package:collection/collection.dart';
 import 'package:sysmac_generator/domain/html/html_table.dart';
-import 'package:sysmac_generator/domain/namespace.dart';
+import 'package:sysmac_generator/domain/node.dart';
 
-class EventGroup extends NameSpace {
+class EventGroup extends Node<Event> {
   EventGroup(String name) : super(name);
 }
 
 /// [Event]s are system alarms, warnings or messages that are displayed to the
 /// operator.
 
-class Event extends NameSpace {
+class Event extends LeafNode<Event> {
   final String groupName1;
   final String groupName2;
   final String id;

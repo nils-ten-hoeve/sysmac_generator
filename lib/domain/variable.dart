@@ -1,7 +1,8 @@
-import 'base_type.dart';
-import 'namespace.dart';
+import 'package:sysmac_generator/domain/data_type.dart';
 
-class Variable extends NameSpaceWithTypeAndComment {
+import 'base_type.dart';
+
+class Variable extends DataType {
   Variable({
     required String name,
     required BaseType baseType,
@@ -25,23 +26,23 @@ class Variable extends NameSpaceWithTypeAndComment {
     return string;
   }
 
-  List<List<NameSpace>> findPaths(bool Function(NameSpace nameSpace) filter) {
-    List<NameSpace> nameSpacePath = [this];
-    return _findNameSpacePathsFor(nameSpacePath, filter);
-  }
-
-  List<List<NameSpace>> _findNameSpacePathsFor(List<NameSpace> nameSpacePath,
-      bool Function(NameSpace nameSpace) filter) {
-    NameSpace nameSpace = nameSpacePath.last;
-    List<List<NameSpace>> nameSpacePaths = [];
-    if (filter(nameSpace)) {
-      nameSpacePaths.add(nameSpacePath);
-    }
-    for (var child in nameSpace.children) {
-      //recursive call
-      nameSpacePaths
-          .addAll(_findNameSpacePathsFor([...nameSpacePath, child], filter));
-    }
-    return nameSpacePaths;
-  }
+// List<List<DataType>> findPaths(bool Function(DataType dataType) filter) {
+//   List<DataType> nameSpacePath = [this];
+//   return _findNameSpacePathsFor(nameSpacePath, filter);
+// }
+//
+// List<List<DataType>> _findNameSpacePathsFor(List<DataType> dataTypePath,
+//     bool Function(DataType nameSpace) filter) {
+//   DataType nameSpace = dataTypePath.last;
+//   List<List<DataType>> dataTypePaths = [];
+//   if (filter(nameSpace)) {
+//     dataTypePaths.add(dataTypePath);
+//   }
+//   for (var child in nameSpace.children) {
+//     //recursive call
+//     dataTypePaths
+//         .addAll(_findNameSpacePathsFor([...dataTypePath, child], filter));
+//   }
+//   return dataTypePaths;
+// }
 }

@@ -1,18 +1,38 @@
 import 'base_type.dart';
-import 'namespace.dart';
+import 'node.dart';
 
-class DataType extends NameSpaceWithTypeAndComment {
-  DataType? parent;
+///Root [Node] of the DataType tree containing [DataTypeBase]s
+class DataTypeTree extends DataTypeBase {
+  DataTypeTree() : super('$DataTypeTree');
+}
 
-  DataType({
-    required String name,
-    required BaseType baseType,
-    required String comment,
-  }) : super(
-          name: name,
-          baseType: baseType,
-          comment: comment,
-        );
+/// Abstract base type of [DataType]s and [NameSpace2]s
+abstract class DataTypeBase extends Node<DataTypeBase> {
+  final String comment;
+
+  DataTypeBase(String name, [this.comment = '']) : super(name);
+}
+
+//TODO rename to NameSpace
+class NameSpace2 extends DataTypeBase {
+  NameSpace2(String name, [String comment = '']) : super(name, comment);
+}
+
+class DataType extends DataTypeBase {
+  // DataType? parent;
+  BaseType baseType;
+
+  DataType({required String name, required this.baseType, String comment = ''})
+      : super(name, comment);
+
+  @override
+  List<DataTypeBase> get children {
+    if (baseType is DataTypeReference) {
+      return (baseType as DataTypeReference).dataType.children;
+    } else {
+      return super.children;
+    }
+  }
 
   @override
   String toString() {
@@ -26,8 +46,4 @@ class DataType extends NameSpaceWithTypeAndComment {
     }
     return string;
   }
-}
-
-class DataTypeTree extends NameSpace {
-  DataTypeTree() : super('$DataTypeTree');
 }

@@ -1,14 +1,15 @@
 import 'package:collection/collection.dart';
-import 'package:sysmac_generator/domain/base_type.dart';
 
-class NameSpace {
+/// A named [Node] for building tree models.
+abstract class Node<T extends Node<T>> {
   final String name;
-  final List<NameSpace> children = [];
 
-  NameSpace(this.name);
+  Node(this.name);
 
-  List<NameSpace> get descendants {
-    List<NameSpace> all = [];
+  final List<T> children = [];
+
+  List<T> get descendants {
+    List<T> all = [];
     for (var child in children) {
       all.add(child);
       all.addAll(child.descendants);
@@ -19,12 +20,12 @@ class NameSpace {
   /// Tries to find a child using a list of [namesToFind]
   /// Returns this when [namesToFind] is empty.
   /// Returns null when a name can't be found.
-  NameSpace? findNamePath(List<String> namesToFind) {
+  Node? findNamePath(List<String> namesToFind) {
     if (namesToFind.isEmpty) {
       return this;
     }
     var childNameToFind = namesToFind.first;
-    NameSpace? foundChild =
+    Node? foundChild =
         children.firstWhereOrNull((child) => child.name == childNameToFind);
     if (foundChild == null) {
       return null;
@@ -38,10 +39,10 @@ class NameSpace {
     }
   }
 
-  NameSpace? findNamePathString(String pathToFind) =>
+  Node? findNamePathString(String pathToFind) =>
       findNamePath(pathToFind.split('\\'));
 
-  NameSpace? findFirst(bool Function(NameSpace nameSpace) predicate) {
+  Node? findFirst(bool Function(Node node) predicate) {
     if (predicate(this)) {
       return this;
     }
@@ -55,17 +56,17 @@ class NameSpace {
     return null;
   }
 
-  List<NameSpace> findPath(
-    NameSpace nameSpaceToFind, [
-    List<NameSpace> currentPath = const [],
+  List<Node> findPath(
+    Node nodeToFind, [
+    List<Node> currentPath = const [],
   ]) {
     currentPath = [...currentPath, this];
-    if (nameSpaceToFind.toString() == toString()) {
+    if (nodeToFind.toString() == toString()) {
       return currentPath;
     }
     for (var child in children) {
       //recursive call
-      var result = child.findPath(nameSpaceToFind, currentPath);
+      var result = child.findPath(nodeToFind, currentPath);
       if (result.isNotEmpty) {
         return result;
       }
@@ -76,7 +77,7 @@ class NameSpace {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is NameSpace &&
+          other is Node &&
           runtimeType == other.runtimeType &&
           name == other.name &&
           children == other.children;
@@ -97,22 +98,30 @@ class NameSpace {
   }
 }
 
-class NameSpaceWithTypeAndComment extends NameSpace {
-  BaseType baseType;
-  final String comment;
+class LeafNode<T extends Node<T>> extends Node<T> {
+  LeafNode(String name) : super(name);
 
-  NameSpaceWithTypeAndComment({
-    required String name,
-    required this.baseType,
-    required this.comment,
-  }) : super(name);
-
+  /// A [LeafNode] has no children
   @override
-  List<NameSpace> get children {
-    if (baseType is DataTypeReference) {
-      return (baseType as DataTypeReference).dataType.children;
-    } else {
-      return super.children;
-    }
-  }
+  List<T> get children => [];
 }
+//
+// class NameSpaceWithTypeAndComment<T extends Node<T>> {
+//   BaseType baseType;
+//   final String comment;
+//
+//   NameSpaceWithTypeAndComment({
+//     required String name,
+//     required this.baseType,
+//     required this.comment,
+//   }) : super(name);
+//
+//   @override
+//   List<Node<T>> get children {
+//     if (baseType is DataTypeReference) {
+//       return (baseType as DataTypeReference).dataType.children;
+//     } else {
+//       return super.children;
+//     }
+//   }
+// }

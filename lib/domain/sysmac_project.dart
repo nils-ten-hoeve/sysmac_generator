@@ -3,7 +3,7 @@ import 'package:sysmac_generator/infrastructure/event.dart';
 
 import '../infrastructure/variable.dart';
 import 'data_type.dart';
-import 'namespace.dart';
+import 'node.dart';
 
 /// Represents a physical Sysmac project file,
 /// which is actually a zip [Archive] containing [ArchiveFile]s
@@ -27,7 +27,7 @@ class SysmacProject {
 
 // OPTION: class Organization extends NameSpace
 
-class Site extends NameSpace {
+class Site extends LeafNode<Site> {
   /// Each known processing plant has a unique [number] (also called a Meyn layout number)
   /// e.g. 4321 = Maple Leaf - London - Canada
   final int number;
@@ -59,7 +59,7 @@ class Site extends NameSpace {
   }
 }
 
-class ElectricPanel extends NameSpace {
+class ElectricPanel extends LeafNode<ElectricPanel> {
   /// Each electric panel within a site has a unique [number]
   /// In this case it is the electric panel number that contains the PLC.
   /// e.g. 6 = Evisceration line (at site 4321 = Maple Leaf - London - Canada)
@@ -100,7 +100,7 @@ String _withLeadingZeros(int number, {required int minNumberOfDigits}) {
   return '0' * leadingZeros + number.toString();
 }
 
-class SysmacProjectVersion extends NameSpace {
+class SysmacProjectVersion extends LeafNode<SysmacProjectVersion> {
   final int standardVersion;
   final int customerVersion;
   final String notInstalledComment;

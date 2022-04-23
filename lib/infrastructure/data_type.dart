@@ -3,7 +3,6 @@ import 'package:xml/xml.dart';
 
 import '../domain/base_type.dart';
 import '../domain/data_type.dart';
-import '../domain/namespace.dart';
 import 'base_type.dart';
 import 'sysmac_project.dart';
 
@@ -28,7 +27,7 @@ class DataTypeTreeFactory {
 
     for (var dataTypeArchiveXmlFile in dataTypeArchiveXmlFiles) {
       String nameSpacePath = dataTypeArchiveXmlFile.nameSpacePath;
-      NameSpace nameSpace =
+      DataTypeBase nameSpace =
           _findOrCreateNameSpacePath(dataTypeTree, nameSpacePath);
 
       var dataTypes = dataTypeArchiveXmlFile.toDataTypes();
@@ -36,8 +35,8 @@ class DataTypeTreeFactory {
     }
   }
 
-  NameSpace _findOrCreateNameSpacePath(
-      NameSpace nameSpace, String nameSpacePathToFind) {
+  DataTypeBase _findOrCreateNameSpacePath(
+      DataTypeBase nameSpace, String nameSpacePathToFind) {
     if (nameSpacePathToFind.isEmpty) {
       // found
       return nameSpace;
@@ -46,7 +45,7 @@ class DataTypeTreeFactory {
     var namesToFind = nameSpacePathToFind.split(nameSpacePathSeparator);
     String nameToFind = namesToFind.first;
 
-    for (NameSpace child in nameSpace.children) {
+    for (DataTypeBase child in nameSpace.children) {
       if (child.name == nameToFind) {
         namesToFind.removeAt(0);
         String remainingPathToFind = namesToFind.join(nameSpacePathSeparator);
@@ -55,7 +54,7 @@ class DataTypeTreeFactory {
     }
     //not found: create nameSpace tree
     for (String nameToCreate in namesToFind) {
-      var newNameSpaceChild = NameSpace(nameToCreate);
+      var newNameSpaceChild = NameSpace2(nameToCreate);
       nameSpace.children.add(newNameSpaceChild);
       nameSpace = newNameSpaceChild;
     }

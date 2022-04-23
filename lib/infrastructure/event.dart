@@ -12,14 +12,13 @@ import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
-import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/util/sentence.dart';
 
 class EventService {
   final Site site;
   final ElectricPanel electricPanel;
-  final List<NameSpace> eventGlobalVariables;
+  final List<DataType> eventGlobalVariables;
 
   EventService({
     required this.site,
@@ -98,7 +97,7 @@ class EventFactory {
   static final _eventTagsParser = EventTagsParser();
   final EventGroupFactory eventGroupFactory;
   final EventFactory? parentFactory;
-  final NameSpace eventGlobalNode;
+  final DataTypeBase eventGlobalNode;
   final ArrayValues arrayValues;
 
   EventFactory(
@@ -107,7 +106,7 @@ class EventFactory {
     this.parentFactory,
   ]) : arrayValues = ArrayValues(eventGlobalNode);
 
-  List<NameSpace> get eventPath => parentFactory == null
+  List<DataTypeBase> get eventPath => parentFactory == null
       ? [eventGlobalNode]
       : [...parentFactory!.eventPath, eventGlobalNode];
 
@@ -167,24 +166,23 @@ class EventFactory {
   List<EventTag> _findEventTags(List<dynamic> parsedComments) =>
       parsedComments.whereType<EventTag>().toList();
 
-  String _joinComments(List<NameSpace> eventPath) {
+  String _joinComments(List<DataTypeBase> eventPath) {
     var joinedComments = '';
-    for (var nameSpace in eventPath) {
-      if (nameSpace is NameSpaceWithTypeAndComment) {
-        if (joinedComments.isNotEmpty) {
-          joinedComments += ' ';
-        }
-        joinedComments += nameSpace.comment;
-        if (nameSpace.baseType is DataTypeReference) {
-          var dataTypeReference = nameSpace.baseType as DataTypeReference;
-          joinedComments += ' ' + dataTypeReference.dataType.comment;
-        }
+    for (var eventGlobalNode in eventPath) {
+      if (joinedComments.isNotEmpty) {
+        joinedComments += ' ';
+      }
+      joinedComments += eventGlobalNode.comment;
+      if (eventGlobalNode is DataType &&
+          eventGlobalNode.baseType is DataTypeReference) {
+        var dataTypeReference = eventGlobalNode.baseType as DataTypeReference;
+        joinedComments += ' ' + dataTypeReference.dataType.comment;
       }
     }
     return joinedComments;
   }
 
-  List<dynamic> _parseComments(List<NameSpace> eventPath) {
+  List<dynamic> _parseComments(List<DataTypeBase> eventPath) {
     String joinedComments = _joinComments(eventPath);
     var result = _eventTagsParser.parse(joinedComments).value;
 
@@ -202,7 +200,9 @@ class EventFactory {
       Sentence.normalize(parsedComments.whereType<String>().join());
 
   ComponentCode? _createComponentCode(
-      List<EventTag> eventTags, List<NameSpace> eventPath) {
+    List<EventTag> eventTags,
+    List<DataTypeBase> eventPath,
+  ) {
     var componentCodeTag = _findComponentCodeTag(eventTags, eventPath);
 
     if (componentCodeTag == null) {
@@ -246,7 +246,7 @@ class EventFactory {
 
   String _findGroupName2(
     String groupName1,
-    List<NameSpace> eventPath,
+    List<DataTypeBase> eventPath,
   ) {
     var groupName2 = _createEventGroupName();
     if (groupName1 == groupName2) {
@@ -275,11 +275,13 @@ class EventFactory {
         orElse: () => '');
   }
 
-  _eventPathString(List<NameSpace> eventPath) =>
-      eventPath.map((nameSpace) => nameSpace.name).join('.');
+  _eventPathString(List<DataTypeBase> eventPath) =>
+      eventPath.map((dataType) => dataType.name).join('.');
 
   ComponentCodeTag? _findComponentCodeTag(
-      List<EventTag> eventTags, List<NameSpace> eventPath) {
+    List<EventTag> eventTags,
+    List<DataTypeBase> eventPath,
+  ) {
     var componentCodeTags = eventTags.whereType<ComponentCodeTag>().toList();
     var derivedComponentCodeTags =
         eventTags.whereType<DerivedComponentCodeTag>().toList();
@@ -298,7 +300,7 @@ class EventFactory {
 
   ComponentCodeTag? _createDerivedComponentCodeTag(
       List<DerivedComponentCodeTag> derivedComponentCodeTags,
-      List<NameSpace> eventPath,
+      List<DataTypeBase> eventPath,
       List<ComponentCodeTag> componentCodeTags) {
     var derivedComponentCodeTag =
         _findDerivedComponentCode(derivedComponentCodeTags, eventPath);
@@ -316,7 +318,7 @@ class EventFactory {
 
   DerivedComponentCodeTag _findDerivedComponentCode(
       List<DerivedComponentCodeTag> derivedComponentCodeTags,
-      List<NameSpace> eventPath) {
+      List<DataTypeBase> eventPath) {
     if (derivedComponentCodeTags.length > 1) {
       log('The following event path contains more then 1 '
           '${DerivedComponentCodeTag}s: ${_eventPathString(eventPath)}');
@@ -327,7 +329,7 @@ class EventFactory {
   ComponentCodeTag? _findComponentCodeTagWithSameLetter(
       DerivedComponentCodeTag derivedComponentCodeTag,
       List<ComponentCodeTag> componentCodeTags,
-      List<NameSpace> eventPath) {
+      List<DataTypeBase> eventPath) {
     if (componentCodeTags.isEmpty) {
       log('The following event path contains a $DerivedComponentCodeTag '
           'but no ${ComponentCodeTag}s": '
@@ -368,7 +370,7 @@ abstract class ArrayValues extends Iterable with Iterator<String> {
 
   ArrayValues._();
 
-  factory ArrayValues(NameSpace eventGlobalNode) {
+  factory ArrayValues(DataTypeBase eventGlobalNode) {
     if (eventGlobalNode is DataType) {
       var arrayRangesReversed = eventGlobalNode.baseType.arrayRanges.reversed;
       ArrayCounter? child;
@@ -386,29 +388,6 @@ abstract class ArrayValues extends Iterable with Iterator<String> {
   void invokeListeners() {
     for (var listener in listeners.whereType<ArrayCounterListener>()) {
       listener.onNext();
-    }
-  }
-}
-
-class NoArrayValues extends ArrayValues {
-  bool firstTime = true;
-
-  NoArrayValues() : super._();
-
-  @override
-  String get current => '';
-
-  @override
-  Iterator get iterator => this;
-
-  @override
-  bool moveNext() {
-    invokeListeners();
-    if (firstTime) {
-      firstTime = false;
-      return true;
-    } else {
-      return false;
     }
   }
 }
@@ -501,6 +480,29 @@ class ArrayCounter extends ArrayValues {
 
 abstract class ArrayCounterListener {
   void onNext();
+}
+
+class NoArrayValues extends ArrayValues {
+  bool firstTime = true;
+
+  NoArrayValues() : super._();
+
+  @override
+  String get current => '';
+
+  @override
+  Iterator get iterator => this;
+
+  @override
+  bool moveNext() {
+    invokeListeners();
+    if (firstTime) {
+      firstTime = false;
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 class EventCounter {

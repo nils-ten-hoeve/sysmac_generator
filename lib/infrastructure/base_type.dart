@@ -3,7 +3,6 @@ import 'package:fluent_regex/fluent_regex.dart';
 
 import '../domain/base_type.dart';
 import '../domain/data_type.dart';
-import '../domain/namespace.dart';
 
 class BaseTypeFactory {
   BaseTypeSubFactories baseTypeSubFactories = BaseTypeSubFactories();
@@ -187,15 +186,13 @@ class DataTypeReferenceFactory {
   /// Replaces all the [UnknownBaseType]s with [DataTypeReference]s
   /// when the path can be found
   void replaceWherePossible(DataTypeTree dataTypeTree) {
-    for (NameSpace child in dataTypeTree.descendants) {
-      if (child is DataType) {
-        var baseType = child.baseType;
-        if (baseType is UnknownBaseType) {
-          var dataTypeReference =
-              createFromUnknownDataType(dataTypeTree, baseType);
-          if (dataTypeReference != null) {
-            child.baseType = dataTypeReference;
-          }
+    for (var child in dataTypeTree.descendants.whereType<DataType>()) {
+      var baseType = child.baseType;
+      if (baseType is UnknownBaseType) {
+        var dataTypeReference =
+            createFromUnknownDataType(dataTypeTree, baseType);
+        if (dataTypeReference != null) {
+          child.baseType = dataTypeReference;
         }
       }
     }

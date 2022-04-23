@@ -7,7 +7,6 @@ import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/html/html_table.dart';
-import 'package:sysmac_generator/domain/namespace.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/domain/variable.dart';
 import 'package:sysmac_generator/infrastructure/base_type.dart';
@@ -167,13 +166,12 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         HtmlRow(values: ['Name', 'Type', 'Comment']),
       ];
 
-  List<HtmlRow> _createDataTypeRows(int level, NameSpace nameSpace) {
+  List<HtmlRow> _createDataTypeRows(int level, DataTypeBase nameSpace) {
     List<HtmlRow> rows = [];
     String indent = level == 0 ? '' : '&nbsp;' * (level * 4);
     String name = nameSpace.name;
     String baseType = _createDataTypeBaseTypeSting(nameSpace);
-    String comment =
-        nameSpace is NameSpaceWithTypeAndComment ? nameSpace.comment : '';
+    String comment = nameSpace.comment;
     var row = HtmlRow(values: [indent + name, baseType, comment]);
     rows.add(row);
     for (var child in nameSpace.children) {
@@ -183,11 +181,11 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     return rows;
   }
 
-  String _createDataTypeBaseTypeSting(NameSpace nameSpace) {
-    if (nameSpace is! DataType) {
-      return '$NameSpace';
+  String _createDataTypeBaseTypeSting(DataTypeBase dataTypeBase) {
+    if (dataTypeBase is! DataType) {
+      return '$NameSpace2';
     } else {
-      return nameSpace.baseType.toString();
+      return dataTypeBase.baseType.toString();
     }
   }
 
@@ -266,19 +264,19 @@ class Definition {
   ///
   ///Note that the [pointer] should never be a leaf in the tree
   ///, e.g.: never represent an [Event]!
-  late NameSpace pointer = dataTypeTree;
+  late DataTypeBase pointer = dataTypeTree;
 
-  NameSpace addNameSpace(String name) {
+  NameSpace2 addNameSpace(String name) {
     _verifyPointerToAddNameSpace();
-    NameSpace nameSpace = NameSpace(name);
+    NameSpace2 nameSpace = NameSpace2(name);
     pointer.children.add(nameSpace);
     pointer = nameSpace;
-    return pointer;
+    return nameSpace;
   }
 
   void _verifyPointerToAddNameSpace() {
     if (pointer is DataType) {
-      throw Exception('You can not add a $NameSpace to a Struct');
+      throw Exception('You can not add a $NameSpace2 to a Struct');
     }
   }
 
@@ -411,7 +409,7 @@ class Definition {
     if (found == null) {
       throw Exception('Could not find path: ${pathToFind.join(".")}');
     } else {
-      pointer = found;
+      pointer = found as DataTypeBase;
     }
     return this;
   }
