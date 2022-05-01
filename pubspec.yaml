@@ -19,3 +19,4 @@ dependencies:
   documentation_builder: ^0.0.11
   recase: ^4.0.0
   petitparser: ^4.4.0
+  logging: ^1.0.2
