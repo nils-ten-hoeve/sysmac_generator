@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:sysmac_generator/domain/html/html_table.dart';
 import 'package:sysmac_generator/domain/node.dart';
+import 'package:sysmac_generator/infrastructure/event.dart';
 
 class EventGroup extends Node<Event> {
   EventGroup(String name) : super(name);
@@ -199,4 +200,11 @@ class EventPriorities extends DelegatingList<EventPriority> {
                       ]))
                   .toList())
           .toHtml();
+}
+
+/// Renders a dynamic [String]
+abstract class EventCommentRenderer {
+  void initListeners(EventFactory eventFactory);
+
+  String render();
 }

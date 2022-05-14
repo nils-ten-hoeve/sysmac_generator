@@ -6,16 +6,15 @@ class DataTypeTree extends DataTypeBase {
   DataTypeTree() : super('$DataTypeTree');
 }
 
-/// Abstract base type of [DataType]s and [NameSpace2]s
+/// Abstract base type of [DataType]s and [NameSpace]s
 abstract class DataTypeBase extends Node<DataTypeBase> {
   final String comment;
 
   DataTypeBase(String name, [this.comment = '']) : super(name);
 }
 
-//TODO rename to NameSpace
-class NameSpace2 extends DataTypeBase {
-  NameSpace2(String name, [String comment = '']) : super(name, comment);
+class NameSpace extends DataTypeBase {
+  NameSpace(String name, [String comment = '']) : super(name, comment);
 }
 
 class DataType extends DataTypeBase {

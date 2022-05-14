@@ -5,6 +5,7 @@ import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/acknowledge_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/counter_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/derived_component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
@@ -52,17 +53,17 @@ class EventTagParser extends Parser {
 /// [EventTagsParser.parse] results in an array of [EventTag] objects or remaining characters.
 
 class EventTagsParser extends EventTagParser {
-  static final _remainingCharactersParser = any().flatten();
+  static final _remainingCharacterParser = any().flatten();
 
   EventTagsParser()
       : super((PriorityTagParser() |
                 AcknowledgeTagParser() |
                 SolutionTagParser() |
+                CounterTagParser() |
                 ComponentCodeTagParser() |
                 DerivedComponentCodeTagParser() |
                 SiteNumberTagParser() |
                 PanelNumberTagParser() |
-                _remainingCharactersParser)
+                _remainingCharacterParser)
             .star());
 }
-

@@ -70,23 +70,17 @@ abstract class AttributesParser extends EventTagParser {
       : super(_createParser(attributeParsers));
 
   static Parser _createParser(List<Parser> attributeParsers) =>
-      (((whiteSpaceParser.optional() &
-                          _createAttributeParser(attributeParsers) &
-                          whiteSpaceParser.optional())
-                      .plus() &
-                  (string(',') &
-                      whiteSpaceParser.optional() &
+      ((whiteSpaceParser.optional() &
                       _createAttributeParser(attributeParsers) &
-                      whiteSpaceParser.optional())) |
-              (whiteSpaceParser.optional() &
+                      whiteSpaceParser.optional())
+                  .repeat(1, 1) &
+              (string(',') &
+                      whiteSpaceParser.optional() &
                       _createAttributeParser(attributeParsers) &
                       whiteSpaceParser.optional())
                   .star())
-          .map((values) {
-        //TODO convert to function block
-        var objects = _getAllObjectsIn(values);
-        return objects;
-      });
+          .repeat(0, 1)
+          .map((values) => _getAllObjectsIn(values));
 
   //TODO verify attributeParsers.multiplicity
 

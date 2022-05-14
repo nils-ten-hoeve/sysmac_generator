@@ -1,50 +1,38 @@
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:petitparser/parser.dart';
+import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/attribute_parser.dart';
+import 'package:sysmac_generator/infrastructure/event.dart';
 
 import 'event_parser.dart';
 import 'generic_parsers.dart';
 
-/// You can use counters when the data type uses an array.
-/// Counters are added by adding the following text to the [DataType] comment:
+/// You can use [CounterTag]s when the data type uses an array.
+/// [CounterTag]'s are replaced with a counter value.
+/// This counter increases every time one of the array values changes.
 ///
-/// [cnt <skip=skip rules> <array=array number>]
-///
-///
-///
+///  * Format: [cnt &lt;comma separated attributes&gt;]
 
-/// etcetera
-/// {insert CounterRuleExampleTest}
-///
-/// TODO {insert CounterRuleArrayExampleTest}
-///
-/// TODO {insert CounterRuleArrayExampleTest}
-///
-/// TODO {insert CounterRuleSkipArrayExampleTest}
-///
-/// SkipCounterRule
-///
-/// Skipping counter values when using arrays:
-/// {@insert SkipEvenCounterRule}
-/// {@insert SkipUnevenCounterRule}
-/// {@insert SkipSingleCounterRule}
-/// {@insert SkipMaxCounterRule}
-/// {@insert SkipMinMaxCounterRule}
-/// You can combine the rules above by separating them with a comma, e.g.:
-/// s=e,5: skips even counter values and counter value 5
-/// s=2,4: skips counter value 2 and counter value 4
-/// s=2-4,8: skips counter value 2-4 and counter value 8
-class CounterTag extends EventTag {
+class CounterTag extends EventTag
+    implements
+        EventCommentRenderer,
+        ArrayCounterOnNextListener,
+        ArrayCounterOnResetListener {
+  /// array: 1= last [ArrayCounter], 2= preceding [ArrayCounter], 3= etc
   final int array;
   final List<SkipRule> skipRules;
+  int value = -1;
+  final bool resetWhenArrayCounterResets;
 
-  CounterTag(this.array, this.skipRules);
+  CounterTag(
+      {this.array = 1,
+      required this.skipRules,
+      this.resetWhenArrayCounterResets = true});
 
-  @override
-  String toString() {
-    return 'CounterTag{array: $array, skipRules: $skipRules}';
-  }
+  // {
+  //  onNext();
+  // }
 
   @override
   bool operator ==(Object other) =>
@@ -52,28 +40,82 @@ class CounterTag extends EventTag {
       other is CounterTag &&
           runtimeType == other.runtimeType &&
           array == other.array &&
-          const ListEquality().equals(skipRules, other.skipRules);
+          const ListEquality().equals(skipRules, other.skipRules) &&
+          value == other.value &&
+          resetWhenArrayCounterResets == other.resetWhenArrayCounterResets;
 
   @override
-  int get hashCode => array.hashCode ^ skipRules.hashCode;
+  int get hashCode =>
+      array.hashCode ^
+      skipRules.hashCode ^
+      value.hashCode ^
+      resetWhenArrayCounterResets.hashCode;
+
+  @override
+  String toString() {
+    return 'CounterTag{array: $array, skipRules: $skipRules, value: $value, resetWhenArrayCounterResets: $resetWhenArrayCounterResets}';
+  }
+
+  @override
+  String render() => value.toString();
+
+  @override
+  void initListeners(EventFactory eventFactory) {
+    var arrayCounters = eventFactory.arrayCountersInReverseOrder;
+    if (array <= arrayCounters.length) {
+      var arrayCounter = arrayCounters[array - 1];
+      arrayCounter.onNextListeners.add(this);
+      arrayCounter.onResetListeners.add(this);
+    }
+  }
+
+  /// called by [ArrayValues] any time a new array value is needed
+  @override
+  void onNext() {
+    value++;
+    while (skipRules.any((skipRule) => skipRule.appliesTo(value))) {
+      var skipRule =
+          skipRules.firstWhere((skipRule) => skipRule.appliesTo(value));
+      value = skipRule.getNextValue(value);
+    }
+  }
+
+  /// called by [ArrayValues] any time a new array value is needed
+  /// and the array value starts from the lowest value
+  @override
+  void onReset() {
+    if (resetWhenArrayCounterResets) {
+      value = -1;
+      onNext();
+    }
+  }
 }
 
 class CounterAttributesParser extends AttributesParser {
   CounterAttributesParser()
-      : super([ArrayAttributeParser(), SkipAttributeParser()]);
+      : super([
+          ArrayAttributeParser(),
+          ContinueAttributeParser(),
+          SkipAttributeParser()
+        ]);
 }
 
 abstract class CounterAttribute {}
 
-/// <array=array number> is optional:
 ///
-/// no array attribute or array=0: counter increases when any array is increased and will not reset within the array
-/// array=1: counter increases when the last array is increased, the counter is reset if the second last array is increased
-/// array=2: counter increases when the second last array is increased, the counter is reset if the third last array is increased
+///  * array=&lt;array number&gt; is optional:
+///    * array number is a negative number and indicates on which previous array the counter increases.
+///    * no [ArrayAttribute] or array=-1: counter increases when the last array value increases
+///    * array=-2: counter increases when the 2nd last array value increases
+///    * array=-3: counter increases when the 3rd last array value increases
+///    * etc..
 class ArrayAttribute extends CounterAttribute {
+  /// array=-1: number=1
+  /// array=-2: number=2
+  /// etc...
   final int number;
 
-  ArrayAttribute({this.number = 0});
+  ArrayAttribute({int number = 1}) : number = (number > 0) ? number : 1;
 
   @override
   String toString() {
@@ -88,14 +130,43 @@ class ArrayAttributeParser extends AttributeParser {
                     whiteSpaceParser.optional() &
                     string('=') &
                     whiteSpaceParser.optional() &
+                    string('-') &
                     intParser)
-                .map((values) => ArrayAttribute(number: values[4])),
+                .map((values) => ArrayAttribute(number: values[5])),
             Multiplicity.zeroOrOnce());
 }
 
-/// <skip=skip rules> are optional and can be used to skip numbers.
-/// e.g.: the counters always start at 0.
-/// Use skip=0, if you want the counter to start at 1.
+///
+///  * &lt;cont&gt; or &lt;continue&gt; is optional.
+///    * When the [CounterTag] contains a [ContinueAttribute]:
+///      The counter restarts counting when the [ArrayCounter] restarts counting.
+///    * When the [CounterTag] does not contain a [ContinueAttribute]:
+///      The counter keeps counting when the [ArrayCounter] restarts counting.
+class ContinueAttribute extends CounterAttribute {
+  ContinueAttribute();
+}
+
+class ContinueAttributeParser extends AttributeParser {
+  ContinueAttributeParser()
+      : super(
+            (stringIgnoreCase('cont') & stringIgnoreCase('inue').optional())
+                .map((values) => ContinueAttribute()),
+            Multiplicity.zeroOrOnce());
+}
+
+///
+///  * skip=&lt;skip rules&gt; are optional and can be used to skip numbers:
+///    * skip=e : skips even numbers
+///    * skip=even : skips even numbers
+///    * skip=u : skips uneven numbers
+///    * skip=uneven : skips uneven numbers
+///    * skip=0 : skips a number, in this case 0 is skipped so the counter starts at 1
+///    * skip=-2 : skips up to a number, in this case numbers 0,1 and 3 are skipped
+///    * skip=3-5: skips a range of numbers, in this case numbers 3,4 and 5 are skipped
+///  * You can combine the skip rules above by separating them with a comma, e.g.:
+///    * skip=e,5: skips even counter values and counter value 5
+///    * skip=2,4: skips counter value 2 and counter value 4
+///    * skip=2-4,8: skips counter value 2-4 and counter value 8
 class SkipAttribute extends CounterAttribute {
   static final log = Logger('$SkipAttribute');
 
@@ -213,7 +284,7 @@ class SkipMinMaxRule extends SkipRule {
   }
 }
 
-/// * e or even: skips even numbers
+/// skip=e or skip=even: skips even numbers
 class SkipEvenParser extends AttributeParser {
   SkipEvenParser()
       : super(
@@ -222,7 +293,7 @@ class SkipEvenParser extends AttributeParser {
             Multiplicity.zeroOrOnce());
 }
 
-/// * u or uneven: skips uneven numbers
+/// skip=u or skip=uneven: skips uneven numbers,
 class SkipUnEvenParser extends AttributeParser {
   SkipUnEvenParser()
       : super(
@@ -233,7 +304,8 @@ class SkipUnEvenParser extends AttributeParser {
             Multiplicity.zeroOrOnce());
 }
 
-/// * <number> : skips number
+/// skip=&lt;number&gt; : skips a number,
+/// e.g.: The counters always start at 0. Use skip=0, if you want the counter to start at 1.
 class SkipSingleNumberParser extends AttributeParser {
   SkipSingleNumberParser()
       : super(
@@ -241,7 +313,8 @@ class SkipSingleNumberParser extends AttributeParser {
             Multiplicity.zeroOrMore());
 }
 
-/// * -<number> : skips up and including number
+/// skip=-&lt;number&gt; : skips up and including number,
+/// e.g.: skip=-4 will start at 5
 class SkipUntilParser extends AttributeParser {
   SkipUntilParser()
       : super(
@@ -250,7 +323,8 @@ class SkipUntilParser extends AttributeParser {
             Multiplicity.zeroOrMore());
 }
 
-/// * <min>-<max> : skips all numbers between and including min and max numbers
+/// skip=&lt;min&gt;-&lt;max&gt; : skips all numbers between the given range,
+/// e.g.: skip 2-4 will skip numbers 2, 3 and 4
 class SkipRangeParser extends AttributeParser {
   SkipRangeParser()
       : super(
@@ -287,7 +361,7 @@ class CounterTagParser extends EventTagParser {
       var arrayAttribute = arrayAttributes.last;
       return arrayAttribute.number;
     } else {
-      return 0;
+      return 1;
     }
   }
 
@@ -301,10 +375,18 @@ class CounterTagParser extends EventTagParser {
     return skipRules;
   }
 
+  static _findContinues(List<CounterAttribute> counterAttributes) =>
+      counterAttributes
+          .any((counterAttribute) => counterAttribute is ContinueAttribute);
+
   static _map(List values) {
     var counterAttributes = values[4].cast<CounterAttribute>();
     var arrayNumber = _findArrayNumber(counterAttributes);
+    var continues = _findContinues(counterAttributes);
     var skipRules = _findSkipRules(counterAttributes);
-    return CounterTag(arrayNumber, skipRules);
+    return CounterTag(
+        array: arrayNumber,
+        skipRules: skipRules,
+        resetWhenArrayCounterResets: !continues);
   }
 }

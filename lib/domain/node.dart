@@ -77,10 +77,10 @@ abstract class Node<T extends Node<T>> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Node &&
+      other is Node &&
           runtimeType == other.runtimeType &&
           name == other.name &&
-          children == other.children;
+          const ListEquality().equals(children, other.children);
 
   @override
   int get hashCode => name.hashCode ^ children.hashCode;

@@ -54,7 +54,7 @@ class DataTypeTreeFactory {
     }
     //not found: create nameSpace tree
     for (String nameToCreate in namesToFind) {
-      var newNameSpaceChild = NameSpace2(nameToCreate);
+      var newNameSpaceChild = NameSpace(nameToCreate);
       nameSpace.children.add(newNameSpaceChild);
       nameSpace = newNameSpaceChild;
     }

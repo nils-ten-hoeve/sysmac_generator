@@ -6,6 +6,7 @@ import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
 import 'package:sysmac_generator/domain/event/parser/acknowledge_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/component_code_parser.dart';
+import 'package:sysmac_generator/domain/event/parser/counter_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/derived_component_code_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
@@ -95,20 +96,47 @@ class EventGroupFactory {
 /// It will contain all information necessary such as array counters
 class EventFactory {
   static final _eventTagsParser = EventTagsParser();
+  late List<dynamic> parsedComments;
   final EventGroupFactory eventGroupFactory;
   final EventFactory? parentFactory;
   final DataTypeBase eventGlobalNode;
-  final ArrayValues arrayValues;
+  ArrayValues arrayValues = NoArrayValues();
+  String arrayValue = '';
 
   EventFactory(
     this.eventGroupFactory,
     this.eventGlobalNode, [
     this.parentFactory,
-  ]) : arrayValues = ArrayValues(eventGlobalNode);
+  ]) {
+    parsedComments = _parseComments();
+  }
 
   List<DataTypeBase> get eventPath => parentFactory == null
       ? [eventGlobalNode]
       : [...parentFactory!.eventPath, eventGlobalNode];
+
+  static final _commentSeparator = ' ';
+
+  List<dynamic> _parseComments() {
+    var parsedComments = _eventTagsParser.parse(_commentToParse).value;
+    return [
+      if (parentFactory == null) SiteNumberTag(site.number),
+      if (parentFactory == null) PanelNumberTag(electricPanel.number),
+      if (parentFactory != null) ...parentFactory!.parsedComments,
+      ...parsedComments,
+    ];
+  }
+
+  String get _commentToParse {
+    var comment = eventGlobalNode.comment + _commentSeparator;
+    if (eventGlobalNode is DataType &&
+        (eventGlobalNode as DataType).baseType is DataTypeReference) {
+      var dataTypeReference =
+          (eventGlobalNode as DataType).baseType as DataTypeReference;
+      comment += dataTypeReference.dataType.comment + _commentSeparator;
+    }
+    return comment;
+  }
 
   EventCounter get eventCounter => eventGroupFactory.eventCounter;
 
@@ -116,10 +144,13 @@ class EventFactory {
   List<Event> createAll() {
     List<Event> events = [];
 
-    for (var arrayValue in arrayValues) {
+    arrayValues = ArrayValues(eventGlobalNode);
+    _initListeners();
+    while (arrayValues.moveNext()) {
+      arrayValue = arrayValues.current;
       if (eventGlobalNode is DataType &&
           (eventGlobalNode as DataType).baseType is VbBoolean) {
-        events.add(_createEvent(arrayValue));
+        events.add(_createEvent());
       } else {
         for (var child in eventGlobalNode.children) {
           events
@@ -130,65 +161,35 @@ class EventFactory {
     return events;
   }
 
-  Event _createEvent(String arrayValue) {
-    var parsedComments = _parseComments(eventPath);
-    var eventTags = _findEventTags(parsedComments);
-    var groupName1 = _findGroupName();
-    var groupName2 = _findGroupName2(groupName1, eventPath);
-    var priority = _findPriority(eventTags);
-    var componentCode = _createComponentCode(eventTags, eventPath);
-    var message = _createMessage(parsedComments);
+  Event _createEvent() {
+    var groupName1 = _groupName();
+    var groupName2 = _groupName2(groupName1);
+    var priority = _priority();
+    var componentCode = _componentCode();
+    var message = _message();
     Event event = Event(
       groupName1: groupName1,
       groupName2: groupName2,
       id: eventCounter.next,
       componentCode: componentCode == null ? '' : componentCode.toCode(),
-      expression: expression,
+      expression: _expression,
       priority: priority,
       message: message,
-      solution: _findSolution(eventTags, componentCode),
-      acknowledge: _findAcknowledge(eventTags, priority),
+      solution: _findSolution(componentCode),
+      acknowledge: _acknowledge(priority),
     );
     return event;
   }
 
-  String get expression {
+  String get _expression {
     if (parentFactory == null) {
       return eventGlobalNode.name;
     } else {
-      return parentFactory!.expression +
+      return parentFactory!._expression +
           '.' +
           eventGlobalNode.name +
-          arrayValues.current;
+          arrayValue;
     }
-  }
-
-  List<EventTag> _findEventTags(List<dynamic> parsedComments) =>
-      parsedComments.whereType<EventTag>().toList();
-
-  String _joinComments(List<DataTypeBase> eventPath) {
-    var joinedComments = '';
-    for (var eventGlobalNode in eventPath) {
-      if (joinedComments.isNotEmpty) {
-        joinedComments += ' ';
-      }
-      joinedComments += eventGlobalNode.comment;
-      if (eventGlobalNode is DataType &&
-          eventGlobalNode.baseType is DataTypeReference) {
-        var dataTypeReference = eventGlobalNode.baseType as DataTypeReference;
-        joinedComments += ' ' + dataTypeReference.dataType.comment;
-      }
-    }
-    return joinedComments;
-  }
-
-  List<dynamic> _parseComments(List<DataTypeBase> eventPath) {
-    String joinedComments = _joinComments(eventPath);
-    var result = _eventTagsParser.parse(joinedComments).value;
-
-    result.insert(0, PanelNumberTag(electricPanel.number));
-    result.insert(0, SiteNumberTag(site.number));
-    return result;
   }
 
   ElectricPanel get electricPanel =>
@@ -196,23 +197,29 @@ class EventFactory {
 
   Site get site => eventGroupFactory.eventService.site;
 
-  String _createMessage(List parsedComments) =>
-      Sentence.normalize(parsedComments.whereType<String>().join());
+  String _message() {
+    String comments = '';
+    for (var parsedComment in parsedComments) {
+      if (parsedComment is String) {
+        comments += parsedComment;
+      } else if (parsedComment is EventCommentRenderer) {
+        comments += parsedComment.render();
+      }
+    }
 
-  ComponentCode? _createComponentCode(
-    List<EventTag> eventTags,
-    List<DataTypeBase> eventPath,
-  ) {
-    var componentCodeTag = _findComponentCodeTag(eventTags, eventPath);
+    return Sentence.normalize(comments);
+  }
+
+  ComponentCode? _componentCode() {
+    var componentCodeTag = _findComponentCodeTag(eventPath);
 
     if (componentCodeTag == null) {
       return null;
     } else {
       return ComponentCode(
-        site: Site(_findSiteNumberTag(eventTags).number),
+        site: Site(_siteNumberTag.number),
         electricPanel: ElectricPanel(
-            number: _findPanelNumberTag(eventTags).number,
-            name: electricPanel.name),
+            number: _panelNumberTag.number, name: electricPanel.name),
         pageNumber: componentCodeTag.pageNumber,
         letters: componentCodeTag.letters,
         columnNumber: componentCodeTag.columnNumber,
@@ -220,14 +227,14 @@ class EventFactory {
     }
   }
 
-  PanelNumberTag _findPanelNumberTag(List<EventTag> eventTags) =>
-      eventTags.whereType<PanelNumberTag>().last;
+  PanelNumberTag get _panelNumberTag =>
+      parsedComments.whereType<PanelNumberTag>().last;
 
-  SiteNumberTag _findSiteNumberTag(List<EventTag> eventTags) =>
-      eventTags.whereType<SiteNumberTag>().last;
+  SiteNumberTag get _siteNumberTag =>
+      parsedComments.whereType<SiteNumberTag>().last;
 
-  EventPriority _findPriority(List<EventTag> eventTags) {
-    var priorityTags = eventTags.whereType<PriorityTag>();
+  EventPriority _priority() {
+    var priorityTags = parsedComments.whereType<PriorityTag>();
     if (priorityTags.isEmpty) {
       return EventPriorities.medium;
     } else {
@@ -235,8 +242,8 @@ class EventFactory {
     }
   }
 
-  bool _findAcknowledge(List<EventTag> eventTags, EventPriority priority) {
-    var acknowledgeTags = eventTags.whereType<AcknowledgeTag>();
+  bool _acknowledge(EventPriority priority) {
+    var acknowledgeTags = parsedComments.whereType<AcknowledgeTag>();
     if (acknowledgeTags.isEmpty) {
       return priority != EventPriorities.info;
     } else {
@@ -244,10 +251,7 @@ class EventFactory {
     }
   }
 
-  String _findGroupName2(
-    String groupName1,
-    List<DataTypeBase> eventPath,
-  ) {
+  String _groupName2(String groupName1) {
     var groupName2 = _createEventGroupName();
     if (groupName1 == groupName2) {
       return '';
@@ -256,8 +260,8 @@ class EventFactory {
     }
   }
 
-  _findSolution(List<EventTag> eventTags, ComponentCode? componentCode) {
-    var solutionTexts = eventTags
+  _findSolution(ComponentCode? componentCode) {
+    var solutionTexts = parsedComments
         .whereType<SolutionTag>()
         .map((solutionTag) => solutionTag.solution)
         .toList();
@@ -268,7 +272,7 @@ class EventFactory {
     return solutionTexts.join(' ');
   }
 
-  String _findGroupName() {
+  String _groupName() {
     var fullName = _createEventGroupName();
     var groupNames = eventGroupFactory.groupNames;
     return groupNames.firstWhere((groupName) => fullName.startsWith(groupName),
@@ -278,13 +282,11 @@ class EventFactory {
   _eventPathString(List<DataTypeBase> eventPath) =>
       eventPath.map((dataType) => dataType.name).join('.');
 
-  ComponentCodeTag? _findComponentCodeTag(
-    List<EventTag> eventTags,
-    List<DataTypeBase> eventPath,
-  ) {
-    var componentCodeTags = eventTags.whereType<ComponentCodeTag>().toList();
+  ComponentCodeTag? _findComponentCodeTag(List<DataTypeBase> eventPath) {
+    var componentCodeTags =
+        parsedComments.whereType<ComponentCodeTag>().toList();
     var derivedComponentCodeTags =
-        eventTags.whereType<DerivedComponentCodeTag>().toList();
+        parsedComments.whereType<DerivedComponentCodeTag>().toList();
 
     if (derivedComponentCodeTags.isEmpty) {
       if (componentCodeTags.isEmpty) {
@@ -363,10 +365,31 @@ class EventFactory {
   String _createEventGroupName() => eventPath.length == 1
       ? eventPath[0].name.titleCase
       : eventPath[1].name.titleCase;
+
+  void _initListeners() {
+    var counterTags = parsedComments
+        .where((parsedComment) =>
+            parentFactory == null ||
+            !parentFactory!.parsedComments.contains(parsedComment))
+        .whereType<CounterTag>()
+        .toList();
+    for (var counterTag in counterTags) {
+      counterTag.initListeners(this);
+    }
+  }
+
+  /// returns all the [ArrayCounter]s of this [EventFactory] and its parents,
+  /// starting with the last [ArrayCounter] of this [EventFactory],
+  /// followed by the preceding [ArrayCounter], etc, etc
+  List<ArrayCounter> get arrayCountersInReverseOrder => [
+        ...arrayValues.arrayCountersInReverseOrder,
+        if (parentFactory != null) ...parentFactory!.arrayCountersInReverseOrder
+      ];
 }
 
 abstract class ArrayValues extends Iterable with Iterator<String> {
-  final List<ArrayCounterListener> listeners = [];
+  final List<ArrayCounterOnNextListener> onNextListeners = [];
+  final List<ArrayCounterOnResetListener> onResetListeners = [];
 
   ArrayValues._();
 
@@ -385,9 +408,17 @@ abstract class ArrayValues extends Iterable with Iterator<String> {
     }
   }
 
-  void invokeListeners() {
-    for (var listener in listeners.whereType<ArrayCounterListener>()) {
+  get arrayCountersInReverseOrder;
+
+  void invokeOnNextListeners() {
+    for (var listener in onNextListeners) {
       listener.onNext();
+    }
+  }
+
+  void invokeOnResetListeners() {
+    for (var listener in onResetListeners) {
+      listener.onReset();
     }
   }
 }
@@ -410,7 +441,7 @@ class ArrayCounter extends ArrayValues {
 
   /// An [ArrayCounter] has at least one value.
   /// Therefore the start value of the [leafArrayCounter] =arrayRange.min-1;
-  int get _startValue => child == null ? arrayRange.min - 1 : arrayRange.min;
+  int get _startValue => arrayRange.min - 1;
 
   /// Advances to the next element of this [ArrayCounter]
   /// (comparable to an [Iterator]).
@@ -425,12 +456,17 @@ class ArrayCounter extends ArrayValues {
   /// It is safe to call [goToNext] after it has already returned `false`,
   /// but it must keep returning `false` and not have any other effect.
   bool goToNext() {
+    if (value == _startValue && parent != null) {
+      //also initialize parent counters (recursively)
+      parent!.goToNext();
+    }
     value++;
-    invokeListeners();
     if (value > arrayRange.max) {
       value = arrayRange.min;
+      invokeOnResetListeners();
       return parent == null ? false : parent!.goToNext();
     } else {
+      invokeOnNextListeners();
       return true;
     }
   }
@@ -476,33 +512,50 @@ class ArrayCounter extends ArrayValues {
 
   @override
   Iterator<String> get iterator => this;
+
+  /// returns all the [ArrayCounter]s and its parents in reverse order
+  @override
+  List<ArrayCounter> get arrayCountersInReverseOrder {
+    List<ArrayCounter> result = [];
+    ArrayCounter? arrayCounter = leafArrayCounter;
+    do {
+      result.add(arrayCounter!);
+      arrayCounter = arrayCounter.parent;
+    } while (arrayCounter != null);
+    return result;
+  }
 }
 
-abstract class ArrayCounterListener {
+abstract class ArrayCounterOnNextListener {
   void onNext();
 }
 
+abstract class ArrayCounterOnResetListener {
+  void onReset();
+}
+
 class NoArrayValues extends ArrayValues {
-  bool firstTime = true;
+  bool done = false;
 
   NoArrayValues() : super._();
 
   @override
-  String get current => '';
+  String get current {
+    done = true;
+    return '';
+  }
 
   @override
   Iterator get iterator => this;
 
   @override
   bool moveNext() {
-    invokeListeners();
-    if (firstTime) {
-      firstTime = false;
-      return true;
-    } else {
-      return false;
-    }
+    invokeOnNextListeners();
+    return !done;
   }
+
+  @override
+  get arrayCountersInReverseOrder => [];
 }
 
 class EventCounter {

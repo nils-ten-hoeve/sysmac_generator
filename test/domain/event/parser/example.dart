@@ -20,6 +20,7 @@ import 'array_example_test.dart';
 import 'component_code_example_test.dart';
 import 'component_code_panel_example_test.dart';
 import 'component_code_site_example_test.dart';
+import 'counter_example_test.dart';
 import 'derived_component_code_example_test.dart';
 import 'event_global_example_test.dart';
 import 'event_tag_override_example_test.dart';
@@ -66,7 +67,11 @@ abstract class EventExample with MarkDownTemplateWriter {
     group('Class : $runtimeType', () {
       test('Method: executeTest', () {
         List<EventGroup> generatedGroups = generatedEventGroups(definition);
+        print('generatedGroups'); //TODO remove later
+        printEventGroups(generatedGroups); //TODO remove later
         List<EventGroup> expectedGroups = expectedEventGroups(definition);
+        print('expectedGroups'); //TODO remove later
+        printEventGroups(expectedGroups); //TODO remove later
         expect(generatedGroups.length, expectedGroups.length);
         for (int groupIndex = 0;
             groupIndex < generatedGroups.length;
@@ -98,6 +103,16 @@ abstract class EventExample with MarkDownTemplateWriter {
     );
     List<EventGroup> generatedGroups = eventService.eventGroups;
     return generatedGroups;
+  }
+
+  void printEventGroups(List<EventGroup> eventGroups) {
+    //TODO remove later
+    for (var eventGroup in eventGroups) {
+      print('  ${eventGroup.name}');
+      for (var event in eventGroup.children) {
+        print('    ${event.expression} ${event.message}');
+      }
+    }
   }
 }
 
@@ -183,7 +198,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
 
   String _createDataTypeBaseTypeSting(DataTypeBase dataTypeBase) {
     if (dataTypeBase is! DataType) {
-      return '$NameSpace2';
+      return '$NameSpace';
     } else {
       return dataTypeBase.baseType.toString();
     }
@@ -266,9 +281,9 @@ class Definition {
   ///, e.g.: never represent an [Event]!
   late DataTypeBase pointer = dataTypeTree;
 
-  NameSpace2 addNameSpace(String name) {
+  NameSpace addNameSpace(String name) {
     _verifyPointerToAddNameSpace();
-    NameSpace2 nameSpace = NameSpace2(name);
+    NameSpace nameSpace = NameSpace(name);
     pointer.children.add(nameSpace);
     pointer = nameSpace;
     return nameSpace;
@@ -276,7 +291,7 @@ class Definition {
 
   void _verifyPointerToAddNameSpace() {
     if (pointer is DataType) {
-      throw Exception('You can not add a $NameSpace2 to a Struct');
+      throw Exception('You can not add a $NameSpace to a Struct');
     }
   }
 
@@ -385,24 +400,33 @@ class Definition {
             DataTypeReference(dataType: struct as DataType, arrayRanges: []));
   }
 
+  // List<EventGroup> get eventGroups {
+  //   EventGroup eventGroup = EventGroup('');
+  //   List<EventGroup> eventGroups = [];
+  //   for (var event in eventsSortedOnGroupName1) {
+  //     if (event.groupName1 != eventGroup.name) {
+  //       eventGroup = EventGroup(event.groupName1);
+  //       eventGroups.add(eventGroup);
+  //     }
+  //     eventGroup.children.add(event);
+  //   }
+  //   return eventGroups;
+  // }
+
   List<EventGroup> get eventGroups {
-    EventGroup eventGroup = EventGroup('');
     List<EventGroup> eventGroups = [];
-    for (var event in eventsSortedOnGroupName1) {
-      if (event.groupName1 != eventGroup.name) {
-        eventGroup = EventGroup(event.groupName1);
-        eventGroups.add(eventGroup);
-      }
+    for (var event in events) {
+      var eventGroup = eventGroups.findOrCreate(event.groupName1);
       eventGroup.children.add(event);
     }
     return eventGroups;
   }
 
-  List<Event> get eventsSortedOnGroupName1 {
-    List<Event> sortedEvents = [...events];
-    sortedEvents.sort((a, b) => a.groupName1.compareTo(b.groupName1));
-    return sortedEvents;
-  }
+  // List<Event> get eventsSortedOnGroupName1 {
+  //   List<Event> sortedEvents = [...events];
+  //   sortedEvents.sort((a, b) => a.groupName1.compareTo(b.groupName1));
+  //   return sortedEvents;
+  // }
 
   Definition goToPath(List<String> pathToFind) {
     var found = dataTypeTree.findNamePath(pathToFind);
@@ -416,6 +440,20 @@ class Definition {
 
   void goToRoot() {
     pointer = dataTypeTree;
+  }
+}
+
+extension EventGroupsExtension on List<EventGroup> {
+  EventGroup findOrCreate(String groupName) {
+    var eventGroup =
+        firstWhereOrNull((eventGroup) => eventGroup.name == groupName);
+    if (eventGroup == null) {
+      var newEventGroup = EventGroup(groupName);
+      add(newEventGroup);
+      return newEventGroup;
+    } else {
+      return eventGroup;
+    }
   }
 }
 
@@ -484,6 +522,7 @@ class EventExamples extends DelegatingList<EventExample>
           EventComponentCodePanelExample(),
           EventDerivedComponentCodeExample(),
           EventArrayExample(),
+          EventArrayCounterExample(),
         ]);
 
   @override

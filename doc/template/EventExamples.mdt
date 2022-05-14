@@ -23,3 +23,5 @@
 {ImportFile path='doc/template/EventDerivedComponentCodeExample.mdt' title='# Derived Component Code'}
 
 {ImportFile path='doc/template/EventArrayExample.mdt' title='# Array'}
+
+{ImportFile path='doc/template/EventArrayCounterExample.mdt' title='# Array Counter'}
