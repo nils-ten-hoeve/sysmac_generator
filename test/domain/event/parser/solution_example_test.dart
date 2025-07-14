@@ -55,7 +55,7 @@ class EventSolutionExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventSolutionExample().executeTest();
 
   var parser = SolutionTagParser();

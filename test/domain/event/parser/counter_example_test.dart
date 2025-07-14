@@ -45,7 +45,7 @@ class EventArrayCounterExample extends EventExample {
       ..addStructReference(
         dataTypeName: line,
         dataTypeExpression: '$workCenter\\$line\\$events',
-        dataTypeComment: line + ' [cnt]',
+        dataTypeComment: '$line [cnt]',
         dataTypeArrayRanges: [ArrayRange.minMax(1, 2)],
       )
 
@@ -125,7 +125,7 @@ class EventArrayCounterExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventArrayCounterExample().executeTest();
 
   var parser = CounterTagParser();

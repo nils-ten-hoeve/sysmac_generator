@@ -125,7 +125,7 @@ class EventDerivedComponentCodeExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventDerivedComponentCodeExample().executeTest();
 
   var parser = DerivedComponentCodeTagParser();

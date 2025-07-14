@@ -56,7 +56,7 @@ class EventAcknowledgeExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventAcknowledgeExample().executeTest();
 
   var parser = AcknowledgeTagParser();

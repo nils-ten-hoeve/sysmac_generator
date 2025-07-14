@@ -14,9 +14,9 @@ class EventPriorityExample extends EventExample {
 
   @override
   String get explanation =>
-      'Each [Event] has a priority so that the operator can see the [Event]s in order of importance. Meyn has defined the following priorities:\n\n' +
-      EventPriorities().asMarkDown +
-      '\n\n' +
+      'Each [Event] has a priority so that the operator can see the [Event]s in order of importance. Meyn has defined the following priorities:\n\n' 
+      '${EventPriorities().asMarkDown}' 
+      '\n\n' 
       "{ImportDartDoc path='lib/domain/event/parser/priority_parser.dart|$PriorityTag' }";
 
   @override
@@ -93,7 +93,7 @@ class PriorityTextFactories
         ]);
 }
 
-main() {
+void main() {
   EventPriorityExample().executeTest();
 
   var parser = PriorityTagParser();

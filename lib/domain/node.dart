@@ -27,16 +27,12 @@ abstract class Node<T extends Node<T>> {
     var childNameToFind = namesToFind.first;
     Node? foundChild =
         children.firstWhereOrNull((child) => child.name == childNameToFind);
-    if (foundChild == null) {
-      return null;
-    }
     if (namesToFind.length == 1) {
       return foundChild;
-    } else {
-      //try to find rest of the names
-      namesToFind.removeAt(0);
-      return foundChild.findNamePath(namesToFind);
     }
+    //try to find rest of the names
+    namesToFind.removeAt(0);
+    return foundChild?.findNamePath(namesToFind);
   }
 
   Node? findNamePathString(String pathToFind) =>

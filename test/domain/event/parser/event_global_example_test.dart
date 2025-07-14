@@ -32,6 +32,6 @@ class EventGlobalExample extends EventExample {
     );
 }
 
-main() {
+void main() {
   EventGlobalExample().executeTest();
 }

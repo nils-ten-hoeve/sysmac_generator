@@ -185,10 +185,7 @@ class EventFactory {
     if (parentFactory == null) {
       return eventGlobalNode.name;
     } else {
-      return parentFactory!._expression +
-          '.' +
-          eventGlobalNode.name +
-          arrayValue;
+      return '${parentFactory!._expression}.${eventGlobalNode.name}$arrayValue';
     }
   }
 
@@ -260,7 +257,7 @@ class EventFactory {
     }
   }
 
-  _findSolution(ComponentCode? componentCode) {
+  String _findSolution(ComponentCode? componentCode) {
     var solutionTexts = parsedComments
         .whereType<SolutionTag>()
         .map((solutionTag) => solutionTag.solution)
@@ -279,7 +276,7 @@ class EventFactory {
         orElse: () => '');
   }
 
-  _eventPathString(List<DataTypeBase> eventPath) =>
+  String _eventPathString(List<DataTypeBase> eventPath) =>
       eventPath.map((dataType) => dataType.name).join('.');
 
   ComponentCodeTag? _findComponentCodeTag(List<DataTypeBase> eventPath) {
@@ -408,7 +405,7 @@ abstract class ArrayValues extends Iterable with Iterator<String> {
     }
   }
 
-  get arrayCountersInReverseOrder;
+  List<ArrayCounter> get arrayCountersInReverseOrder;
 
   void invokeOnNextListeners() {
     for (var listener in onNextListeners) {

@@ -187,7 +187,7 @@ class SkipAttribute extends CounterAttribute {
     }
   }
 
-  bool _isSkipEvenOrUnEvenRule(skipRule) =>
+  bool _isSkipEvenOrUnEvenRule(SkipRule skipRule) =>
       skipRule is SkipEvenRule || skipRule is SkipUnEvenRule;
 }
 
@@ -375,11 +375,11 @@ class CounterTagParser extends EventTagParser {
     return skipRules;
   }
 
-  static _findContinues(List<CounterAttribute> counterAttributes) =>
+  static bool _findContinues(List<CounterAttribute> counterAttributes) =>
       counterAttributes
           .any((counterAttribute) => counterAttribute is ContinueAttribute);
 
-  static _map(List values) {
+  static CounterTag _map(List values) {
     var counterAttributes = values[4].cast<CounterAttribute>();
     var arrayNumber = _findArrayNumber(counterAttributes);
     var continues = _findContinues(counterAttributes);

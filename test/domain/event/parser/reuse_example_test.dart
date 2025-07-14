@@ -53,14 +53,14 @@ class EventReuseExample extends EventExample {
     var equipmentModules = 'EquipmentModules';
     var transport = 'Transport';
     var events = 'Events';
-    var eventsVfd = events + 'Vfd';
+    var eventsVfd = '${events}Vfd';
     var controlModules = 'ControlModules';
     var carrierStopper = 'CarrierStopper';
     var cylCtrl = 'CylCtrl';
     var transportEvent = 'TransportEvent';
     var eventGlobal = 'EventGlobal';
     var bckmtCarStprComment = 'Back meat harvester carrousel stopper';
-    var bckmtCarStprCylComment = bckmtCarStprComment + ' cylinder';
+    var bckmtCarStprCylComment = '$bckmtCarStprComment cylinder';
     var camHeight = 'CamHeight';
     var camHeightEvent = 'CamHeightEvent';
     var mtrCtrl = 'MtrCtrl';
@@ -81,7 +81,7 @@ class EventReuseExample extends EventExample {
       eventExpression: '$eventGlobal.$bckmtCarStpr.$carrierStopperEvent',
       comment: bckmtCarStprComment,
     );
-    var bckmtCarStprCyl = bckmtCarStpr + 'Cyl';
+    var bckmtCarStprCyl = '${bckmtCarStpr}Cyl';
     var cylCtrlDataType = '$controlModules\\$cylCtrl\\$events';
     _add(
       definition: definition,
@@ -222,7 +222,7 @@ class EventReuseExample extends EventExample {
     return definition;
   }
 
-  _add({
+  void _add({
     required Definition definition,
     required String dataTypeName,
     required String dataTypeExpression,
@@ -244,6 +244,6 @@ class EventReuseExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventReuseExample().executeTest();
 }

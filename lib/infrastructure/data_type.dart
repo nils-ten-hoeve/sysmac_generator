@@ -20,7 +20,7 @@ class DataTypeTreeFactory {
     return dataTypeTree;
   }
 
-  _addAndCreateChildren(
+  void _addAndCreateChildren(
       SysmacProjectArchive sysmacProjectArchive, DataTypeTree dataTypeTree) {
     var dataTypeArchiveXmlFiles =
         sysmacProjectArchive.projectIndexXml.dataTypeArchiveXmlFiles();

@@ -65,6 +65,6 @@ class EventGroupExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventGroupExample().executeTest();
 }

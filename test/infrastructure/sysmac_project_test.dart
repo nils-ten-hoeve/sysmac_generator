@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 import 'test_resource.dart';
 
-main() {
+void main() {
   group('class: $SysmacProjectFactory', () {
     group('constructor', () {
       test('empty path should throw error', () {

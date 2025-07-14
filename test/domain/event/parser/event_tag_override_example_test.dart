@@ -43,6 +43,6 @@ class EventTagOverrideExample extends EventExample {
     );
 }
 
-main() {
+void main() {
   EventTagOverrideExample().executeTest();
 }

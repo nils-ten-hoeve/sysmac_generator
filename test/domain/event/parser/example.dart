@@ -25,7 +25,7 @@ import 'derived_component_code_example_test.dart';
 import 'event_global_example_test.dart';
 import 'event_tag_override_example_test.dart';
 import 'group_example_test.dart';
-import 'mesage_example_test.dart';
+import 'message_example_test.dart';
 import 'priority_example_test.dart';
 import 'reuse_example_test.dart';
 import 'solution_example_test.dart';
@@ -44,7 +44,7 @@ abstract class EventExample with MarkDownTemplateWriter {
   /// override when [SysmacProjectFile] name table needs to be added to [asMarkDown]
   bool get showSysmacFileNameTable => false;
 
-  get title => runtimeType
+  String get title => runtimeType
       .toString()
       .replaceAll(RegExp('^Event'), '')
       .replaceAll(RegExp('Example\$'), '')
@@ -161,9 +161,9 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         ]),
       ];
 
-  String _createReferencePath(Definition _definition, Variable variable) {
+  String _createReferencePath(Definition definition, Variable variable) {
     var referencedDataType = (variable.baseType as DataTypeReference).dataType;
-    var referencePath = _definition.dataTypeTree
+    var referencePath = definition.dataTypeTree
         .findPath(referencedDataType)
         .map((nameSpace) => nameSpace.name)
         .toList();
@@ -212,7 +212,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     return rows;
   }
 
-  _createSysmacFileNameTable(EventExample eventExample) => HtmlTable(
+  HtmlTable _createSysmacFileNameTable(EventExample eventExample) => HtmlTable(
         headerRows: _createSysmacFileNameHeaderRows(),
         rows: _createSysmacFileNameRows(eventExample),
       );
@@ -223,7 +223,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         ),
       ];
 
-  _createSysmacFileNameRows(EventExample eventExample) => [
+  List<HtmlRow> _createSysmacFileNameRows(EventExample eventExample) => [
         HtmlRow(
           values: [
             '${eventExample.site.code}${eventExample.electricPanel.code}-'
@@ -470,7 +470,7 @@ class EventTableColumn {
 }
 
 class EventTableColumns extends DelegatingList<EventTableColumn> {
-  EventTableColumns.forColumns(columns) : super(columns);
+  EventTableColumns.forColumns(List<EventTableColumn> columns) : super(columns);
 
   EventTableColumns() : super([]);
 
@@ -501,7 +501,7 @@ class EventTableColumns extends DelegatingList<EventTableColumn> {
   EventTableColumns get withSolution =>
       _add(EventTableColumn('Solution', (event) => event.solution));
 
-  _add(EventTableColumn newColumn) =>
+  EventTableColumns _add(EventTableColumn newColumn) =>
       EventTableColumns.forColumns([...this, newColumn]);
 }
 
@@ -543,7 +543,7 @@ mixin MarkDownTemplateWriter {
 
   String get fileName => 'doc/template/$runtimeType.mdt';
 
-  writeMarkDownTemplateFile() {
+  void writeMarkDownTemplateFile() {
     String markDown = markDownHeader;
     markDown += asMarkDown;
     File(fileName).writeAsStringSync(markDown);

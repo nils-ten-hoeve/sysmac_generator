@@ -7,7 +7,7 @@ import 'generic_parsers.dart';
 /// Often extra information is needed for the operator or technician on how to solve an event..
 ///
 /// By default the event has the following solution text when the event has a
-/// [ComponentCode]: See component <Component Code> on electric diagram
+/// [ComponentCode]: See component Component Code on electric diagram e.g. 40S3
 /// &lt;Site Number&gt;DE&lt;Panel Number&gt; on page &lt;Page Number&gt;
 /// at column &lt;Column Number&gt;.
 ///

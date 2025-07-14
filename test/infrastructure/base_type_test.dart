@@ -2,24 +2,24 @@ import 'package:sysmac_generator/domain/base_type.dart';
 import 'package:sysmac_generator/infrastructure/base_type.dart';
 import 'package:test/test.dart';
 
-main() {
+void main() {
   group('class: $BaseTypeFactory', () {
     var baseTypeFactory = BaseTypeFactory();
 
     group('${BaseType}s', () {
-      var _struct = 'STRUCT';
-      test(_struct, () {
-        expect(baseTypeFactory.createFromExpression(_struct), isA<BaseType>());
-        expect(baseTypeFactory.createFromExpression(_struct), isA<Struct>());
-        expect(baseTypeFactory.createFromExpression(_struct.toLowerCase()),
+      var structType = 'STRUCT';
+      test(structType, () {
+        expect(baseTypeFactory.createFromExpression(structType), isA<BaseType>());
+        expect(baseTypeFactory.createFromExpression(structType), isA<Struct>());
+        expect(baseTypeFactory.createFromExpression(structType.toLowerCase()),
             isA<UnknownBaseType>());
       });
 
-      var _enum = 'ENUM';
-      test(_enum, () {
-        expect(baseTypeFactory.createFromExpression(_enum), isA<BaseType>());
-        expect(baseTypeFactory.createFromExpression(_enum), isA<Enum>());
-        expect(baseTypeFactory.createFromExpression(_enum.toLowerCase()),
+      var enumType = 'ENUM';
+      test(enumType, () {
+        expect(baseTypeFactory.createFromExpression(enumType), isA<BaseType>());
+        expect(baseTypeFactory.createFromExpression(enumType), isA<Enum>());
+        expect(baseTypeFactory.createFromExpression(enumType.toLowerCase()),
             isA<UnknownBaseType>());
       });
     });

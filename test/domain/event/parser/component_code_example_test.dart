@@ -38,7 +38,7 @@ class EventComponentCodeExample extends EventExample {
     );
 }
 
-main() {
+void main() {
   EventComponentCodeExample().executeTest();
 
   var componentCodeTagParser = ComponentCodeTagParser();

@@ -72,7 +72,7 @@ class ElectricPanel extends LeafNode<ElectricPanel> {
   ElectricPanel({
     required this.number,
     required String name,
-  })  : code = 'DE' + _withLeadingZeros(number, minNumberOfDigits: 2),
+  })  : code = 'DE${_withLeadingZeros(number, minNumberOfDigits: 2)}',
         super(name);
 
   @override

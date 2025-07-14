@@ -8,7 +8,7 @@ import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'test_resource.dart';
 import 'package:test/test.dart';
 
-main() {
+void main() {
   File file = SysmacProjectTestResource().file;
   var sysmacProjectArchive = SysmacProjectArchive(file.path);
   ProjectIndexXml projectIndexXml = sysmacProjectArchive.projectIndexXml;

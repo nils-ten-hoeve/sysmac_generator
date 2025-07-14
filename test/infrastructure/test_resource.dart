@@ -6,11 +6,7 @@ class TestResource {
   TestResource(String pathRelativeToTest) : file = findFile(pathRelativeToTest);
 
   static File findFile(String pathRelativeToTestDirectory) {
-    String path = findProjectRootDirectory().path +
-        Platform.pathSeparator +
-        "test" +
-        Platform.pathSeparator +
-        pathRelativeToTestDirectory;
+    String path = "${findProjectRootDirectory().path}${Platform.pathSeparator}test${Platform.pathSeparator}$pathRelativeToTestDirectory";
     return File(path);
   }
 

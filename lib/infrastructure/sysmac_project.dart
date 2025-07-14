@@ -57,12 +57,12 @@ class SysmacProjectFactory {
     );
   }
 
-  _createSite(List<dynamic> parsedFileName) {
+  Site _createSite(List<dynamic> parsedFileName) {
     int siteNumber = parsedFileName[1] as int;
     return Site(siteNumber);
   }
 
-  _createElectricPanel(List<dynamic> parsedFileName) {
+  ElectricPanel _createElectricPanel(List<dynamic> parsedFileName) {
     int number = parsedFileName[3] as int;
     String name = parsedFileName[5] as String;
     return ElectricPanel(number: number, name: name);
@@ -136,21 +136,21 @@ class SysmacProjectArchive {
     projectIndexXml = ProjectIndexXml(archive);
   }
 
-  _validateExtension(File file) {
+  void _validateExtension(File file) {
     if (!file.path.toLowerCase().endsWith(".$extension")) {
       throw ArgumentError(
           "does not end with .$extension extension", 'sysmacProjectFilePath');
     }
   }
 
-  _validateExists(File file) {
+  void _validateExists(File file) {
     if (!file.existsSync()) {
       throw ArgumentError('does not point to a existing Sysmac project file',
           'sysmacProjectFilePath');
     }
   }
 
-  _validateNotEmpty(String sysmacProjectFilePath) {
+  void _validateNotEmpty(String sysmacProjectFilePath) {
     if (sysmacProjectFilePath.trim().isEmpty) {
       throw ArgumentError('may not be empty', 'sysmacProjectFilePath');
     }

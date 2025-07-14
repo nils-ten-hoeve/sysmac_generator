@@ -39,7 +39,7 @@ class EventComponentCodeSiteExample extends EventExample {
     );
 }
 
-main() {
+void main() {
   EventComponentCodeSiteExample().executeTest();
 
   var parser = SiteNumberTagParser();

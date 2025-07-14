@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 
 import 'test_resource.dart';
 
-main() {
+void main() {
   File file = SysmacProjectTestResource().file;
   var sysmacProject = SysmacProjectFactory().create(file.path);
   var variableService = sysmacProject.globalVariableService;

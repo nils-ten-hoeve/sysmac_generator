@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Dart (bin\\sysmac_generator.dart)",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin\\sysmac_generator.dart",
+            "args": ["test/8669DE05-Evisceration-018-002.smc2"]
+        }
+    ]
+}

@@ -54,7 +54,7 @@ class EventArrayExample extends EventExample {
       definition.addExpectedEvent(
         groupName1: fuse,
         expression: '$eventGlobalVariableName.$fuse($f)',
-        message: fuseMessage.sentenceCase + '.',
+        message: '${fuseMessage.sentenceCase}.',
       );
     }
 
@@ -80,7 +80,7 @@ class EventArrayExample extends EventExample {
   }
 }
 
-main() {
+void main() {
   EventArrayExample().executeTest();
 
   group('class: $ArrayCounter', () {

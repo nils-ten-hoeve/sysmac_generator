@@ -12,7 +12,7 @@ class Sentence {
         _addPeriodIfMissing(_replaceDoubleSpaces(trimmed)));
   }
 
-  static _addPeriodIfMissing(String trimmed) {
+  static String _addPeriodIfMissing(String trimmed) {
     if (trimmed.endsWith('.')) {
       return trimmed;
     } else {
@@ -20,7 +20,7 @@ class Sentence {
     }
   }
 
-  static _convertFirstLetterToCapitalLetter(String trimmedWithPeriod) =>
+  static String _convertFirstLetterToCapitalLetter(String trimmedWithPeriod) =>
       trimmedWithPeriod.substring(0, 1).toUpperCase() +
       trimmedWithPeriod.substring(1);
 

@@ -1,5 +1,4 @@
 import 'package:sysmac_generator/domain/event/event.dart';
-import 'package:sysmac_generator/sysmac_generator.dart';
 
 import '../infrastructure/sysmac_project.dart';
 
@@ -51,7 +50,5 @@ class EventService {
     sysmacProject.eventService.eventGroups;
   }
 
-  void generateForCynergy(String sysmacProjectFilePath) {
-    //TODO
-  }
+
 }

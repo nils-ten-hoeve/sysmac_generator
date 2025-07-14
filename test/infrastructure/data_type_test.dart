@@ -62,7 +62,7 @@ const String xml = """<?xml version="1.0" encoding="utf-8"?>
 </DataType>
 </data>""";
 
-main() {
+void main() {
   var dataTypes = DataTypeArchiveXmlFile.fromXml(
     nameSpacePath: 'Test\\NameSpace',
     xml: xml,

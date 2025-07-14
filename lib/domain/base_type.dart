@@ -63,7 +63,7 @@ class ArrayRange {
   @override
   int get hashCode => min.hashCode ^ max.hashCode;
 
-  static _numberFromExpression(String expression, String groupName) {
+  static int _numberFromExpression(String expression, String groupName) {
     var value = regex.firstMatch(expression)!.namedGroup(groupName)!;
     return int.parse(value);
   }

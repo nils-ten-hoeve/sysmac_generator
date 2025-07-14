@@ -97,7 +97,7 @@ abstract class AttributesParser extends EventTagParser {
     // This is a design time error and therefore should not happen at normal run time.
   }
 
-  static List _getAllObjectsIn(value) {
+  static List<dynamic> _getAllObjectsIn(dynamic value) {
     var objects = [];
     if (value is Iterable) {
       for (var element in value) {

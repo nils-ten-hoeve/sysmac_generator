@@ -67,7 +67,7 @@ class EventComponentCodePanelExample extends EventExample {
     );
 }
 
-main() {
+void main() {
   EventComponentCodePanelExample().executeTest();
 
   var parser = PanelNumberTagParser();
