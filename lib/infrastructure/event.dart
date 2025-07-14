@@ -420,7 +420,8 @@ class EventFactory {
 //   }
 // }
 
-abstract class ArrayValues extends Iterable<String> implements Iterator<String> {
+abstract class ArrayValues extends Iterable<String>
+    implements Iterator<String> {
   final List<ArrayCounterOnNextListener> onNextListeners = [];
   final List<ArrayCounterOnResetListener> onResetListeners = [];
 
@@ -462,7 +463,6 @@ abstract class ArrayValues extends Iterable<String> implements Iterator<String> 
   @override
   bool moveNext();
 }
-
 
 class ArrayCounter extends ArrayValues {
   final ArrayRange arrayRange;

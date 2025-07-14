@@ -9,7 +9,8 @@ void main() {
     group('${BaseType}s', () {
       var structType = 'STRUCT';
       test(structType, () {
-        expect(baseTypeFactory.createFromExpression(structType), isA<BaseType>());
+        expect(
+            baseTypeFactory.createFromExpression(structType), isA<BaseType>());
         expect(baseTypeFactory.createFromExpression(structType), isA<Struct>());
         expect(baseTypeFactory.createFromExpression(structType.toLowerCase()),
             isA<UnknownBaseType>());

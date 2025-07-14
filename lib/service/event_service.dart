@@ -49,6 +49,4 @@ class EventService {
     //var eventGroups=
     sysmacProject.eventService.eventGroups;
   }
-
-
 }

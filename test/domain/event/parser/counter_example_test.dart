@@ -204,29 +204,29 @@ void main() {
       });
 
       test("'[cnt skip=Even]' results in a $CounterTag(skipRules=SkipEvenRule)",
-              () {
-            var result = parser.matchesSkipping('[cnt skip=Even]');
+          () {
+        var result = parser.matchesSkipping('[cnt skip=Even]');
         expect(result.first, CounterTag(skipRules: [SkipEvenRule()]));
       });
 
       test(
           "' [cnt skip= u ] ' results in a $CounterTag(skipRules=SkipEvenRule)",
-              () {
-            var result = parser.matchesSkipping(' [cnt skip= u ] ');
+          () {
+        var result = parser.matchesSkipping(' [cnt skip= u ] ');
         expect(result.first, CounterTag(skipRules: [SkipUnEvenRule()]));
       });
 
       test(
           "'[cnt skip=uneveN]' results in a $CounterTag(skipRules=SkipEvenRule)",
-              () {
-            var result = parser.matchesSkipping('[cnt skip=uneveN]');
+          () {
+        var result = parser.matchesSkipping('[cnt skip=uneveN]');
         expect(result.first, CounterTag(skipRules: [SkipUnEvenRule()]));
       });
 
       test(
           "'[cnt skip=even, uneveN]' results in a $CounterTag(skipRules=SkipEvenRule)",
-              () {
-            String logMsg2 = '';
+          () {
+        String logMsg2 = '';
         Logger.root.onRecord.listen((LogRecord rec) {
           logMsg2 = rec.message;
         });
@@ -236,24 +236,24 @@ void main() {
       });
 
       test("'[cnt skip=3]' results in a $CounterTag(skipRules=$SkipMinMaxRule)",
-              () {
-            var result = parser.matchesSkipping('[cnt skip=3]');
+          () {
+        var result = parser.matchesSkipping('[cnt skip=3]');
         expect(result.first,
             CounterTag(skipRules: [SkipMinMaxRule(min: 3, max: 3)]));
       });
 
       test(
           "'[cnt skip=-3]' results in a $CounterTag(skipRules=$SkipMinMaxRule)",
-              () {
-            var result = parser.matchesSkipping('[cnt skip=-3]');
+          () {
+        var result = parser.matchesSkipping('[cnt skip=-3]');
         expect(result.first,
             CounterTag(skipRules: [SkipMinMaxRule(min: 0, max: 3)]));
       });
 
       test(
           "'[cnt skip=3-5]' results in a $CounterTag(skipRules=$SkipMinMaxRule)",
-              () {
-            var result = parser.matchesSkipping('[cnt skip=3-5]');
+          () {
+        var result = parser.matchesSkipping('[cnt skip=3-5]');
         expect(result.first,
             CounterTag(skipRules: [SkipMinMaxRule(min: 3, max: 5)]));
       });
@@ -261,8 +261,8 @@ void main() {
       group('Combined', () {
         test(
             "'[cnt skip=even, uneveN]' results in a $CounterTag(skipRules=SkipEvenRule)",
-                () {
-              String logMsg2 = '';
+            () {
+          String logMsg2 = '';
           Logger.root.onRecord.listen((LogRecord rec) {
             logMsg2 = rec.message;
           });
@@ -274,19 +274,19 @@ void main() {
 
         test(
             "'[cnt skip=3,5]' results in a $CounterTag(skipRules=$SkipMinMaxRule)",
-                () {
-              var result = parser.matchesSkipping('[cnt skip=3,5]');
-              expect(
-                  result.first,
-                  CounterTag(skipRules: [
+            () {
+          var result = parser.matchesSkipping('[cnt skip=3,5]');
+          expect(
+              result.first,
+              CounterTag(skipRules: [
                 SkipMinMaxRule(min: 3, max: 3),
                 SkipMinMaxRule(min: 5, max: 5),
               ]));
-            });
+        });
 
         test(
             "'[cnt skip=-3, 5-7]' results in a $CounterTag(skipRules=$SkipMinMaxRule)",
-                () {
+            () {
           var result = parser.matchesSkipping('[cnt skip=-3, 5-7]');
           expect(
               result.first,

@@ -17,7 +17,6 @@ const exitCodeError = 1;
 class SysmacGenerator {
   void execute(List<String> arguments) {
     try {
-      
       var sysmacProjectFilePath = arguments.join(' ');
       var sysmacProject = SysmacProjectFactory().create(sysmacProjectFilePath);
       XorHmiService().generateTagsFile(sysmacProject);
@@ -27,7 +26,7 @@ class SysmacGenerator {
     }
   }
 
-/// TODO this was a previous endeavour that needs completing
+  /// TODO this was a previous endeavour that needs completing
   //TODO change to generateFile(String templatePath, String sourcePath, {String destinationPath});
   void generateForSysmacHmi(String sysmacProjectFilePath) {
     try {

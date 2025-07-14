@@ -1,6 +1,5 @@
 import 'package:sysmac_generator/domain/data_type.dart';
 
-
 class Variable extends DataType {
   Variable({
     required super.name,
@@ -20,5 +19,4 @@ class Variable extends DataType {
     }
     return string;
   }
-
 }

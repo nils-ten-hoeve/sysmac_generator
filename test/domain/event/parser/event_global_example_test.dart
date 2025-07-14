@@ -20,12 +20,14 @@ class EventGlobalExample extends EventExample {
   @override
   Definition createDefinition() => Definition()
     ..addStruct('Events')
-    ..addStructBool('Event1', 'first event')..addStructBool('Event2', 'second event')
+    ..addStructBool('Event1', 'first event')
+    ..addStructBool('Event2', 'second event')
     ..addExpectedEvent(
       groupName1: 'Event1',
       expression: 'EventGlobal.Event1',
       message: 'First event.',
-    )..addExpectedEvent(
+    )
+    ..addExpectedEvent(
       groupName1: 'Event2',
       expression: 'EventGlobal.Event2',
       message: 'Second event.',
