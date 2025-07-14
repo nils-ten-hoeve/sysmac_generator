@@ -95,7 +95,7 @@ abstract class Node<T extends Node<T>> {
 }
 
 class LeafNode<T extends Node<T>> extends Node<T> {
-  LeafNode(String name) : super(name);
+  LeafNode(super.name);
 
   /// A [LeafNode] has no children
   @override

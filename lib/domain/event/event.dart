@@ -4,7 +4,7 @@ import 'package:sysmac_generator/domain/node.dart';
 import 'package:sysmac_generator/infrastructure/event.dart';
 
 class EventGroup extends Node<Event> {
-  EventGroup(String name) : super(name);
+  EventGroup(super.name);
 }
 
 /// [Event]s are system alarms, warnings or messages that are displayed to the

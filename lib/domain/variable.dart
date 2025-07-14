@@ -1,17 +1,12 @@
 import 'package:sysmac_generator/domain/data_type.dart';
 
-import 'base_type.dart';
 
 class Variable extends DataType {
   Variable({
-    required String name,
-    required BaseType baseType,
-    required String comment,
-  }) : super(
-          name: name,
-          baseType: baseType,
-          comment: comment,
-        );
+    required super.name,
+    required super.baseType,
+    required super.comment,
+  });
 
   @override
   String toString() {

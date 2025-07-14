@@ -470,7 +470,7 @@ class EventTableColumn {
 }
 
 class EventTableColumns extends DelegatingList<EventTableColumn> {
-  EventTableColumns.forColumns(List<EventTableColumn> columns) : super(columns);
+  EventTableColumns.forColumns(super.columns);
 
   EventTableColumns() : super([]);
 

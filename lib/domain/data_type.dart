@@ -10,11 +10,11 @@ class DataTypeTree extends DataTypeBase {
 abstract class DataTypeBase extends Node<DataTypeBase> {
   final String comment;
 
-  DataTypeBase(String name, [this.comment = '']) : super(name);
+  DataTypeBase(super.name, [this.comment = '']);
 }
 
 class NameSpace extends DataTypeBase {
-  NameSpace(String name, [String comment = '']) : super(name, comment);
+  NameSpace(super.name, [super.comment]);
 }
 
 class DataType extends DataTypeBase {

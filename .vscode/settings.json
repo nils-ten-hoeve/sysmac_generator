@@ -1,14 +1,24 @@
 {
     "cSpell.words": [
+        "Ethercat",
         "inue",
+        "LREAL",
+        "LWORD",
         "Meyn",
         "neven",
         "OFINT",
         "Omron",
         "petitparser",
+        "prio",
         "recase",
+        "sbyte",
+        "Scalder",
+        "SINT",
         "Sysmac",
+        "timespan",
         "UDINT",
-        "ULINT"
+        "uinteger",
+        "ULINT",
+        "USINT"
     ]
 }

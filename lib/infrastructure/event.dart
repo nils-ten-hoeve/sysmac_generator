@@ -384,7 +384,43 @@ class EventFactory {
       ];
 }
 
-abstract class ArrayValues extends Iterable with Iterator<String> {
+// TODO remove? abstract class ArrayValues extends Iterable with Iterator<String> {
+//   final List<ArrayCounterOnNextListener> onNextListeners = [];
+//   final List<ArrayCounterOnResetListener> onResetListeners = [];
+
+//   ArrayValues._();
+
+//   factory ArrayValues(DataTypeBase eventGlobalNode) {
+//     if (eventGlobalNode is DataType) {
+//       var arrayRangesReversed = eventGlobalNode.baseType.arrayRanges.reversed;
+//       ArrayCounter? child;
+//       ArrayCounter? arrayCounter;
+//       for (var arrayRange in arrayRangesReversed) {
+//         arrayCounter = ArrayCounter(arrayRange: arrayRange, child: child);
+//         child = arrayCounter;
+//       }
+//       return arrayCounter ?? NoArrayValues();
+//     } else {
+//       return NoArrayValues();
+//     }
+//   }
+
+//   List<ArrayCounter> get arrayCountersInReverseOrder;
+
+//   void invokeOnNextListeners() {
+//     for (var listener in onNextListeners) {
+//       listener.onNext();
+//     }
+//   }
+
+//   void invokeOnResetListeners() {
+//     for (var listener in onResetListeners) {
+//       listener.onReset();
+//     }
+//   }
+// }
+
+abstract class ArrayValues extends Iterable<String> implements Iterator<String> {
   final List<ArrayCounterOnNextListener> onNextListeners = [];
   final List<ArrayCounterOnResetListener> onResetListeners = [];
 
@@ -418,7 +454,15 @@ abstract class ArrayValues extends Iterable with Iterator<String> {
       listener.onReset();
     }
   }
+
+  // Iterator implementation
+  @override
+  String get current;
+
+  @override
+  bool moveNext();
 }
+
 
 class ArrayCounter extends ArrayValues {
   final ArrayRange arrayRange;
@@ -543,7 +587,7 @@ class NoArrayValues extends ArrayValues {
   }
 
   @override
-  Iterator get iterator => this;
+  Iterator<String> get iterator => this;
 
   @override
   bool moveNext() {
