@@ -5,7 +5,8 @@
             "type": "dart",
             "request": "launch",
             "program": "bin\\sysmac_generator.dart",
-            "args": ["test/8669DE05-Evisceration-018-002.smc2"]
+            "args": ["W:\\PLC\\Blue print - Eviseration M4\\plc projects\\8669DE05-Evisceration-018-003\\Project\\8669DE05-Evisceration-018-003.smc2"]
+                //"test/8669DE05-Evisceration-018-002.smc2"
         }
     ]
 }

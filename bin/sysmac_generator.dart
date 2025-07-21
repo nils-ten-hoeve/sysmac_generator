@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:sysmac_generator/service/xor_hmi_service.dart';
+import 'package:sysmac_generator/service/create_jmobile_tags_file.dart';
+import 'package:sysmac_generator/service/create_jmobile_events_file.dart';
 import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 import 'package:sysmac_generator/service/event_service.dart';
 
@@ -19,9 +20,24 @@ class SysmacGenerator {
     try {
       var sysmacProjectFilePath = arguments.join(' ');
       var sysmacProject = SysmacProjectFactory().create(sysmacProjectFilePath);
-      XorHmiService().generateTagsFile(sysmacProject);
-    } catch (e) {
-      showInfo();
+
+      var variables = sysmacProject.globalVariableService.variables;
+      writeJMobileTagsFile(sysmacProject, variables);
+
+      var events = createEvents(sysmacProject, variables);
+      for (var event in events) {
+        print(event);
+      }
+
+      writeSysmacEventArrayCodeFile(sysmacProject, events);
+      writeJMobileEventsFile(sysmacProject, events);
+    } catch (e, s) {
+      print(e);
+      if (e is ArgumentError) {
+        showInfo();
+      } else {
+        print(s);
+      }
       exit(exitCodeError);
     }
   }
@@ -30,7 +46,7 @@ class SysmacGenerator {
   //TODO change to generateFile(String templatePath, String sourcePath, {String destinationPath});
   void generateForSysmacHmi(String sysmacProjectFilePath) {
     try {
-      EventService().generateForSysmacHmi(sysmacProjectFilePath);
+      EventServiceOld().generateForSysmacHmi(sysmacProjectFilePath);
     } on Exception catch (e) {
       print(e);
       showInfo();

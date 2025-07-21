@@ -141,7 +141,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
     return markDown;
   }
 
-  HtmlTable _createVariableTable(Definition definition, Variable variable) =>
+  HtmlTable _createVariableTable(Definition definition, VariableOld variable) =>
       HtmlTable(
         headerRows: _createVariableHeaderRows(),
         rows: _createVariableRows(definition, variable),
@@ -152,7 +152,8 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         HtmlRow(values: ['Name', 'Type', 'Comment']),
       ];
 
-  List<HtmlRow> _createVariableRows(Definition definition, Variable variable) =>
+  List<HtmlRow> _createVariableRows(
+          Definition definition, VariableOld variable) =>
       [
         HtmlRow(values: [
           variable.name,
@@ -161,7 +162,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         ]),
       ];
 
-  String _createReferencePath(Definition definition, Variable variable) {
+  String _createReferencePath(Definition definition, VariableOld variable) {
     var referencedDataType = (variable.baseType as DataTypeReference).dataType;
     var referencePath = definition.dataTypeTree
         .findPath(referencedDataType)
@@ -234,7 +235,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
         ),
       ];
 
-  HtmlTable _createEventTable(List<Event> events) => HtmlTable(
+  HtmlTable _createEventTable(List<EventOld> events) => HtmlTable(
         headerRows: _createEventHeaderRows(),
         rows: _createEventRows(events),
       );
@@ -250,7 +251,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
                 .toList()),
       ];
 
-  List<HtmlRow> _createEventRows(List<Event> events) {
+  List<HtmlRow> _createEventRows(List<EventOld> events) {
     List<HtmlRow> rows = [];
     for (var event in events) {
       rows.add(HtmlRow(
@@ -268,7 +269,7 @@ class EventExampleMarkDownWriter with MarkDownTemplateWriter {
 ///
 class Definition {
   final DataTypeTree dataTypeTree = DataTypeTree();
-  final List<Event> events = [];
+  final List<EventOld> events = [];
   String variableComment = '';
 
   /// A [pointer] is the last position where:
@@ -278,7 +279,7 @@ class Definition {
   /// are added to [pointer]s children.
   ///
   ///Note that the [pointer] should never be a leaf in the tree
-  ///, e.g.: never represent an [Event]!
+  ///, e.g.: never represent an [EventOld]!
   late DataTypeBase pointer = dataTypeTree;
 
   NameSpace addNameSpace(String name) {
@@ -355,12 +356,12 @@ class Definition {
       {required String groupName1,
       String groupName2 = '',
       String componentCode = '',
-      EventPriority priority = EventPriorities.medium,
+      EventPriorityOld priority = EventPriorities.medium,
       required String expression,
       required String message,
       String solution = '',
       bool acknowledge = true}) {
-    Event event = Event(
+    EventOld event = EventOld(
         groupName1: groupName1,
         groupName2: groupName2,
         id: '${events.length + 1}',
@@ -383,7 +384,7 @@ class Definition {
     return dataTypeTree;
   }
 
-  Variable get eventGlobalVariable {
+  VariableOld get eventGlobalVariable {
     if (dataTypeTree.children.isEmpty) {
       throw Exception('The $DataTypeTree may not be empty.');
     }
@@ -393,11 +394,12 @@ class Definition {
       throw Exception(
           'The  $DataTypeTree does not contain a $DataType with $BaseType == $Struct.');
     }
-    return Variable(
-        name: eventGlobalVariableName,
-        comment: variableComment,
-        baseType:
-            DataTypeReference(dataType: struct as DataType, arrayRanges: []));
+    return VariableOld(
+      name: eventGlobalVariableName,
+      comment: variableComment,
+      baseType: DataTypeReference(
+          dataType: struct as DataType, arrayRanges: ArrayRanges()),
+    );
   }
 
   // List<EventGroup> get eventGroups {
@@ -464,7 +466,7 @@ class GroupDefinition {}
 
 class EventTableColumn {
   final String name;
-  final String Function(Event event) cellValue;
+  final String Function(EventOld event) cellValue;
 
   EventTableColumn(this.name, this.cellValue);
 }

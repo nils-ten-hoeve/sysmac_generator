@@ -12,7 +12,7 @@ import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
 
-/// In order to generate [Event]s we need more information.
+/// In order to generate [EventOld]s we need more information.
 /// This information is stored in [EventTag]s.
 ///
 /// [EventTag]s can be used inside:
@@ -21,7 +21,7 @@ import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
 ///
 /// The format of an [EventTag] is normally some text between square brackets, e.g.: [30M2]
 ///
-/// [EventTag]s are not directly visible in the [Event] message!
+/// [EventTag]s are not directly visible in the [EventOld] message!
 abstract class EventTag {
 // all relevant tag information as final field values!
 }

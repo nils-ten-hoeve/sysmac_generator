@@ -51,7 +51,7 @@ void main() {
     group('property: globalVariableService', () {
       test('finds globalVariableService with variable', () {
         var globalVariableService = sysmacProjectFile.globalVariableService;
-        expect(globalVariableService.variables.length, 48);
+        expect(globalVariableService.variablesOld.length, 48);
       });
     });
   });

@@ -1,6 +1,13 @@
 {
     "cSpell.words": [
+        "arrayindex",
+        "arraysize",
+        "elmax",
+        "elmin",
         "Ethercat",
+        "ETIP",
+        "eumax",
+        "eumin",
         "inue",
         "LREAL",
         "LWORD",
@@ -15,6 +22,7 @@
         "Scalder",
         "SINT",
         "Sysmac",
+        "TAGLOCATOR",
         "timespan",
         "UDINT",
         "uinteger",

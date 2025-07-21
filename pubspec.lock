@@ -417,6 +417,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  shouldly:
+    dependency: "direct dev"
+    description:
+      name: shouldly
+      sha256: b65d1f24bc5625bab1b264b3cb59e1d88682618540d8d315a54e9a4375a3cab8
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0+1"
   source_map_stack_trace:
     dependency: transitive
     description:

@@ -79,7 +79,7 @@ class EventPriorityExample extends EventExample {
 }
 
 class PriorityTextFactories
-    extends DelegatingList<String Function(EventPriority priority)> {
+    extends DelegatingList<String Function(EventPriorityOld priority)> {
   PriorityTextFactories()
       : super([
           (priority) => priority.abbreviation.toLowerCase(),
@@ -101,9 +101,9 @@ void main() {
     for (var priority in EventPriorities()) {
       for (var priorityTextFactory in PriorityTextFactories()) {
         var priorityText = priorityTextFactory(priority);
-        var priorityTitle = '$EventPriority.${priority.name.pascalCase}';
+        var priorityTitle = '$EventPriorityOld.${priority.name.pascalCase}';
 
-        group("Parsing $EventPriority: '$priorityText'", () {
+        group("Parsing $EventPriorityOld: '$priorityText'", () {
           group('Without spaces', () {
             var input1 = '1234[prio=$priorityText]5678';
             test("Parsing: '$input1' results in $priorityTitle", () {

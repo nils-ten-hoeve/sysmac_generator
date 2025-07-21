@@ -19,7 +19,8 @@ void main() {
       var enumType = 'ENUM';
       test(enumType, () {
         expect(baseTypeFactory.createFromExpression(enumType), isA<BaseType>());
-        expect(baseTypeFactory.createFromExpression(enumType), isA<Enum>());
+        expect(
+            baseTypeFactory.createFromExpression(enumType), isA<EnumChild>());
         expect(baseTypeFactory.createFromExpression(enumType.toLowerCase()),
             isA<UnknownBaseType>());
       });
@@ -100,6 +101,10 @@ void main() {
       test('STRING', () {
         expect(baseTypeFactory.createFromExpression('STRING'), isA<NxType>());
         expect(baseTypeFactory.createFromExpression('STRING'), isA<NxString>());
+        expect(
+            baseTypeFactory.createFromExpression('STRING[123]'), isA<NxType>());
+        expect(baseTypeFactory.createFromExpression('STRING[123]'),
+            isA<NxString>());
         expect(baseTypeFactory.createFromExpression('string'),
             isA<UnknownBaseType>());
       });
@@ -137,7 +142,7 @@ void main() {
         expect(baseTypeFactory.createFromExpression('DATE_AND_TIME'),
             isA<NxType>());
         expect(baseTypeFactory.createFromExpression('DATE_AND_TIME'),
-            isA<NxDateAndType>());
+            isA<NxDateAndTime>());
         expect(baseTypeFactory.createFromExpression('date_and_time'),
             isA<UnknownBaseType>());
       });
@@ -219,6 +224,10 @@ void main() {
       test('String', () {
         expect(baseTypeFactory.createFromExpression('String'), isA<VbType>());
         expect(baseTypeFactory.createFromExpression('String'), isA<VbString>());
+        expect(
+            baseTypeFactory.createFromExpression('String[123]'), isA<VbType>());
+        expect(baseTypeFactory.createFromExpression('String[123]'),
+            isA<VbString>());
         expect(baseTypeFactory.createFromExpression('string'),
             isA<UnknownBaseType>());
       });
@@ -436,6 +445,30 @@ void main() {
                 .arrayRanges[2]
                 .max,
             10);
+      });
+      test('ARRAY[1..2]', () {
+        expect(
+            baseTypeFactory.createFromExpression('ARRAY[1..2]'), isA<NxType>());
+        expect(
+            baseTypeFactory.createFromExpression('ARRAY[1..2]'), isA<NxBool>());
+        expect(
+            baseTypeFactory
+                .createFromExpression('ARRAY[1..2]')
+                .arrayRanges
+                .length,
+            1);
+        expect(
+            baseTypeFactory
+                .createFromExpression('ARRAY[1..2]')
+                .arrayRanges[0]
+                .min,
+            1);
+        expect(
+            baseTypeFactory
+                .createFromExpression('ARRAY[1..2]')
+                .arrayRanges[0]
+                .max,
+            2);
       });
     });
   });

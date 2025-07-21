@@ -1,7 +1,8 @@
 import 'package:sysmac_generator/domain/data_type.dart';
 
-class Variable extends DataType {
-  Variable({
+@Deprecated('Use Variable')
+class VariableOld extends DataType {
+  VariableOld({
     required super.name,
     required super.baseType,
     required super.comment,
@@ -10,7 +11,7 @@ class Variable extends DataType {
   @override
   String toString() {
     String string =
-        '$Variable{name: $name, comment: $comment, dataType: $baseType}';
+        '$VariableOld{name: $name, comment: $comment, dataType: $baseType}';
     for (var child in children) {
       var lines = child.toString().split('\n');
       for (var line in lines) {

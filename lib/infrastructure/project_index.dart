@@ -1,4 +1,5 @@
 import 'package:archive/archive.dart';
+import 'package:collection/collection.dart';
 import 'package:sysmac_generator/domain/data_type.dart';
 import 'package:xml/xml.dart';
 
@@ -20,7 +21,7 @@ const String variable = 'Variable';
 /// file extension inside a [SysmacProjectFile].
 ///
 /// It contains a [XmlDocument] containing them main project index that contains
-/// references to other xml files.
+/// references to other xml or swld files.
 ///
 /// It can convert this [XmlDocument] to domain objects that represent
 /// more meaningful information (e.g. references to other xml files)
@@ -43,9 +44,11 @@ class ProjectIndexXml extends ArchiveXml {
         String nameSpacePath =
             dataTypeEntity.getAttribute(nameSpaceAttribute) ?? '';
         var archiveFile = _findArchiveFile(id);
-        var dataTypeXmlArchiveFile = DataTypeArchiveXmlFile.fromArchiveFile(
-            nameSpacePath: nameSpacePath, archiveFile: archiveFile);
-        dataTypeArchiveXmlFiles.add(dataTypeXmlArchiveFile);
+        if (archiveFile != null) {
+          var dataTypeXmlArchiveFile = DataTypeArchiveXmlFile.fromArchiveFile(
+              nameSpacePath: nameSpacePath, archiveFile: archiveFile);
+          dataTypeArchiveXmlFiles.add(dataTypeXmlArchiveFile);
+        }
       } on Error {
         // Not found: no problem, try next
       }
@@ -53,6 +56,12 @@ class ProjectIndexXml extends ArchiveXml {
     return dataTypeArchiveXmlFiles;
   }
 
+  List<XmlNode> _findGlobalVariableEntities() => xmlDocument.descendants
+      .where((node) => _isGlobalVariableEntity(node))
+      .toList();
+
+  @Deprecated(
+      'This is needed for OldVariable which is deprecated. Use Variable instead')
   List<XmlNode> _findGlobalMemoryVariableEntities() => xmlDocument.descendants
       .where((node) => _isGlobalMemoryVariableEntity(node))
       .toList();
@@ -69,6 +78,8 @@ class ProjectIndexXml extends ArchiveXml {
       node.name.local == entity &&
       node.getAttribute(typeAttribute) == dataType;
 
+  @Deprecated(
+      'This is needed for OldVariable which is deprecated. Use Variable instead')
   bool _isGlobalMemoryVariableEntity(XmlNode node) =>
       node is XmlElement &&
       node.name.local == entity &&
@@ -76,6 +87,28 @@ class ProjectIndexXml extends ArchiveXml {
       node.getAttribute(subTypeAttribute) == 'MemoryVariables' &&
       node.getAttribute(nameAttribute) == 'Global Variables';
 
+  bool _isGlobalVariableEntity(XmlNode node) =>
+      node is XmlElement &&
+      node.name.local == entity &&
+      node.getAttribute(typeAttribute) == 'Variables' &&
+      node.getAttribute(subTypeAttribute) == 'Global' &&
+      node.getAttribute(nameAttribute) == 'Global Variables';
+
+  ArchiveFile globalVariableArchiveFile() {
+    List<XmlNode> entities = _findGlobalVariableEntities();
+    if (entities.length != 1) {
+      throw Exception('Expected only one reference to the variables');
+    }
+    var variableDataFileId = entities.first.getAttribute(idAttribute)!;
+    var variableDataFile = _findArchiveFile(variableDataFileId);
+    if (variableDataFile == null) {
+      throw Exception('Could not find file: $variableDataFileId');
+    }
+    return variableDataFile;
+  }
+
+  @Deprecated(
+      'This is needed for OldVariable which is deprecated. Use Variable instead')
   List<GlobalVariableArchiveXmlFile> globalVariableArchiveXmlFiles(
       DataTypeTree dataTypeTree) {
     List<XmlNode> entities = _findGlobalMemoryVariableEntities();
@@ -87,23 +120,24 @@ class ProjectIndexXml extends ArchiveXml {
         String nameSpacePath =
             dataTypeEntity.getAttribute(nameSpaceAttribute) ?? '';
         var archiveFile = _findArchiveFile(id);
-        var variableXmlArchiveFile =
-            GlobalVariableArchiveXmlFile.fromArchiveFile(
-                dataTypeTree: dataTypeTree,
-                nameSpacePath: nameSpacePath,
-                archiveFile: archiveFile);
-        variableArchiveXmlFiles.add(variableXmlArchiveFile);
-      } on Error {
+        if (archiveFile != null) {
+          var variableXmlArchiveFile =
+              GlobalVariableArchiveXmlFile.fromArchiveFile(
+                  dataTypeTree: dataTypeTree,
+                  nameSpacePath: nameSpacePath,
+                  archiveFile: archiveFile);
+          variableArchiveXmlFiles.add(variableXmlArchiveFile);
+        }
+      } catch (e) {
         // Not found: no problem, try next
       }
     }
     return variableArchiveXmlFiles;
   }
 
-  /// throws error when not found
-  ArchiveFile _findArchiveFile(String id) {
+  ArchiveFile? _findArchiveFile(String id) {
     String xmlFileName = '$id.xml';
-    return archive.firstWhere(
+    return archive.firstWhereOrNull(
         (ArchiveFile archiveFile) => archiveFile.name.endsWith(xmlFileName));
   }
 }

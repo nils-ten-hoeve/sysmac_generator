@@ -17,6 +17,7 @@ class NameSpace extends DataTypeBase {
   NameSpace(super.name, [super.comment]);
 }
 
+/// A [DataType] is a custom data type that is made of [BaseType]s
 class DataType extends DataTypeBase {
   // DataType? parent;
   BaseType baseType;

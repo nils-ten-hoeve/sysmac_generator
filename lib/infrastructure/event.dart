@@ -12,7 +12,6 @@ import 'package:sysmac_generator/domain/event/parser/event_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/panel_nr_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/priority_parser.dart';
 import 'package:sysmac_generator/domain/event/parser/site_nr_parser.dart';
-import 'package:sysmac_generator/domain/event/parser/solution_parser.dart';
 import 'package:sysmac_generator/domain/sysmac_project.dart';
 import 'package:sysmac_generator/util/sentence.dart';
 
@@ -38,7 +37,7 @@ class EventGroupFactory {
   EventGroupFactory(this.eventService);
 
   List<EventGroup> create() {
-    List<Event> allEvents = [];
+    List<EventOld> allEvents = [];
     for (var eventGlobalVariable in eventService.eventGlobalVariables) {
       allEvents.addAll(EventFactory(this, eventGlobalVariable).createAll());
     }
@@ -141,8 +140,8 @@ class EventFactory {
   EventCounter get eventCounter => eventGroupFactory.eventCounter;
 
   /// Recursively creates all events of a eventGlobalNode.
-  List<Event> createAll() {
-    List<Event> events = [];
+  List<EventOld> createAll() {
+    List<EventOld> events = [];
 
     arrayValues = ArrayValues(eventGlobalNode);
     _initListeners();
@@ -161,21 +160,23 @@ class EventFactory {
     return events;
   }
 
-  Event _createEvent() {
+  EventOld _createEvent() {
     var groupName1 = _groupName();
     var groupName2 = _groupName2(groupName1);
     var priority = _priority();
-    var componentCode = _componentCode();
+    // var componentCode = _componentCode();
     var message = _message();
-    Event event = Event(
+    EventOld event = EventOld(
       groupName1: groupName1,
       groupName2: groupName2,
       id: eventCounter.next,
-      componentCode: componentCode == null ? '' : componentCode.toCode(),
+      componentCode: '',
+
+      ///componentCode == null ? '' : componentCode.toCode(),
       expression: _expression,
       priority: priority,
       message: message,
-      solution: _findSolution(componentCode),
+      // solution: _findSolution(componentCode),
       acknowledge: _acknowledge(priority),
     );
     return event;
@@ -207,22 +208,22 @@ class EventFactory {
     return Sentence.normalize(comments);
   }
 
-  ComponentCode? _componentCode() {
-    var componentCodeTag = _findComponentCodeTag(eventPath);
+  // ComponentCode? _componentCode() {
+  //   var componentCodeTag = _findComponentCodeTag(eventPath);
 
-    if (componentCodeTag == null) {
-      return null;
-    } else {
-      return ComponentCode(
-        site: Site(_siteNumberTag.number),
-        electricPanel: ElectricPanel(
-            number: _panelNumberTag.number, name: electricPanel.name),
-        pageNumber: componentCodeTag.pageNumber,
-        letters: componentCodeTag.letters,
-        columnNumber: componentCodeTag.columnNumber,
-      );
-    }
-  }
+  //   if (componentCodeTag == null) {
+  //     return null;
+  //   } else {
+  //     return ComponentCode(
+  //       site: Site(_siteNumberTag.number),
+  //       electricPanel: ElectricPanel(
+  //           number: _panelNumberTag.number, name: electricPanel.name),
+  //       pageNumber: componentCodeTag.pageNumber,
+  //       letters: componentCodeTag.letters,
+  //       columnNumber: componentCodeTag.columnNumber,
+  //     );
+  //   }
+  // }
 
   PanelNumberTag get _panelNumberTag =>
       parsedComments.whereType<PanelNumberTag>().last;
@@ -230,7 +231,7 @@ class EventFactory {
   SiteNumberTag get _siteNumberTag =>
       parsedComments.whereType<SiteNumberTag>().last;
 
-  EventPriority _priority() {
+  EventPriorityOld _priority() {
     var priorityTags = parsedComments.whereType<PriorityTag>();
     if (priorityTags.isEmpty) {
       return EventPriorities.medium;
@@ -239,7 +240,7 @@ class EventFactory {
     }
   }
 
-  bool _acknowledge(EventPriority priority) {
+  bool _acknowledge(EventPriorityOld priority) {
     var acknowledgeTags = parsedComments.whereType<AcknowledgeTag>();
     if (acknowledgeTags.isEmpty) {
       return priority != EventPriorities.info;
@@ -257,17 +258,17 @@ class EventFactory {
     }
   }
 
-  String _findSolution(ComponentCode? componentCode) {
-    var solutionTexts = parsedComments
-        .whereType<SolutionTag>()
-        .map((solutionTag) => solutionTag.solution)
-        .toList();
-    if (componentCode != null) {
-      solutionTexts.add(
-          'See component ${componentCode.toCode()} on electric diagram ${componentCode.site.code}.${componentCode.electricPanel.code} on page ${componentCode.pageNumber} at column ${componentCode.columnNumber}.');
-    }
-    return solutionTexts.join(' ');
-  }
+  // String _findSolution(ComponentCode? componentCode) {
+  //   var solutionTexts = parsedComments
+  //       .whereType<SolutionTag>()
+  //       .map((solutionTag) => solutionTag.solution)
+  //       .toList();
+  //   if (componentCode != null) {
+  //     solutionTexts.add(
+  //         'See component ${componentCode.toCode()} on electric diagram ${componentCode.site.code}.${componentCode.electricPanel.code} on page ${componentCode.pageNumber} at column ${componentCode.columnNumber}.');
+  //   }
+  //   return solutionTexts.join(' ');
+  // }
 
   String _groupName() {
     var fullName = _createEventGroupName();

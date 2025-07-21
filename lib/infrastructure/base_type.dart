@@ -7,10 +7,24 @@ import '../domain/data_type.dart';
 class BaseTypeFactory {
   BaseTypeSubFactories baseTypeSubFactories = BaseTypeSubFactories();
 
-  BaseType createFromExpression(String expression) {
+  BaseType createFromExpression(String typeExpression) {
     var factory = baseTypeSubFactories
-        .firstWhere((factory) => factory.regex.hasMatch(expression));
-    return factory.create(expression);
+        .firstWhere((factory) => factory.regex.hasMatch(typeExpression));
+    return factory.create(typeExpression);
+  }
+
+  BaseType createFromExpressionIncludingCustomTypes(
+      String typeExpression, DataTypeTree dataTypeTree) {
+    var baseType = createFromExpression(typeExpression);
+    if (baseType is UnknownBaseType) {
+      var dataType = dataTypeTree.findNamePathString(typeExpression);
+      if (dataType != null) {
+        return DataTypeReference(
+            dataType: dataType as DataType, arrayRanges: baseType.arrayRanges);
+      }
+      //Note that the baseType could still be UnknownBaseType
+    }
+    return baseType;
   }
 }
 
@@ -25,7 +39,7 @@ class BaseTypeSubFactories extends DelegatingList<BaseTypeSubFactory> {
       : super([
           ArrayFactory(),
           StructFactory(),
-          EnumFactory(),
+          EnumParentFactory(),
           ...NxTypeFactories(),
           ...VbTypeFactories(),
           UnknownBaseTypeFactory(),
@@ -52,16 +66,15 @@ class StructFactory extends BaseTypeSubFactory {
   BaseType create(String expression) => _struct;
 }
 
-class EnumFactory extends BaseTypeSubFactory {
-  final Enum _enum = Enum();
-  final RegExp _regex =
-      FluentRegex().startOfLine().literal('$Enum'.toUpperCase()).endOfLine();
+class EnumParentFactory extends BaseTypeSubFactory {
+  static final _enumParent = EnumParent();
+  final RegExp _regex = FluentRegex().startOfLine().literal('ENUM').endOfLine();
 
   @override
   RegExp get regex => _regex;
 
   @override
-  BaseType create(String expression) => _enum;
+  BaseType create(String expression) => _enumParent;
 }
 
 class NxTypeFactory extends BaseTypeSubFactory {
@@ -70,6 +83,19 @@ class NxTypeFactory extends BaseTypeSubFactory {
 
   NxTypeFactory(this._nxType)
       : _regex = FluentRegex().startOfLine().literal(_nxType.name).endOfLine();
+
+  /// e.g. STRING[123]
+  NxTypeFactory.withOptionalLength(this._nxType)
+      : _regex = FluentRegex()
+            .startOfLine()
+            .literal(_nxType.name)
+            .group(
+                FluentRegex()
+                    .literal('[')
+                    .digit(Quantity.oneOrMoreTimes())
+                    .literal(']'),
+                quantity: Quantity.zeroOrOneTime())
+            .endOfLine();
 
   @override
   NxType create(String expression) => _nxType;
@@ -93,13 +119,13 @@ class NxTypeFactories extends DelegatingList<NxTypeFactory> {
           NxTypeFactory(NxReal()),
           NxTypeFactory(NxLReal()),
           NxTypeFactory(NxBool()),
-          NxTypeFactory(NxString()),
+          NxTypeFactory.withOptionalLength(NxString()),
           NxTypeFactory(NxSInt()),
           NxTypeFactory(NxUSInt()),
           NxTypeFactory(NxByte()),
           NxTypeFactory(NxTime()),
           NxTypeFactory(NxDate()),
-          NxTypeFactory(NxDateAndType()),
+          NxTypeFactory(NxDateAndTime()),
           NxTypeFactory(NxTimeOfDay()),
         ]);
 }
@@ -110,6 +136,18 @@ class VbTypeFactory extends BaseTypeSubFactory {
 
   VbTypeFactory(this._vbType)
       : _regex = FluentRegex().startOfLine().literal(_vbType.name).endOfLine();
+
+  VbTypeFactory.withOptionalLength(this._vbType)
+      : _regex = FluentRegex()
+            .startOfLine()
+            .literal(_vbType.name)
+            .group(
+                FluentRegex()
+                    .literal('[')
+                    .digit(Quantity.oneOrMoreTimes())
+                    .literal(']'),
+                quantity: Quantity.zeroOrOneTime())
+            .endOfLine();
 
   @override
   VbType create(String expression) => _vbType;
@@ -131,7 +169,7 @@ class VbTypeFactories extends DelegatingList<VbTypeFactory> {
           VbTypeFactory(VbDouble()),
           VbTypeFactory(VbDecimal()),
           VbTypeFactory(VbBoolean()),
-          VbTypeFactory(VbString()),
+          VbTypeFactory.withOptionalLength(VbString()),
           VbTypeFactory(VbChar()),
           VbTypeFactory(VbSByte()),
           VbTypeFactory(VbByte()),
@@ -147,35 +185,52 @@ class ArrayFactory extends BaseTypeSubFactory {
       .startOfLine()
       .literal('ARRAY')
       .literal('[')
-      .group(ArrayRange.regex,
-          type: GroupType.captureNamed(rangeName),
-          quantity: Quantity.oneOrMoreTimes())
-      .literal('] OF ')
       .group(
-          FluentRegex().characterSet(
-              CharacterSet().addLetters(CaseType.lowerAndUpper),
-              Quantity.oneOrMoreTimes()),
-          type: GroupType.captureNamed(typeName));
+        ArrayRange.regex,
+        type: GroupType.captureNamed(rangeName),
+        quantity: Quantity.oneOrMoreTimes(),
+      )
+      .literal(']')
+      .group(
+        FluentRegex().literal(' OF ').group(
+              FluentRegex().letter(quantity: Quantity.oneTime()).characterSet(
+                    CharacterSet().addLetters().addLiterals('\\'),
+                    Quantity.oneOrMoreTimes(),
+                  ),
+              type: GroupType.captureNamed(typeName),
+            ),
+        quantity:
+            Quantity.zeroOrOneTime(), // Makes the " OF <type>" part optional
+      )
+      .endOfLine();
 
   @override
   BaseType create(String expression) {
     var baseType = _createBaseType(expression);
     var arrayRanges = _createArrayRanges(expression);
+    baseType.arrayRanges.clear();
     baseType.arrayRanges.addAll(arrayRanges);
     return baseType;
   }
 
   BaseType _createBaseType(String expression) {
-    var typeExpression = _regex.firstMatch(expression)!.namedGroup(typeName)!;
+    var typeExpression = _regex.firstMatch(expression)!.namedGroup(typeName);
+    if (typeExpression == null) {
+      /// if nothing is specified, lets assume it is an array of bool
+      return NxBool();
+    }
+
     return BaseTypeFactory().createFromExpression(typeExpression);
   }
 
   List<ArrayRange> _createArrayRanges(String expression) {
     var rangeExpressions = ArrayRange.regex.allMatches(expression);
-    return rangeExpressions
+
+    var ranges = rangeExpressions
         .map(
             (match) => ArrayRange(expression.substring(match.start, match.end)))
         .toList();
+    return ranges;
   }
 
   @override
@@ -190,26 +245,14 @@ class DataTypeReferenceFactory {
       var baseType = child.baseType;
       if (baseType is UnknownBaseType) {
         var dataTypeReference =
-            createFromUnknownDataType(dataTypeTree, baseType);
-        if (dataTypeReference != null) {
-          child.baseType = dataTypeReference;
-        }
+            _baseTypeFactory.createFromExpressionIncludingCustomTypes(
+                baseType.expression, dataTypeTree);
+        dataTypeReference.arrayRanges.clear();
+        dataTypeReference.arrayRanges.addAll(baseType.arrayRanges);
+        child.baseType = dataTypeReference;
       }
     }
   }
 
-  DataTypeReference? createFromUnknownDataType(
-      DataTypeTree dataTypeTree, UnknownBaseType baseType) {
-    String path = baseType.expression;
-    var referencedDataType = dataTypeTree.findNamePathString(path);
-    if (referencedDataType != null && referencedDataType is DataType) {
-      var arrayRanges = baseType.arrayRanges;
-      return DataTypeReference(
-        dataType: referencedDataType,
-        arrayRanges: arrayRanges,
-      );
-    } else {
-      return null;
-    }
-  }
+  final _baseTypeFactory = BaseTypeFactory();
 }

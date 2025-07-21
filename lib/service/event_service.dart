@@ -1,9 +1,13 @@
+import 'package:collection/collection.dart';
 import 'package:sysmac_generator/domain/event/event.dart';
+import 'package:sysmac_generator/domain/sysmac_project.dart';
+import 'package:sysmac_generator/infrastructure/variable.dart';
 
 import '../infrastructure/sysmac_project.dart';
 
 /// Generates event documents from a [SysmacProjectFile]
-class EventService {
+@Deprecated('Old strategy! Now see ')
+class EventServiceOld {
   /// # Why events must be generated
   /// The goal is to always generate all the events from a [SysmacProjectFile],
   /// while not making any manual changes afterwards so that:
@@ -13,7 +17,7 @@ class EventService {
   ///
   /// # How events are generated
   /// The [SysmacGenerator] will read a folder containing [SysmacProjectFile]s
-  /// (of just a single [SysmacProjectFile]) and parse the [Event]s.
+  /// (of just a single [SysmacProjectFile]) and parse the [EventOld]s.
   ///
   /// It will then generate generate output files using [TemplateFile]s and [TemplateTag]s.
   /// These generated files can than be used to be imported into
@@ -44,9 +48,27 @@ class EventService {
   // Open the SysmacProject file and delete all alarms in the HMI, when all
   // UserAlarm texts in the M$ Excel file are correct. Now the new UserAlarms
   // can be inserted by importing the M$ Excel file.
+
   void generateForSysmacHmi(String sysmacProjectFilePath) {
     var sysmacProject = SysmacProjectFactory().create(sysmacProjectFilePath);
     //var eventGroups=
     sysmacProject.eventService.eventGroups;
   }
+}
+
+const String eventGlobalVariableName = 'EventGlobal';
+List<Event> createEvents(
+    SysmacProject sysmacProject, List<Variable> variables) {
+  var variables = sysmacProject.globalVariableService.variables;
+
+  var eventGlobal =
+      variables.firstWhereOrNull((v) => v.name == eventGlobalVariableName);
+  if (eventGlobal == null) {
+    throw Exception(
+        'Expected ${sysmacProject.archive.file.path} to have 1 global variable of name "$eventGlobalVariableName"');
+  }
+  var eventRootNode = EventNode.fromVariable(eventGlobal);
+  var counter = Counter();
+  var events = eventRootNode.createEvents(counter);
+  return events;
 }

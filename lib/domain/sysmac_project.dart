@@ -1,5 +1,6 @@
 import 'package:recase/recase.dart';
 import 'package:sysmac_generator/infrastructure/event.dart';
+import 'package:sysmac_generator/infrastructure/sysmac_project.dart';
 
 import '../infrastructure/variable.dart';
 import 'data_type.dart';
@@ -8,6 +9,7 @@ import 'node.dart';
 /// Represents a physical Sysmac project file,
 /// which is actually a zip [Archive] containing [ArchiveFile]s
 class SysmacProject {
+  final SysmacProjectArchive archive;
   final Site site;
   final ElectricPanel electricPanel;
   final SysmacProjectVersion sysmacProjectVersion;
@@ -17,7 +19,8 @@ class SysmacProject {
   final EventService eventService;
 
   SysmacProject(
-      {required this.site,
+      {required this.archive,
+      required this.site,
       required this.electricPanel,
       required this.sysmacProjectVersion,
       required this.dataTypeTree,

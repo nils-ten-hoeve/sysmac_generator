@@ -21,7 +21,7 @@ import 'generic_parsers.dart';
 ///   * [prio=medium high]
 ///   * [priority=MediumHigh]
 class PriorityTag extends EventTag {
-  final EventPriority priority;
+  final EventPriorityOld priority;
 
   PriorityTag(this.priority);
 
@@ -56,8 +56,8 @@ class PriorityValueParser extends EventTagParser {
     return ChoiceParser(parsers);
   }
 
-  static Map<String, EventPriority> _createValues() {
-    Map<String, EventPriority> values = {};
+  static Map<String, EventPriorityOld> _createValues() {
+    Map<String, EventPriorityOld> values = {};
     for (var priority in EventPriorities()) {
       values[priority.abbreviation] = priority;
       values[priority.name] = priority;
@@ -66,7 +66,8 @@ class PriorityValueParser extends EventTagParser {
     return values;
   }
 
-  static List<String> _longToShortValueKeys(Map<String, EventPriority> values) {
+  static List<String> _longToShortValueKeys(
+      Map<String, EventPriorityOld> values) {
     var keys = values.keys.toList();
     keys.sort((text1, text2) => text1.length.compareTo(text2.length) * -1);
     return keys;

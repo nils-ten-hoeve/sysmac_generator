@@ -9,6 +9,7 @@ import 'sysmac_project.dart';
 const String nameAttribute = 'Name';
 const String baseTypeAttribute = 'BaseType';
 const String commentAttribute = 'Comment';
+const String enumValueAttribute = 'EnumValue';
 
 const String nameSpacePathSeparator = '\\';
 
@@ -85,12 +86,16 @@ class DataTypeArchiveXmlFile extends ArchiveXml {
         .toList();
   }
 
+  final _baseTypeFactory = BaseTypeFactory();
+
   DataType _createDataType(XmlNode dataTypeElement) {
     String name = dataTypeElement.getAttribute(nameAttribute)!;
     String baseTypeExpression =
         dataTypeElement.getAttribute(baseTypeAttribute)!;
-    BaseType baseType =
-        BaseTypeFactory().createFromExpression(baseTypeExpression);
+    String? enumValue = dataTypeElement.getAttribute(enumValueAttribute);
+    BaseType baseType = enumValue == null || enumValue.isEmpty
+        ? _baseTypeFactory.createFromExpression(baseTypeExpression)
+        : EnumChild(int.parse(enumValue));
     String comment = dataTypeElement.getAttribute(commentAttribute)!;
     var dataType = DataType(
       name: name,

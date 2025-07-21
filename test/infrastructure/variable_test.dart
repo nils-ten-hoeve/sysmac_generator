@@ -14,7 +14,7 @@ void main() {
 
   group('class: $GlobalVariableService', () {
     group('field: globalVariables', () {
-      var results = variableService.variables;
+      var results = variableService.variablesOld;
       test('variables isNot Empty', () {
         expect(results, isNotEmpty);
       });

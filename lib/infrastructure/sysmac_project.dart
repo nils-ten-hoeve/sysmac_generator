@@ -48,6 +48,7 @@ class SysmacProjectFactory {
           globalVariableService.findVariablesWithEventGlobalName(),
     );
     return SysmacProject(
+      archive: sysmacProjectArchive,
       site: site,
       electricPanel: electricPanel,
       sysmacProjectVersion: sysmacProjectVersion,
@@ -124,12 +125,12 @@ var _fileNameParser = _pathParser &
 /// which is actually a zip [Archive] containing [ArchiveFile]s
 class SysmacProjectArchive {
   static String extension = 'smc2';
-
+  late final File file;
   late ProjectIndexXml projectIndexXml;
 
   SysmacProjectArchive(String sysmacProjectFilePath) {
     _validateNotEmpty(sysmacProjectFilePath);
-    final file = File(sysmacProjectFilePath);
+    file = File(sysmacProjectFilePath);
     _validateExtension(file);
     _validateExists(file);
     Archive archive = readArchive(file);
